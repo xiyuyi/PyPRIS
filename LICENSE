@@ -11,9 +11,12 @@ furnished to do so, subject to the following conditions:
 
     The asociated publication (listed bellow) being cited and credited.
     
-      Xiyu Yi, Rafael Piestun, Shimon Weiss; "3D super-resolution imaging using a generalized and scalable progressive refinement method on sparse recovery (PRIS)", SPIE BiOS 2019.
-
-    Author information (name, email address) shall remain the same in the assocaited script files and packages when used in other packages.
+      Xiyu Yi, Rafael Piestun, Shimon Weiss; "3D super-resolution imaging using 
+      a generalized and scalable progressive refinement method on sparse 
+      recovery (PRIS)", SPIE BiOS 2019.
+      
+    Author information (name, email address) shall remain the same in the 
+    assocaited script files and packages when used in other packages.
       Authors: Xiyu Yi, email address: xiyu.yi@gmail.com
                Xingjia Wang, email address: xingjia.wang9805@gmail.com
                
