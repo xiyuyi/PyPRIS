@@ -1,4 +1,6 @@
 import numpy as np
+import torch
+
 
 class PRIS:
     """
@@ -8,12 +10,12 @@ class PRIS:
         self.type = 'PRIS solver'
         self.refinement_number = 5  # default total number of refinement
         self.refinement_factor_list = [1, 2, 2, 2, 2]  # default list of refinement factors
-        self.lasso_solver = 'lbreg'  # default choice of lasso solver. Only available one currently.
+        self.sparse_solver = 'lbreg'  # default choice of lasso solver. Only available one currently.
         self.dual_channel = 'Yes'  # default setting of the number of observation channels.
-        self.A = []
-        self.b = []
+        self.A = []  # sensing matrix
+        self.b = []  # observation
         self.x = torch.empty(1, 1, dtype=torch.float)
-        self.lbreg_opts = []
+        self.sparse_recovery_opts = []
         self.current_pris_iteration = 0
 
     def set_pris_options(self, pris_options):
@@ -33,18 +35,21 @@ class PRIS:
         self.A = A
         self.b = b
         self.x = np.ndarray()
-        self.lbreg_opts = lbreg_opts
+        self.sparse_recovery_opts = sparse_recovery_opts
 
-    def prepare_next_iteration(self, pris_options, psf_model, coordinates_refiner):
+    def pris_refine(self, pris_options, psf_model, coordinates_refiner):
         # based on the iteration number, do the following:
-        # update location coordinates candidate voxels.
-        coordinates_refiner(self, pris_options)
+        # identify the selected voxels
+        select(self, pris_options)
+        # refine the selected candidate voxels.
+        refiner(self, pris_options)
         # update A using all the candidate voxels, and PSF model.
         self.A = psf_model(self)
 
-    def pris_go(self, lasso_solver):
+    def pris_go(self, sparse_recovery_solver):
+        # based on the refined sensing matrix, perform sparse-recovery
         self.current_pris_iteration = self.current_pris_iteration + 1  # Pris iteration number tag increase by one.
-        self.x = lasso_solver(self.A, self.b)
+        self.x = sparse_recovery_solver(self.A, self.b)
 
 
 class PrisOpts:
