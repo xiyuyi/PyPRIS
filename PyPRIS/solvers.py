@@ -1,7 +1,5 @@
 import numpy as np
 
-
-
 class PRIS:
     """
 
@@ -31,7 +29,7 @@ class PRIS:
         self.lasso_solver = pris_options.lasso_solver  # choice of lasso solver. Only available one currently.
         self.dual_channel = pris_options.dual_channel
 
-    def set_lbreg_options(self, A, b, lbreg_opts):
+    def set_sparse_recovery_options(self, A, b, sparse_recovery_opts):
         self.A = A
         self.b = b
         self.x = np.ndarray()
@@ -49,7 +47,7 @@ class PRIS:
         self.x = lasso_solver(self.A, self.b)
 
 
-class ParaOptsPris:
+class PrisOpts:
     """
     I want to force objects of this class to have fixed number of attributes.
 

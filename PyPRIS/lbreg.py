@@ -1,6 +1,6 @@
 import numpy as np
 
-class LassoSolverLbreg:
+class LbregSolver:
     """ linearized bregman iteration.
 
             Keyword arguments:
@@ -9,7 +9,7 @@ class LassoSolverLbreg:
             lbreg_opts -- options and parameters for the linearized bregman iteration.
     """
     def __init__(self, A, b, lbreg_opts):
-        self.type = 'LASSO Solver'
+        self.type = 'sparse recovery solver'
         self.kick_switch = lbreg_opts.kick_switch
         self.A = A
         self.b = b
@@ -28,7 +28,7 @@ class LassoSolverLbreg:
         :return: updated u
         """
 
-class ParaOptsLbreg:
+class LbregOpts:
     def __init__(self):
-        self.type = 'Options'
+        self.type = 'options for linearized bregman iteration'
 

@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='PyPRIS',
-      version='0.1',
+      version='1',
       description='performing 3D super-resolution reconstruction using progressive '
                   'refinement method for sparse recovery',
       url='[to be added]',
