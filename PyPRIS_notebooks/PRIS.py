@@ -137,7 +137,7 @@ class SingleObs:
             self.obswbox[loc1sta : loc1end,     loc2sta] = c
             self.obswbox[loc1sta : loc1end, loc2end - 1] = c
             
-class PyPRIS():
+class PyPRIS:
     def __init__(self):
         self.name = 'PRIS object'
         self.A = np.ndarray(0) # sensing matrix
@@ -145,5 +145,34 @@ class PyPRIS():
         self.candidate_coordinates = list() # coordinates of candidates
         self.candidate_3D_space_Ranges = dict() # the range of the coordinates of candidates
         self.blur = np.ndarray() # observation
+        self.positivity = True # positivity constraint
         
+class LinBreg:
+    def __init__(self, A, x, b):
+        self.A = A # sensing matrix.
+        self.x = x # coefficient vector for the pool of candidates.
+        self.b = b # observation vector.
+        self.mu = np.mean(self.x.ravel())  # shrinkage threshold.
+        self.cumber = np.zeros(self.x.shape)
+        self.flag_stop = False # flag to stop optimization iteration
+        self.opts = False # debug flag
+        self.opts = False # debug flag
+        self.maxit = 100 # maximum iteration steps
+        self.stepsize = 10 # step size
         
+    def shrink(x,mu):
+        x[np.where(x > mu)] -= mu
+        x[np.where(x < -mu)] += mu
+
+    def go(self):
+        it_count = 0
+        while self.stop is False:
+            er = self.b - np.dot(self.A, self.x)
+            erpj = np.dot(er, self.A)
+            self.cumber += erpj
+            if self.positivity is True: cumber[np.find(cumber<0)]=0
+            self.x = self.stepsize * self.shrink(cumber, self.mu)
+            it_count += 1
+            # determin stop or not
+            if it_count > self.maxit: self.flag_stop = True
+            
