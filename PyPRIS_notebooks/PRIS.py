@@ -233,7 +233,7 @@ class LinBreg:
         # and split domains in a binary way.
         i0 = np.where(self.x == 0) # zero entries on x [x entries where there kicking is in demand]
         i1 = np.where(self.x != 0) # none zero entries in x. [x entries where there is a value, no need for kicking]
-        si = (self.mu *np.sign(self.erpj[i0]) - self.x[i0]) / self.erpj[i0] # stepsie for entries that needs kicking
+        si = (self.mu *np.sign(self.erpj[i0]) - self.cumerr[i0]) / self.erpj[i0] # stepsie for entries that needs kicking
         self.stepsize[i0] = np.min(si)  
         self.stepsize[i1] = 1
 
@@ -243,7 +243,7 @@ class LinBreg:
 
         # update kicking_reference for follow-up kicking evaluation
         self.kicking_reference = copy.deepcopy(self.x)
-
+        
     def go(self):
         t1 = time.time()
         it_count = 0
@@ -275,22 +275,28 @@ class LinBreg:
             # distribution of stepsizes (self.stepsize). 
             if np.remainder(it_count, self.kicking_ints) == 0:
                 self.kicking_evaluation(it_count)
+                if self.deep_debug is True: self.debug_output(it_count, appstr = '_c1_kicking_evaluated')
                 # kick if we get a positive kicking ealuation.
                 if self.kicking_flag is True: self.kicking_go()
-                    
+                else: self.stepsize = 1 # [Note: this step involves some redundancy] 
+                      
+                if self.deep_debug is True: self.debug_output(it_count, appstr = '_c2_kicking_updated')
+                   
             # get the acumulation of the back projected error.
             self.cumerr += self.erpj * self.stepsize
-            if self.deep_debug is True: self.debug_output(it_count, appstr = '_c_cumerr_updated')
+            if self.deep_debug is True: self.debug_output(it_count, appstr = '_d_cumerr_updated')
+            
+
             
             # perform positivity constraint:
             if self.flag_positivity is True: self.cumerr[np.where(self.cumerr < 0)] = 0
-            if self.deep_debug is True: self.debug_output(it_count, appstr = '_d_positivity_updated')
+            if self.deep_debug is True: self.debug_output(it_count, appstr = '_e_positivity_updated')
 
             # shrinkage to update the candidate coefficients.
             self.x = copy.deepcopy(self.cumerr)
-            if self.deep_debug is True: self.debug_output(it_count, appstr = '_e_x_copied')
+            if self.deep_debug is True: self.debug_output(it_count, appstr = '_f_x_copied')
             self.x = self.alpha * self.shrink(self.x)   
-            if self.deep_debug is True: self.debug_output(it_count, appstr = '_f_x_updated')
+            if self.deep_debug is True: self.debug_output(it_count, appstr = '_g_x_updated')
             
             # decide on the termination of iterations.
             if it_count > self.maxit: self.flag_stop = True
@@ -299,7 +305,7 @@ class LinBreg:
             self.track_status(it_count, self.er)
             
             # check intermediate outputs. (Valid under debug mode).
-            self.debug_output(it_count, appstr = '_g_track_status_updated')
+            self.debug_output(it_count, appstr = '_h_track_status_updated')
 
     # Generate intermediate output under debug mode.
     def debug_output(self, it_count, appstr):
@@ -307,9 +313,9 @@ class LinBreg:
             if np.remainder(it_count, self.debug_it_int) == self.it_check_rem:
                 print('intermediate output it#'+ str(it_count))
                 temp = np.mean(self.x[0:self.x.size-1].reshape(self.range_ind0.size,self.range_ind1.size,self.range_ind2.size),axis=0)
-                nrow = 3
-                ncol = 4
-                plt.figure(figsize=(11,7))
+                nrow = 4
+                ncol = 5
+                plt.figure(figsize=(13,8))
                 plt.subplot(nrow, ncol, 1)
                 plt.imshow(temp)
                 t = plt.title('XY-plane projection')
@@ -326,10 +332,9 @@ class LinBreg:
                 t.set_position([.5, 1.15])
 
                 plt.subplot(nrow, ncol, 4)
-                plt.text(0,0.8,'mu: '+str(np.floor(self.mu)),fontsize=16)
-                plt.text(0,0.6,'stepsize: '+str(np.floor(self.stepsize)),fontsize=16)
-                
-                plt.axis('off')
+                plt.plot(self.recb.ravel(), '.')
+                t = plt.title('recovered obsrvation plot')
+                t.set_position([.5, 1.15])
 
                 plt.subplot(nrow, ncol, 5)
                 plt.plot(self.iterations, self.bg, '.')
@@ -363,10 +368,16 @@ class LinBreg:
                 t.set_position([.5, 1.15])
 
                 plt.subplot(nrow, ncol, 11)
-                plt.plot(self.recb.ravel(), '.')
-                t = plt.title('recovered obsrvation plot')
+                plt.plot(self.stepsize.ravel(), '.')
+                t = plt.title('stepsize distribution')
                 t.set_position([.5, 1.15])
 
+                plt.subplot(nrow, ncol, 16)
+                plt.text(0,0.8,'mu: '+str(np.floor(self.mu)),fontsize=16)
+                plt.text(0,0.6,'stepsize: '+str(np.floor(self.stepsize)),fontsize=16)
+                plt.text(0,0.3,'current kicking flag is: '+str(self.kicking_flag),fontsize=16)
+                plt.axis('off')
+                
                 plt.tight_layout(rect=[0, 0.04, 1, 0.9])
                 plt.subplots_adjust(top=0.85, left = 0.1)
                 plt.savefig('../../PyPRIS_Scratch/debug_output/plots_it' + str(it_count) + appstr +'.png', dpi=300, figsize=(100,80))
