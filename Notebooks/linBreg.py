@@ -22,7 +22,7 @@ def ifcont(res, crit):
 
 # Implementation of Bregman Iteration
 
-def linbreg(im, sensmx, threshold=800, stepsize=1e-5, d=0.000012, minstep = 1000, maxstep = 1e6, crit = 1e-8, dim = 2, plot = True):
+def linbreg(im, sensmx, threshold=800, stepsize=1e-5, d=0.000012, minstep = 1000, maxstep = 1e6, crit = 1e-8, kicking = False, dim = 2, plot = True):
     f = im
     
     A = sensmx
@@ -33,7 +33,9 @@ def linbreg(im, sensmx, threshold=800, stepsize=1e-5, d=0.000012, minstep = 1000
     
     u = np.zeros(n)
     v = np.zeros(n)
+    u_0 = np.zeros(n)
 
+    
     delta = abs(2 / np.linalg.norm(np.dot(A, A_t)) - d)
     mu = threshold  # shrink threshold
     step_size = mu * stepsize
@@ -43,10 +45,26 @@ def linbreg(im, sensmx, threshold=800, stepsize=1e-5, d=0.000012, minstep = 1000
     while (count < minstep or ifcont(res, crit)):
         count += 1
         if count % 1e4 == 0: print(count)
+            
         res = np.append(res, np.linalg.norm(np.dot(A, u) - f))
-        v += np.dot(A_t, f - np.dot(A, u)) * step_size
+                 
+        if (kicking == True):
+            if(u_0.all() != 0 and np.linalg.norm(u_0 - u) < d):
+                I_1 = u.nonzero()
+                I_0 = np.where(u == 0)
+                s = min(np.ceil((mu * np.sign(np.dot(A_t, (f - np.dot(A, u)))[I_0]) - v[I_0])/np.dot(A_t, (f - np.dot(A,u)))[I_0]))
+                v[I_0] += s * np.dot(A_t , (f - np.dot(A, u)))[I_0]
+        
+            else:
+                v += np.dot(A_t, f - np.dot(A, u)) * step_size
+         
+        else:
+            v += np.dot(A_t, f - np.dot(A, u)) * step_size
+            
         u = 1 * shrink(v, mu)
         u[np.where(u < 0)] = 0 #positivity constraint
+                   
+            
         if count >= maxstep: break
             
     if (plot):
