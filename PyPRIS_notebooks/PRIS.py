@@ -13,10 +13,12 @@ class SingleObs:
         self.subpixel_shift = False
         
     def single_obs(self):
-        # opts.psf   numpy.ndarray, 3D psf matrix, x-y should be odd numbers.  
-        # opts.location list, location coordinte for z-x-y
-        # opts.imsize list, x-y dimension of the observation image.
-        # opts.psfz0 list, with a single integer, 
+        """ 
+        opts.psf   numpy.ndarray, 3D psf matrix, x-y should be odd numbers.  
+        opts.location list, location coordinte for z-x-y
+        opts.imsize list, x-y dimension of the observation image.
+        opts.psfz0 list, with a single integer. 
+        """
 
         if self.debug is True:
             print('----------------- debug message -----------------')
@@ -136,6 +138,7 @@ class SingleObs:
             self.obswbox[loc1sta : loc1end,     loc2sta] = c
             self.obswbox[loc1sta : loc1end, loc2end - 1] = c
             
+        
 class PyPRIS:
     def __init__(self):
         self.name = 'PRIS object'
@@ -145,4 +148,5 @@ class PyPRIS:
         self.candidate_3D_space_Ranges = dict() # the range of the coordinates of candidates
         self.blur = np.ndarray() # observation
         self.positivity = True # positivity constraint
- 
+
+        
