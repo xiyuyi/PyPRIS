@@ -1,7 +1,12 @@
 import numpy as np
-import copy
 from scipy import interpolate
+import time
+import copy
+import PIL.Image as Image
+import libtiff
+from matplotlib import pyplot as plt
 
+import matplotlib
 class SingleObs:
     def __init__(self):
         self.psf = np.arange(1,31).reshape(2,3,5)
@@ -186,7 +191,11 @@ class LinBreg:
         self.hist_kicking_refnorm = list()
         self.hist_kicking_eval_counts = list()
         self.stepsize = np.ones(self.x.shape) # stepsize.     
-
+        self.range_ind0 = 3
+        self.range_ind1 = 3
+        self.range_ind2 = 3
+        
+        
     def getready(self):
         if self.debug is True:
             import os
@@ -206,8 +215,8 @@ class LinBreg:
         sk[np.where(sk < -self.mu)] += self.mu
         return sk
     
-    def kicking_evaluation(self):
-        self.kicking_refnorm = np.linalg.norm(self.x-self.kicking_reference)
+    def kicking_evaluation(self, it_count):
+        self.kicking_refnorm = np.linalg.norm(self.x - self.kicking_reference)
         if self.kicking_refnorm < self.kicking_thres:
             # flip the kicking flag to "True" with positive evaluation
             self.kicking_flag = True
@@ -265,7 +274,7 @@ class LinBreg:
             # In this implementation, the effect of kicking is realized throught a modified. 
             # distribution of stepsizes (self.stepsize). 
             if np.remainder(it_count, self.kicking_ints) == 0:
-                self.kicking_evaluation()
+                self.kicking_evaluation(it_count)
                 # kick if we get a positive kicking ealuation.
                 if self.kicking_flag is True: self.kicking_go()
                     
@@ -297,7 +306,7 @@ class LinBreg:
         if self.debug is True:
             if np.remainder(it_count, self.debug_it_int) == self.it_check_rem:
                 print('intermediate output it#'+ str(it_count))
-                temp = np.mean(self.x[0:self.x.size-1].reshape(range_ind0.size,range_ind1.size,range_ind2.size),axis=0)
+                temp = np.mean(self.x[0:self.x.size-1].reshape(self.range_ind0.size,self.range_ind1.size,self.range_ind2.size),axis=0)
                 nrow = 3
                 ncol = 4
                 plt.figure(figsize=(11,7))
