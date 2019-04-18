@@ -194,7 +194,8 @@ class LinBreg:
         self.range_ind0 = 3
         self.range_ind1 = 3
         self.range_ind2 = 3
-        
+        self.obs_dim0 = 0
+        self.obs_dim1 = 0
         
     def getready(self):
         if self.debug is True:
@@ -273,13 +274,12 @@ class LinBreg:
             # threshold.
             # In this implementation, the effect of kicking is realized throught a modified. 
             # distribution of stepsizes (self.stepsize). 
+            self.stepsize = np.ones(self.x.shape) # [Note: this step involves some redundancy] 
             if np.remainder(it_count, self.kicking_ints) == 0:
                 self.kicking_evaluation(it_count)
                 if self.deep_debug is True: self.debug_output(it_count, appstr = '_c1_kicking_evaluated')
                 # kick if we get a positive kicking ealuation.
                 if self.kicking_flag is True: self.kicking_go()
-                else: self.stepsize = 1 # [Note: this step involves some redundancy] 
-                      
                 if self.deep_debug is True: self.debug_output(it_count, appstr = '_c2_kicking_updated')
                    
             # get the acumulation of the back projected error.
@@ -289,7 +289,7 @@ class LinBreg:
 
             
             # perform positivity constraint:
-            if self.flag_positivity is True: self.cumerr[np.where(self.cumerr < 0)] = 0
+            if self.flag_positivity is True: self.x[np.where(self.x < 0)] = 0
             if self.deep_debug is True: self.debug_output(it_count, appstr = '_e_positivity_updated')
 
             # shrinkage to update the candidate coefficients.
@@ -320,15 +320,15 @@ class LinBreg:
                 plt.imshow(temp)
                 t = plt.title('XY-plane projection')
                 t.set_position([.5, 1.15])
-
+                
                 plt.subplot(nrow, ncol, 2)
-                plt.plot(self.iterations, np.log(self.hist_res), '.')
-                t = plt.title('Log(L2(res))')
+                plt.imshow(self.b.reshape(self.obs_dim0, self.obs_dim1))
+                t = plt.title('input blur')
                 t.set_position([.5, 1.15])
 
                 plt.subplot(nrow, ncol, 3)
-                plt.plot(self.er.ravel(), '.')
-                t = plt.title('err')
+                plt.imshow(self.recb.reshape(self.obs_dim0, self.obs_dim1))
+                t = plt.title('recovered blur')
                 t.set_position([.5, 1.15])
 
                 plt.subplot(nrow, ncol, 4)
@@ -371,15 +371,33 @@ class LinBreg:
                 plt.plot(self.stepsize.ravel(), '.')
                 t = plt.title('stepsize distribution')
                 t.set_position([.5, 1.15])
+                
+                plt.subplot(nrow, ncol, 12)
+                plt.plot(self.iterations, np.log(self.hist_res), '.')
+                t = plt.title('Log(L2(res))')
+                t.set_position([.5, 1.15])
+                
+                plt.subplot(nrow, ncol, 13)
+                plt.plot(self.er.ravel(), '.')
+                t = plt.title('err')
+                t.set_position([.5, 1.15])
+
+                plt.subplot(nrow, ncol, 14)
+                if len(self.hist_kicking_eval_counts)  > 2:
+                    t = list(zip(*self.hist_kicking_eval_counts))
+                    plt.scatter(t[0],t[1], c = t[1])
+                    t = plt.title('kicking history')
+                    t.set_position([.5, 1.15])
 
                 plt.subplot(nrow, ncol, 16)
-                plt.text(0,0.8,'mu: '+str(np.floor(self.mu)),fontsize=16)
-                plt.text(0,0.6,'stepsize: '+str(np.floor(self.stepsize)),fontsize=16)
-                plt.text(0,0.3,'current kicking flag is: '+str(self.kicking_flag),fontsize=16)
+                plt.text(0,0.9,'mu: ' + str(np.floor(self.mu)),fontsize = 16)
+                plt.text(0,0.6,'stepsize: ' + str(np.floor(self.stepsize)), fontsize = 16)
+                plt.text(0,0.3,'current kicking flag is: ' + str(self.kicking_flag),fontsize = 16)
+                plt.text(0,0,'current figure: plots_it' + str(it_count) + appstr,fontsize = 16)
                 plt.axis('off')
                 
-                plt.tight_layout(rect=[0, 0.04, 1, 0.9])
-                plt.subplots_adjust(top=0.85, left = 0.1)
+                plt.tight_layout(rect = [0, 0.04, 1, 0.9])
+                plt.subplots_adjust(top = 0.85, left = 0.1)
                 plt.savefig('../../PyPRIS_Scratch/debug_output/plots_it' + str(it_count) + appstr +'.png', dpi=300, figsize=(100,80))
                 plt.close()
 
