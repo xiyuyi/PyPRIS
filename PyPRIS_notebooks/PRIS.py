@@ -182,14 +182,6 @@ class LinBreg:
         self.alpha = 1
         self.debug = False
         self.deep_debug = False
-        self.kicking_flag = False
-        self.kicking_ints = 10 # number of iterations between kicking evaluation.
-        self.kicking_reference = self.x
-        self.kicking_option = False
-        self.kicking_thres = 1e-10
-        self.kicking_refnorm = np.max(self.x)
-        self.hist_kicking_refnorm = list()
-        self.hist_kicking_eval_counts = list()
         self.stepsize = np.ones(self.x.shape) # stepsize.     
         self.range_ind0 = 3
         self.range_ind1 = 3
@@ -197,12 +189,56 @@ class LinBreg:
         self.obs_dim0 = 0
         self.obs_dim1 = 0
         
+        self.kick = self.Kick(self)
+        
+    class Kick:
+        def __init__(self,LinBreg):
+            self.parent = LinBreg
+            self.flag = False
+            self.ints = 10 # number of iterations between kicking evaluation.
+            self.reference = copy.deepcopy(self.parent.x)
+            self.option = False
+            self.thres = 1e-10
+            self.refnorm = np.max(self.parent.x)
+            self.hist_refnorm = list()
+            self.hist_eval_counts = list() 
+
+        def evaluation(self, it_count):
+            self.refnorm = np.linalg.norm(self.parent.x - self.reference)
+            if self.refnorm < self.thres:
+                # flip the kicking flag to "True" with positive evaluation
+                self.flag = True
+            else:
+                # flip the kicking flag to "False" with negative evaluation.
+                self.flag = False
+
+            self.hist_refnorm.append(self.refnorm)
+            self.hist_eval_counts.append([it_count, self.flag])
+                      
+        def go(self):
+            # execute kicking
+            # kicking execution only modifies the domains of the step size 
+            # and split domains in a binary way.
+            i0 = np.where(self.parent.x == 0) # zero entries on x [x entries where there kicking is in demand]
+            i1 = np.where(self.parent.x != 0) # none zero entries in x. [x entries where there is a value, no need for kicking]
+            si = (self.parent.mu *np.sign(self.parent.erpj[i0]) - self.parent.cumerr[i0]) / self.parent.erpj[i0] # stepsie for entries that needs kicking
+            self.parent.stepsize[i0] = np.min(si)  
+            self.parent.stepsize[i1] = 1
+            # reset kick.flag to False and wait for the flip 
+            # from the next positive kicking evaluation
+            self.flag = False 
+            # update kick.reference for follow-up kicking evaluation
+            self.reference = copy.deepcopy(self.parent.x) 
+        
+        
     def getready(self):
         if self.debug is True:
             import os
             # define the name of the directory to be created.
+            path_0 = "../../PyPRIS_Scratch"
             path = "../../PyPRIS_Scratch/debug_output"
             try:  
+                os.mkdir(path_0)
                 os.mkdir(path)
             except OSError:  
                 print ("Creation of the directory %s failed" % path)
@@ -215,35 +251,6 @@ class LinBreg:
         sk[np.where(sk > self.mu)] -= self.mu
         sk[np.where(sk < -self.mu)] += self.mu
         return sk
-    
-    def kicking_evaluation(self, it_count):
-        self.kicking_refnorm = np.linalg.norm(self.x - self.kicking_reference)
-        if self.kicking_refnorm < self.kicking_thres:
-            # flip the kicking flag to "True" with positive evaluation
-            self.kicking_flag = True
-        else:
-            # flip the kicking flag to "False" with negative evaluation.
-            self.kicking_flag = False
-            
-        self.hist_kicking_refnorm.append(self.kicking_refnorm)
-        self.hist_kicking_eval_counts.append([it_count, self.kicking_flag])
-
-    def kicking_go(self):
-        # execute kicking
-        # kicking execution only modifies the domains of the step size 
-        # and split domains in a binary way.
-        i0 = np.where(self.x == 0) # zero entries on x [x entries where there kicking is in demand]
-        i1 = np.where(self.x != 0) # none zero entries in x. [x entries where there is a value, no need for kicking]
-        si = (self.mu *np.sign(self.erpj[i0]) - self.cumerr[i0]) / self.erpj[i0] # stepsie for entries that needs kicking
-        self.stepsize[i0] = np.min(si)  
-        self.stepsize[i1] = 1
-
-        # reset kicking_flag to False and wait for the flip 
-        # from the next positive kicking evaluation
-        self.kicking_flag = False 
-
-        # update kicking_reference for follow-up kicking evaluation
-        self.kicking_reference = copy.deepcopy(self.x)
         
     def go(self):
         t1 = time.time()
@@ -275,11 +282,12 @@ class LinBreg:
             # In this implementation, the effect of kicking is realized throught a modified. 
             # distribution of stepsizes (self.stepsize). 
             self.stepsize = np.ones(self.x.shape) # [Note: this step involves some redundancy] 
-            if np.remainder(it_count, self.kicking_ints) == 0:
-                self.kicking_evaluation(it_count)
+            if np.remainder(it_count, self.kick.ints) == 0:
+                self.kick.evaluation(it_count)
                 if self.deep_debug is True: self.debug_output(it_count, appstr = '_c1_kicking_evaluated')
                 # kick if we get a positive kicking ealuation.
-                if self.kicking_flag is True: self.kicking_go()
+                if self.kick.flag is True: 
+                    self.kick.go()
                 if self.deep_debug is True: self.debug_output(it_count, appstr = '_c2_kicking_updated')
                    
             # get the acumulation of the back projected error.
@@ -383,8 +391,8 @@ class LinBreg:
                 t.set_position([.5, 1.15])
 
                 plt.subplot(nrow, ncol, 14)
-                if len(self.hist_kicking_eval_counts)  > 2:
-                    t = list(zip(*self.hist_kicking_eval_counts))
+                if len(self.kick.hist_eval_counts)  > 2:
+                    t = list(zip(*self.kick.hist_eval_counts))
                     plt.scatter(t[0],t[1], c = t[1])
                     t = plt.title('kicking history')
                     t.set_position([.5, 1.15])
@@ -392,7 +400,7 @@ class LinBreg:
                 plt.subplot(nrow, ncol, 16)
                 plt.text(0,0.9,'mu: ' + str(np.floor(self.mu)),fontsize = 16)
                 plt.text(0,0.6,'stepsize: ' + str(np.floor(self.stepsize)), fontsize = 16)
-                plt.text(0,0.3,'current kicking flag is: ' + str(self.kicking_flag),fontsize = 16)
+                plt.text(0,0.3,'current kicking flag is: ' + str(self.kick.flag),fontsize = 16)
                 plt.text(0,0,'current figure: plots_it' + str(it_count) + appstr,fontsize = 16)
                 plt.axis('off')
                 
