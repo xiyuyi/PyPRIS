@@ -338,7 +338,7 @@ class LinBreg:
     def save_obj(self, currit, step = 100):
         if self.save is True:
             if currit % step == 1:
-                with open("../../PyPRIS_Scratch/saved_objects/Linbreg_{}.file".format(currit), "wb") as f:
+                with open("../../PyPRIS_Scratch/saved_objects/PyPRIS_{}.file".format(currit), "wb") as f:
                     pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
                      
     # Generate intermediate output under debug mode.
@@ -442,7 +442,7 @@ class LinBreg:
         self.bg.append(self.x[self.x.size-1]) 
         
         
-def loadLinbreg(step):
-    with open('../../PyPRIS_Scratch/saved_objects/Linbreg_{}.file'.format(step), "rb") as f:
-        Linbreg = pickle.load(f)
-    return Linbreg
+def loadPyPRIS(step):
+    with open('../../PyPRIS_Scratch/saved_objects/PyPRIS_{}.file'.format(step), "rb") as f:
+        PyPRIS = pickle.load(f)
+    return PyPRIS
