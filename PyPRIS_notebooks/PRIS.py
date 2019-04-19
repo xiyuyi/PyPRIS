@@ -143,8 +143,7 @@ class SingleObs:
             self.obswbox[loc1end - 1, loc2sta : loc2end] = c
             self.obswbox[loc1sta : loc1end,     loc2sta] = c
             self.obswbox[loc1sta : loc1end, loc2end - 1] = c
-            
-        
+               
 class PyPRIS:
     def __init__(self):
         self.name = 'PRIS object'
@@ -193,8 +192,7 @@ class LinBreg:
         self.obs_dim1 = 0
         
         self.kick = self.Kick(self)
-        
-        
+               
     class Kick:
         def __init__(self,LinBreg):
             self.parent = LinBreg
@@ -233,8 +231,7 @@ class LinBreg:
             self.flag = False 
             # update kick.reference for follow-up kicking evaluation
             self.reference = copy.deepcopy(self.parent.x) 
-        
-        
+               
     def getready(self):
         if self.debug is True:
             import os
@@ -263,7 +260,6 @@ class LinBreg:
             else:  
                 print ("Successfully created the directory %s " % path_s)
                 
-
     def shrink(self,sk):
         sk[np.where((sk >= -self.mu) * (sk <= self.mu))] = 0
         sk[np.where(sk > self.mu)] -= self.mu
@@ -441,8 +437,7 @@ class LinBreg:
         self.hist_resDrop.append((self.hist_res[it_count] - self.hist_res[it_count-1])/self.hist_res[it_count-1])
         self.iterations.append(it_count)
         self.bg.append(self.x[self.x.size-1]) 
-        
-        
+           
 def loadPyPRIS(step):
     with open('../../PyPRIS_Scratch/saved_objects/PyPRIS_{}.file'.format(step), "rb") as f:
         PyPRIS = pickle.load(f)
