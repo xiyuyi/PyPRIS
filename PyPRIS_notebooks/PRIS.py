@@ -4,6 +4,7 @@ import time
 import copy
 import PIL.Image as Image
 import libtiff
+import pickle
 from matplotlib import pyplot as plt
 
 import matplotlib
@@ -181,7 +182,8 @@ class LinBreg:
         self.bg = list()
         self.alpha = 1
         self.debug = False
-        self.deep_debug = False
+        self.deep_debug = False        
+        self.save = True
         self.stepsize = np.ones(self.x.shape) # stepsize.     
         self.range_ind0 = 3
         self.range_ind1 = 3
@@ -190,6 +192,7 @@ class LinBreg:
         self.obs_dim1 = 0
         
         self.kick = self.Kick(self)
+        
         
     class Kick:
         def __init__(self,LinBreg):
@@ -236,14 +239,28 @@ class LinBreg:
             import os
             # define the name of the directory to be created.
             path_0 = "../../PyPRIS_Scratch"
-            path = "../../PyPRIS_Scratch/debug_output"
+            path_d = "../../PyPRIS_Scratch/debug_output"
+            path_s = "../../PyPRIS_Scratch/saved_objects"
             try:  
                 os.mkdir(path_0)
-                os.mkdir(path)
             except OSError:  
-                print ("Creation of the directory %s failed" % path)
+                print ("Creation of the directory %s failed" % path_0)
             else:  
-                print ("Successfully created the directory %s " % path)
+                print ("Successfully created the directory %s " % path_0)
+                
+            try:  
+                os.mkdir(path_d)
+            except OSError:  
+                print ("Creation of the directory %s failed" % path_d)
+            else:  
+                print ("Successfully created the directory %s " % path_d)
+                
+            try:  
+                os.mkdir(path_s)
+            except OSError:  
+                print ("Creation of the directory %s failed" % path_s)
+            else:  
+                print ("Successfully created the directory %s " % path_s)
                 
 
     def shrink(self,sk):
@@ -314,7 +331,16 @@ class LinBreg:
             
             # check intermediate outputs. (Valid under debug mode).
             self.debug_output(it_count, appstr = '_h_track_status_updated')
-
+            
+            # save object into separate file every assigned step
+            self.save_obj(it_count)
+            
+    def save_obj(self, currit, step = 100):
+        if self.save is True:
+            if currit % step == 1:
+                with open("../../PyPRIS_Scratch/saved_objects/PyPRIS_{}.file".format(currit), "wb") as f:
+                    pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
+                     
     # Generate intermediate output under debug mode.
     def debug_output(self, it_count, appstr):
         if self.debug is True:
@@ -414,3 +440,9 @@ class LinBreg:
         self.hist_resDrop.append((self.hist_res[it_count] - self.hist_res[it_count-1])/self.hist_res[it_count-1])
         self.iterations.append(it_count)
         self.bg.append(self.x[self.x.size-1]) 
+        
+        
+def loadPyPRIS(step):
+    with open('../../PyPRIS_Scratch/saved_objects/PyPRIS_{}.file'.format(step), "rb") as f:
+        PyPRIS = pickle.load(f)
+    return PyPRIS
