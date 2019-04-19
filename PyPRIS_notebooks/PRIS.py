@@ -178,6 +178,7 @@ class LinBreg:
         self.iterations = list()
         self.hist_res = list()
         self.hist_resDrop = list()
+        self.save_obj_int = 100
         
         self.bg = list()
         self.alpha = 1
@@ -333,9 +334,9 @@ class LinBreg:
             self.debug_output(it_count, appstr = '_h_track_status_updated')
             
             # save object into separate file every assigned step
-            self.save_obj(it_count)
+            self.save_obj(it_count, self.save_obj_int)
             
-    def save_obj(self, currit, step = 100):
+    def save_obj(self, currit, step):
         if self.save is True:
             if currit % step == 1:
                 with open("../../PyPRIS_Scratch/saved_objects/PyPRIS_{}.file".format(currit), "wb") as f:
