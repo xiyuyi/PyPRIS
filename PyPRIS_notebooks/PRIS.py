@@ -159,13 +159,9 @@ class LinBreg:
     # Authors: Xiyu Yi, Xingjia Wang @ UCLA, 2019.
     # PI: Shimon Weiss, Department of Chemistry and Biochemistry, UCLA.
     import time
-    def __init__(self, A, x, b, PRIS_iter):
-        
-        self.id = PRIS_iter # ID unique to PRIS object 
-        
+    def __init__(self, A, x, b):
         # solve for x from Ax = b.
         self.A = A # sensing matrix.
-        self.A_dir = '' # directory to store sensing matrix when saving
         self.x = x # coefficient vector for the pool of candidates.
         self.b = b # observation vector.
         self.mu = np.mean(self.b.ravel())  # shrinkage threshold.
@@ -196,11 +192,6 @@ class LinBreg:
         self.obs_dim1 = 0
         
         self.kick = self.Kick(self)
-        
-    def __getstate__(self):
-        state = self.__dict__
-        del state['A']
-        return state        
                
     class Kick:
         def __init__(self,LinBreg):
@@ -242,48 +233,32 @@ class LinBreg:
             self.reference = copy.deepcopy(self.parent.x) 
                
     def getready(self):
-        import os
-        # define the name of the directory to be created.
-        path_0 = "../../PyPRIS_Scratch/"
-        path_d = "../../PyPRIS_Scratch/debug_output"        
-        path_s = "../../PyPRIS_Scratch/saved_objects"        
-        try: 
-            if not os.path.exists(path_0):
-                os.mkdir(path_0)
-        except OSError:  
-            print ("Creation of the directory %s failed" % path_0)
-        else:  
-            print ("Successfully created Scratch directory %s " % path_0)
-                
-        if self.save is True:                
-            try: 
-                if not os.path.exists(path_s):
-                    os.mkdir(path_s)
-                try:
-                    with open("../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_SensingMx.file".format(self.id), "wb") as f:
-                        pickle.dump(self.A, f, pickle.HIGHEST_PROTOCOL)
-                except OSError:  
-                    print ("Failed to write sensing matrix to directory %s " % path_s)
-                else:  
-                    print ("Successfully wrote sensing matrix to directory %s " % path_s)
-                    
-            except OSError:  
-                print ("Creation of the directory %s failed" % path_s)
-            else:  
-                print ("Successfully created Object-saving directory %s " % path_s)
-            
-            
-                
-            
-        if self.debug is True:   
+        if self.debug is True:
+            import os
+            # define the name of the directory to be created.
+            path_0 = "../../PyPRIS_Scratch"
+            path_d = "../../PyPRIS_Scratch/debug_output"
+            path_s = "../../PyPRIS_Scratch/saved_objects"
             try:  
-                if not os.path.exists(path_d):
-                    os.mkdir(path_d)
+                os.mkdir(path_0)
+            except OSError:  
+                print ("Creation of the directory %s failed" % path_0)
+            else:  
+                print ("Successfully created the directory %s " % path_0)
+                
+            try:  
+                os.mkdir(path_d)
             except OSError:  
                 print ("Creation of the directory %s failed" % path_d)
             else:  
-                print ("Successfully created Debug directory %s " % path_d)
-            
+                print ("Successfully created the directory %s " % path_d)
+                
+            try:  
+                os.mkdir(path_s)
+            except OSError:  
+                print ("Creation of the directory %s failed" % path_s)
+            else:  
+                print ("Successfully created the directory %s " % path_s)
                 
     def shrink(self,sk):
         sk[np.where((sk >= -self.mu) * (sk <= self.mu))] = 0
@@ -360,11 +335,8 @@ class LinBreg:
     def save_obj(self, currit, step):
         if self.save is True:
             if currit % step == 1:
-                with open("../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_{}.file".format(self.id, currit), "wb") as f:
+                with open("../../PyPRIS_Scratch/saved_objects/PyPRIS_{}.file".format(currit), "wb") as f:
                     pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
-                    print ("Successfully saved Linbreg ID {} at iteration {} to directory.".format(self.id, currit))
-                with open('../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_SensingMx.file'.format(self.id), "rb") as s:
-                    self.A = pickle.load(s)  
                      
     # Generate intermediate output under debug mode.
     def debug_output(self, it_count, appstr):
@@ -457,7 +429,7 @@ class LinBreg:
                 
                 plt.tight_layout(rect = [0, 0.04, 1, 0.9])
                 plt.subplots_adjust(top = 0.85, left = 0.1)
-                plt.savefig('../../PyPRIS_Scratch/debug_output/PyPRIS_{}_plots_it{}{}.png'.format(self.id, it_count, appstr), dpi=300, figsize=(100,80))
+                plt.savefig('../../PyPRIS_Scratch/debug_output/plots_it' + str(it_count) + appstr +'.png', dpi=300, figsize=(100,80))
                 plt.close()
 
     def track_status(self, it_count, er):
@@ -466,9 +438,7 @@ class LinBreg:
         self.iterations.append(it_count)
         self.bg.append(self.x[self.x.size-1]) 
            
-def loadPyPRIS(PRIS_iter, step):
-    with open('../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_{}.file'.format(PRIS_iter, step), "rb") as f:
+def loadPyPRIS(step):
+    with open('../../PyPRIS_Scratch/saved_objects/PyPRIS_{}.file'.format(step), "rb") as f:
         PyPRIS = pickle.load(f)
-    with open('../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_SensingMx.file'.format(PRIS_iter), "rb") as s:
-        PyPRIS.A = pickle.load(s)  
     return PyPRIS
