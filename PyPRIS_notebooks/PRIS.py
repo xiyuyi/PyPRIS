@@ -178,6 +178,8 @@ class LinBreg:
         self.hist_res = list()
         self.hist_resDrop = list()
         self.save_obj_int = 100
+        self.candidate_intervals = list()
+        self.candidate_coords = list()
         
         self.bg = list()
         self.alpha = 1
