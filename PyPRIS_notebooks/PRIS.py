@@ -366,18 +366,41 @@ class LinBreg:
                 with open('../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_SensingMx.file'.format(self.id), "rb") as s:
                     self.A = pickle.load(s)  
                      
+    def candidate_vis(self):
+        intervals = self.candidate_intervals
+        locs = list(zip(*self.candidate_coords))
+        dims = list()
+        minimals = list()
+        maximums = list()
+
+        for inds, interval in zip(locs, intervals):
+            maximum = np.max(inds)
+            minimal = np.min(inds)
+            dims.append(1+np.int((maximum-minimal)//interval))
+            minimals.append(minimal)
+            maximums.append(maximum)
+
+        vis = np.zeros(dims)
+        for coords, intensity in zip(self.candidate_coords, self.x[0:len(self.x)-1]):
+            vis[coords[0]-minimals[0]-1, int((coords[1]-minimals[1])//intervals[1]), int((coords[2]-minimals[2])//intervals[2])] = intensity
+
+        return vis
+
     # Generate intermediate output under debug mode.
     def debug_output(self, it_count, appstr):
         if self.debug is True:
             if np.remainder(it_count, self.debug_it_int) == self.it_check_rem:
                 print('intermediate output it#'+ str(it_count))
-                temp = np.mean(self.x[0:self.x.size-1].reshape(self.range_ind0.size,self.range_ind1.size,self.range_ind2.size),axis=0)
+                vis = self.candidate_vis()
                 nrow = 4
                 ncol = 5
                 plt.figure(figsize=(13,8))
                 plt.subplot(nrow, ncol, 1)
-                plt.imshow(temp)
-                t = plt.title('XY-plane projection')
+                if len(vis) is 0:                    
+                    t = plt.title("No signal yet.")
+                else:
+                    plt.imshow(np.mean(vis,axis=0))                    
+                    t = plt.title('XY-plane projection')
                 t.set_position([.5, 1.15])
                 
                 plt.subplot(nrow, ncol, 2)
