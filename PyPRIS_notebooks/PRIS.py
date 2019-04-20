@@ -6,8 +6,8 @@ import PIL.Image as Image
 import libtiff
 import pickle
 from matplotlib import pyplot as plt
-
 import matplotlib
+
 class SingleObs:
     def __init__(self):
         self.psf = np.arange(1,31).reshape(2,3,5)
