@@ -303,7 +303,6 @@ class LinBreg:
         self.hist_res = list()
         self.hist_resDrop = list()
         self.save_obj_int = 100
-        self.A_dir = ''  # directory to store sensing matrix when saving
         self.bg = list()
         self.alpha = 1
         self.debug = False
@@ -313,10 +312,19 @@ class LinBreg:
         self.obs_dim1 = 0
 
         self.kick = self.Kick(self)
+        
+        self.A_dir = ''  # directory to store sensing matrix when saving
+        try:
+            with open("../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_SensingMx.file".format(self.id), "wb") as f:
+                pickle.dump(self.A, f, pickle.HIGHEST_PROTOCOL)
+            except OSError:
+                print ("Failed to write sensing matrix to directory %s " % path_s)
+            else:
+                print ("Successfully wrote sensing matrix to directory %s " % path_s)
 
     def __getstate__(self):
         state = self.__dict__
-        del state['A']
+        state['A'] = 0
         return state
 
     class Kick:
@@ -385,13 +393,6 @@ class LinBreg:
             try:
                 if not os.path.exists(path_s):
                     os.mkdir(path_s)
-                try:
-                    with open("../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_SensingMx.file".format(self.id), "wb") as f:
-                        pickle.dump(self.A, f, pickle.HIGHEST_PROTOCOL)
-                except OSError:
-                    print ("Failed to write sensing matrix to directory %s " % path_s)
-                else:
-                    print ("Successfully wrote sensing matrix to directory %s " % path_s)
 
             except OSError:
                 print ("Creation of the directory %s failed" % path_s)
