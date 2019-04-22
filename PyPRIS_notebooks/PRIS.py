@@ -308,6 +308,7 @@ class LinBreg:
     # Authors: Xiyu Yi, Xingjia Wang @ UCLA, 2019.
     # PI: Shimon Weiss, Department of Chemistry and Biochemistry, UCLA.
     import time
+xiyu_prep_PyPRIS_class
     def __init__(self, A, x, b, PRIS_iter):
 
         self.id = PRIS_iter  # ID unique to PRIS object
@@ -317,6 +318,13 @@ class LinBreg:
         self.A_dir = ''  # directory to store sensing matrix when saving
         self.x = x  # coefficient vector for the pool of candidates.
         self.b = b  # observation vector.
+
+    def __init__(self, A, x, b):
+        # solve for x from Ax = b.
+        self.A = A # sensing matrix.
+        self.x = x # coefficient vector for the pool of candidates.
+        self.b = b # observation vector.
+master
         self.mu = np.mean(self.b.ravel())  # shrinkage threshold.
         self.er = np.zeros(self.b.shape)
         self.erpj = np.zeros(self.x.shape)
@@ -345,12 +353,16 @@ class LinBreg:
         self.obs_dim1 = 0
 
         self.kick = self.Kick(self)
+ xiyu_prep_PyPRIS_class
 
     def __getstate__(self):
         state = self.__dict__
         del state['A']
         return state
 
+
+               
+ master
     class Kick:
         def __init__(self, LinBreg):
             self.parent = LinBreg
@@ -390,6 +402,7 @@ class LinBreg:
             # from the next positive kicking evaluation
             self.flag = False
             # update kick.reference for follow-up kicking evaluation
+ xiyu_prep_PyPRIS_class
             self.reference = copy.deepcopy(self.parent.x)
 
     def get_ready(self):
@@ -433,6 +446,39 @@ class LinBreg:
                 print ("Successfully created Debug directory %s " % path_d)
 
     def shrink(self, sk):
+
+            self.reference = copy.deepcopy(self.parent.x) 
+               
+    def getready(self):
+        if self.debug is True:
+            import os
+            # define the name of the directory to be created.
+            path_0 = "../../PyPRIS_Scratch"
+            path_d = "../../PyPRIS_Scratch/debug_output"
+            path_s = "../../PyPRIS_Scratch/saved_objects"
+            try:  
+                os.mkdir(path_0)
+            except OSError:  
+                print ("Creation of the directory %s failed" % path_0)
+            else:  
+                print ("Successfully created the directory %s " % path_0)
+                
+            try:  
+                os.mkdir(path_d)
+            except OSError:  
+                print ("Creation of the directory %s failed" % path_d)
+            else:  
+                print ("Successfully created the directory %s " % path_d)
+                
+            try:  
+                os.mkdir(path_s)
+            except OSError:  
+                print ("Creation of the directory %s failed" % path_s)
+            else:  
+                print ("Successfully created the directory %s " % path_s)
+                
+    def shrink(self,sk):
+ master
         sk[np.where((sk >= -self.mu) * (sk <= self.mu))] = 0
         sk[np.where(sk > self.mu)] -= self.mu
         sk[np.where(sk < -self.mu)] += self.mu
@@ -505,8 +551,9 @@ class LinBreg:
     def save_obj(self, currit, step):
         if self.save is True:
             if currit % step == 1:
-                with open("../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_{}.file".format(self.id, currit), "wb") as f:
+                with open("../../PyPRIS_Scratch/saved_objects/PyPRIS_{}.file".format(currit), "wb") as f:
                     pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
+ xiyu_prep_PyPRIS_class
                     print ("Successfully saved Linbreg ID {} at iteration {} to directory.".format(self.id, currit))
                 with open('../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_SensingMx.file'.format(self.id), "rb") as s:
                     self.A = pickle.load(s)
@@ -532,6 +579,10 @@ class LinBreg:
 
         return vis
 
+
+                     
+    # Generate intermediate output under debug mode.
+ master
     def debug_output(self, it_count, appstr):
         # Generate intermediate output under debug mode.
         if self.debug is True:
@@ -623,17 +674,25 @@ class LinBreg:
                 plt.text(0, 0.3, 'current kicking flag is: ' + str(self.kick.flag), fontsize=16)
                 plt.text(0, 0, 'current figure: plots_it' + str(it_count) + appstr, fontsize=16)
                 plt.axis('off')
+ xiyu_prep_PyPRIS_class
 
                 plt.subplots_adjust(top=0.95, left=0, right=1, bottom=0, wspace=0.5, hspace=1)
                 plt.savefig(
                     '../../PyPRIS_Scratch/debug_output/PyPRIS_{}_plots_it{}{}.png'.format(self.id, it_count, appstr),
                     dpi=300, figsize=(100, 80))
+
+                
+                plt.tight_layout(rect = [0, 0.04, 1, 0.9])
+                plt.subplots_adjust(top = 0.85, left = 0.1)
+                plt.savefig('../../PyPRIS_Scratch/debug_output/plots_it' + str(it_count) + appstr +'.png', dpi=300, figsize=(100,80))
+ master
                 plt.close()
 
     def track_status(self, it_count, er):
         self.hist_res.append(np.linalg.norm(er))
         self.hist_resDrop.append((self.hist_res[it_count] - self.hist_res[it_count - 1]) / self.hist_res[it_count - 1])
         self.iterations.append(it_count)
+ xiyu_prep_PyPRIS_class
         self.bg.append(self.x[self.x.size - 1])
 
 
@@ -643,3 +702,11 @@ def loadPyPRIS(PRIS_iter, step):
     with open('../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_SensingMx.file'.format(PRIS_iter), "rb") as s:
         PyPRIS.A = pickle.load(s)
     return PyPRIS
+
+        self.bg.append(self.x[self.x.size-1]) 
+           
+def loadPyPRIS(step):
+    with open('../../PyPRIS_Scratch/saved_objects/PyPRIS_{}.file'.format(step), "rb") as f:
+        PyPRIS = pickle.load(f)
+    return PyPRIS
+ master
