@@ -574,8 +574,7 @@ class LinBreg:
                 plt.text(0, 0, 'current figure: plots_it' + str(it_count) + appstr, fontsize=16)
                 plt.axis('off')
 
-                plt.tight_layout(rect=[0, 0.04, 1, 0.9])
-                plt.subplots_adjust(top=0.85, left=0.1)
+                plt.subplots_adjust(top=0.95, left=0, right=1, bottom=0, wspace=0.5, hspace=1)
                 plt.savefig(
                     '../../PyPRIS_Scratch/debug_output/PyPRIS_{}_plots_it{}{}.png'.format(self.id, it_count, appstr),
                     dpi=300, figsize=(100, 80))
