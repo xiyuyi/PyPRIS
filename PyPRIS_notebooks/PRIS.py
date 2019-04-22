@@ -191,25 +191,75 @@ class PyPRIS:
         self.name = 'PyPRIS object'
         self.positivity = True  # positivity constraint.
         self.observation = np.ndarray(0)  # this should be the observation vector
-        self.current_ReF = list()  # current refinement factor, this is the absolute refinement
-        self.current_relReF = list()  # current relative refinement factor. This is the relative refinement performed
+
+        self.current_relReF = list([1, 2, 2])    # current relative refinement factor. This is the relative refinement to be or have been performed
         #                               for this round of pris as compared to the last round of pris.
         self.current_PRIS_ItN = list([0])  # current PRIS iteration count, starting from 0.
         self.current_A = np.ndarray(0)  # current sensing matrix.
         self.current_candidates = list()  # current pool of candidates.
         self.current_candidates_intervals = list()  # current intervals of neighboring candidate voxels.
         self.current_check_mark_id = 0
+
         self.hist_candidates = list()  # keep a record of the full history.
         self.hist_candidates_intervals = list()  # keep a record of the full history.
         self.hist_PRIS_ItN = list()
         self.hist_check_mark_id = list()  # checkmark ID. ascending each time after you make a check_mark
+
         self.observator = None  # this should be a function that needs to be defined.
+
+    def prep_for_new_refinement(self):
+        self.hist_candidates.append(copy.deepcopy(self.current_candidates))
+        self.hist_candidates_intervals.append(copy.deepcopy(self.current_candidates_intervals))
+        self.hist_PRIS_ItN.append(copy.deepcopy(self.current_PRIS_ItN))
+        self.set_check_mark()
 
     def generate_sensing_mx(self):
         self.current_A = np.ndarray([len(self.observation), len(self.current_candidates) + 1])
         for count, loc in enumerate(self.current_candidates):
             self.current_A[:, count] = self.observe(loc)
         self.current_A[:, len(self.current_candidates)] = 1
+
+    def refine_candidates(self, linbreg):
+    # this will take the current candidates and the result in the linbreg object,
+    # and generate refined pool of candidates.
+        # create a check mark.
+        self.set_check_mark()
+
+        # Get the non_zero_coordinates from the existing linbreg results.
+        non_zero_inds = np.argwhere(linbreg.x[0:len(linbreg.x) - 1] > 0)
+        non_zero_coordinates = [self.current_candidates[i] for i in list(non_zero_inds.ravel())]
+
+        self.current_candidates_intervals = copy.deepcopy(
+            [pre / ref for pre, ref in zip(self.current_candidates_intervals, self.current_relReF)]
+        )
+        current_interval = self.current_candidates_intervals
+    # get new coordinates with 2-fold refinement.
+        new_coords = list()
+        for i in non_zero_coordinates:
+            extra_coords = [[i[0], i[1] - current_interval[1] / 2 * 3, i[2] - current_interval[2] / 2 * 3], \
+                            [i[0], i[1] - current_interval[1] / 2 * 3, i[2] - current_interval[2] / 2], \
+                            [i[0], i[1] - current_interval[1] / 2 * 3, i[2] + current_interval[2] / 2], \
+                            [i[0], i[1] - current_interval[1] / 2 * 3, i[2] + current_interval[2] / 2 * 3], \
+                            [i[0], i[1] - current_interval[1] / 2, i[2] - current_interval[2] / 2 * 3], \
+                            [i[0], i[1] - current_interval[1] / 2, i[2] - current_interval[2] / 2], \
+                            [i[0], i[1] - current_interval[1] / 2, i[2] + current_interval[2] / 2], \
+                            [i[0], i[1] - current_interval[1] / 2, i[2] + current_interval[2] / 2 * 3], \
+                            [i[0], i[1] + current_interval[1] / 2 * 3, i[2] - current_interval[2] / 2 * 3], \
+                            [i[0], i[1] + current_interval[1] / 2 * 3, i[2] - current_interval[2] / 2], \
+                            [i[0], i[1] + current_interval[1] / 2 * 3, i[2] + current_interval[2] / 2], \
+                            [i[0], i[1] + current_interval[1] / 2 * 3, i[2] + current_interval[2] / 2 * 3], \
+                            [i[0], i[1] + current_interval[1] / 2, i[2] - current_interval[2] / 2 * 3], \
+                            [i[0], i[1] + current_interval[1] / 2, i[2] - current_interval[2] / 2], \
+                            [i[0], i[1] + current_interval[1] / 2, i[2] + current_interval[2] / 2], \
+                            [i[0], i[1] + current_interval[1] / 2, i[2] + current_interval[2] / 2 * 3]]
+            for i1 in extra_coords:
+                if i1 not in new_coords:
+                    new_coords.append(i1)
+
+        self.current_candidates = copy.deepcopy(new_coords)
+
+        # set a check mark for tracking purposes.
+        self.set_check_mark()
 
     def set_check_mark(self):
         self.hist_candidates.append(self.current_candidates)
