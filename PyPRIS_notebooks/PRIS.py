@@ -4,9 +4,7 @@ import time
 import copy
 import pickle
 from matplotlib import pyplot as plt
-
 import matplotlib
-
 
 class ObserveStation:
     def __init__(self):
