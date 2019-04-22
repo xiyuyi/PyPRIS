@@ -20,7 +20,7 @@ class ObserveStation:
             self.psfz0 = 3
             self.debug = False
             self.edge_padding = False
-            self.subpixel_shift = False
+            self.subpixel_shift = True
 
         def single_obs(self):
             """ 
@@ -288,9 +288,9 @@ class LinBreg:
         self.deep_debug = False
         self.save = True
         self.stepsize = np.ones(self.x.shape)  # stepsize.
-        self.range_ind0 = 3
-        self.range_ind1 = 3
-        self.range_ind2 = 3
+        #self.range_ind0 = 3
+        #self.range_ind1 = 3
+        #self.range_ind2 = 3
         self.obs_dim0 = 0
         self.obs_dim1 = 0
 
@@ -482,8 +482,8 @@ class LinBreg:
 
         return vis
 
-    # Generate intermediate output under debug mode.
     def debug_output(self, it_count, appstr):
+        # Generate intermediate output under debug mode.
         if self.debug is True:
             if np.remainder(it_count, self.debug_it_int) == self.it_check_rem:
                 print('intermediate output it#' + str(it_count))
