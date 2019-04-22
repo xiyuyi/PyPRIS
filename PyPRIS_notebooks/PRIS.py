@@ -6,6 +6,10 @@ import pickle
 from matplotlib import pyplot as plt
 import matplotlib
 
+#  Authors: Xiyu Yi, Xingjia Wang @ UCLA, 2019.
+#  PI: Shimon Weiss, Department of Chemistry and Biochemistry, UCLA.
+
+
 class ObserveStation:
     def __init__(self):
         self.biplane_observer = None
@@ -149,7 +153,7 @@ class ObserveStation:
                              observer_debugger=False, observer_edge_padding=True):
         # prepare an observer for biplane observation
         # this method will only be executed once in the preparation before calculating the sensing matrix.
-        self.biplane_observer = self.SingleObs()
+        self.biplane_observer = self.SingleObs() # this is the parent class.
         self.biplane_observer.psf = np.copy(psf)
         self.biplane_observer.psfz0 = psfz0
         self.biplane_observer.debug = observer_debugger
@@ -179,7 +183,7 @@ class ObserveStation:
         self.biplane_observer.single_obs()  # take the observation
         self.biplane_observer.observation2 = self.biplane_observer.obs.ravel()  # record this second observation
 
-        # the biplane_observer now hands over the biplane observation and return it as output.
+        # the biplane_observer now returns the observation
         blur = np.concatenate([self.biplane_observer.observation1, self.biplane_observer.observation2]).ravel()
         return blur
 
@@ -282,46 +286,16 @@ class PyPRIS:
                 print(key + ":  " + str(value))
 
 
-def get_refined_candidates(self):
-    '''
-        This method takes in the LinBreg object, and update the PyPRIS object
-        :return:
-        '''
-
-
-def get_sensing_mx(pypris):
-    '''
-    Non-member function for the PyPRIS class.
-    calculate the sensing matrix based on the given pool of candidates, and given SingleObservation definition.
-
-    This should be  non-member function for the PyPRIS class, just so it can be easily changed
-    into any other strategy of sensing matrix calculation.
-    :return:
-    '''
-    A = numpy.ndarray(len(pypris.current_candidates))
-    return A
-
-
 class LinBreg:
-    # Authors: Xiyu Yi, Xingjia Wang @ UCLA, 2019.
-    # PI: Shimon Weiss, Department of Chemistry and Biochemistry, UCLA.
     import time
-    def __init__(self, A, x, b, PRIS_iter):
-
-        self.id = PRIS_iter  # ID unique to PRIS object
-
+    def __init__(self):
+        self.id = []  # ID unique to PRIS object
         # solve for x from Ax = b.
-        self.A = A  # sensing matrix.
-        self.A_dir = ''  # directory to store sensing matrix when saving
-        self.x = x  # coefficient vector for the pool of candidates.
-        self.b = b  # observation vector.
-        self.mu = np.mean(self.b.ravel())  # shrinkage threshold.
-        self.er = np.zeros(self.b.shape)
-        self.erpj = np.zeros(self.x.shape)
-        self.cumerr = np.zeros(self.x.shape)
-        self.recb = np.zeros(self.b.shape)
+        self.A = 0  # sensing matrix.
+        self.x = 0
+        self.b = 0  # observation vector.
         self.flag_stop = False  # flag to stop optimization iteration.
-        self.maxit = 2  # maximum iteration steps.
+        self.maxit = 2000  # maximum iteration steps.
         self.debug_it_int = 1
         self.flag_positivity = True
         self.it_check_rem = 1
@@ -329,16 +303,12 @@ class LinBreg:
         self.hist_res = list()
         self.hist_resDrop = list()
         self.save_obj_int = 100
-
+        self.A_dir = ''  # directory to store sensing matrix when saving
         self.bg = list()
         self.alpha = 1
         self.debug = False
         self.deep_debug = False
         self.save = True
-        self.stepsize = np.ones(self.x.shape)  # stepsize.
-        #self.range_ind0 = 3
-        #self.range_ind1 = 3
-        #self.range_ind2 = 3
         self.obs_dim0 = 0
         self.obs_dim1 = 0
 
@@ -391,6 +361,13 @@ class LinBreg:
             self.reference = copy.deepcopy(self.parent.x)
 
     def get_ready(self):
+        self.x = np.zeros(self.A.shape[1])
+        self.stepsize = np.ones(self.x.shape)  # stepsize.
+        self.er = np.zeros(self.b.shape)
+        self.erpj = np.zeros(self.x.shape)
+        self.cumerr = np.zeros(self.x.shape)
+        self.recb = np.zeros(self.b.shape)
+        
         import os
         # define the name of the directory to be created.
         path_0 = "../../PyPRIS_Scratch/"
