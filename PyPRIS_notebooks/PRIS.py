@@ -213,12 +213,6 @@ class PyPRIS:
         self.hist_PRIS_ItN.append(copy.deepcopy(self.current_PRIS_ItN))
         self.set_check_mark()
 
-    def generate_sensing_mx(self):
-        self.current_A = np.ndarray([len(self.observation), len(self.current_candidates) + 1])
-        for count, loc in enumerate(self.current_candidates):
-            self.current_A[:, count] = self.observe(loc)
-        self.current_A[:, len(self.current_candidates)] = 1
-
     def refine_candidates(self, linbreg):
     # this will take the current candidates and the result in the linbreg object,
     # and generate refined pool of candidates.
@@ -260,6 +254,12 @@ class PyPRIS:
 
         # set a check mark for tracking purposes.
         self.set_check_mark()
+
+    def generate_sensing_mx(self):
+        self.current_A = np.ndarray([len(self.observation), len(self.current_candidates) + 1])
+        for count, loc in enumerate(self.current_candidates):
+            self.current_A[:, count] = self.observe(loc)
+        self.current_A[:, len(self.current_candidates)] = 1
 
     def set_check_mark(self):
         self.hist_candidates.append(self.current_candidates)
