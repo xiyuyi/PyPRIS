@@ -322,11 +322,6 @@ class LinBreg:
             else:
                 print ("Successfully wrote sensing matrix to directory %s " % path_s)
 
-    def __getstate__(self):
-        state = self.__dict__
-        state['A'] = 0
-        return state
-
     class Kick:
         def __init__(self, LinBreg):
             self.parent = LinBreg
@@ -481,12 +476,13 @@ class LinBreg:
     def save_obj(self, currit, step):
         if self.save is True:
             if currit % step == 1:
+                self.A = 0
                 with open("../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_{}.file".format(self.id, currit), "wb") as f:
                     pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
                     print ("Successfully saved Linbreg ID {} at iteration {} to directory.".format(self.id, currit))
                 with open('../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_SensingMx.file'.format(self.id), "rb") as s:
                     self.A = pickle.load(s)
-
+                    
     def candidate_vis(self):
         intervals = self.candidate_intervals
         locs = list(zip(*self.candidate_coords))
