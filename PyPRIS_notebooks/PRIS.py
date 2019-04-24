@@ -302,7 +302,6 @@ class LinBreg:
         self.hist_res = list()
         self.hist_resDrop = list()
         self.save_obj_int = 100
-        self.A_dir = ''  # directory to store sensing matrix when saving
         self.bg = list()
         self.alpha = 1
         self.debug = False
@@ -312,11 +311,8 @@ class LinBreg:
         self.obs_dim1 = 0
 
         self.kick = self.Kick(self)
-
-    def __getstate__(self):
-        state = self.__dict__
-        del state['A']
-        return state
+        
+        self.A_dir = ''  # directory to store sensing matrix when saving
 
     class Kick:
         def __init__(self, LinBreg):
@@ -370,8 +366,9 @@ class LinBreg:
         import os
         # define the name of the directory to be created.
         path_0 = "../../PyPRIS_Scratch/"
-        path_d = "../../PyPRIS_Scratch/debug_output"
         path_s = "../../PyPRIS_Scratch/saved_objects"
+        path_d = "../../PyPRIS_Scratch/debug_output"
+        
         try:
             if not os.path.exists(path_0):
                 os.mkdir(path_0)
@@ -380,7 +377,7 @@ class LinBreg:
         else:
             print ("Successfully created Scratch directory %s " % path_0)
 
-        if self.save is True:
+        if self.save is True:   
             try:
                 if not os.path.exists(path_s):
                     os.mkdir(path_s)
@@ -389,9 +386,9 @@ class LinBreg:
                         pickle.dump(self.A, f, pickle.HIGHEST_PROTOCOL)
                 except OSError:
                     print ("Failed to write sensing matrix to directory %s " % path_s)
-                else:
+                else: 
                     print ("Successfully wrote sensing matrix to directory %s " % path_s)
-
+                    
             except OSError:
                 print ("Creation of the directory %s failed" % path_s)
             else:
@@ -479,12 +476,13 @@ class LinBreg:
     def save_obj(self, currit, step):
         if self.save is True:
             if currit % step == 1:
+                self.A = 0
                 with open("../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_{}.file".format(self.id, currit), "wb") as f:
                     pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
                     print ("Successfully saved Linbreg ID {} at iteration {} to directory.".format(self.id, currit))
                 with open('../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_SensingMx.file'.format(self.id), "rb") as s:
                     self.A = pickle.load(s)
-
+                    
     def candidate_vis(self):
         intervals = self.candidate_intervals
         locs = list(zip(*self.candidate_coords))
