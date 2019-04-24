@@ -1,0 +1,16 @@
+name: PyPRIS_env
+dependencies:
+  - python=3.7
+  - numpy=1.15
+  - matplotlib=2.2.3
+  - mpl_toolkits
+  - scipy=1.1.0
+  - scikit-image=0.14.0
+  - scikit-learn
+  - jupyter
+  - ipykernel
+  - pip
+  - pip:
+    - pillow=5.2.0
+    - libtiff
+    
