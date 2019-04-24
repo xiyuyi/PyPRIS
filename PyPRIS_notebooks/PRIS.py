@@ -42,14 +42,6 @@ class ObserveStation:
                 loc2 = np.int(np.floor(self.location[2]))
                 loc1_sps = self.location[1] - loc1  # the subpixel shift component
                 loc2_sps = self.location[2] - loc2  # the subpixel shift component
-#                if loc1_sps == 0 and loc2_sps == 0:
-#                    self.subpixel_shift = False
-#
-#            else:
-#                loc1 = self.location[1]  # first dimension location coordiantes. [inner]
-#                loc2 = self.location[2]  # second dimension location coordiantes. [further inner]
-#                loc1_sps = 0
-#                loc2_sps = 0
 
             locz = self.location[0]  # location coordinates of depth.
 
