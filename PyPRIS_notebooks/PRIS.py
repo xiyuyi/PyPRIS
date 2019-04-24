@@ -20,7 +20,7 @@ class ObserveStation:
             self.location = [0, 1, 2]
             self.imsize = [4, 4]
             self.psfz0 = 3
-            self.debug = False
+            self.debug = True
             self.edge_padding = False
             self.subpixel_shift = True
 
@@ -42,12 +42,14 @@ class ObserveStation:
                 loc2 = np.int(np.floor(self.location[2]))
                 loc1_sps = self.location[1] - loc1  # the subpixel shift component
                 loc2_sps = self.location[2] - loc2  # the subpixel shift component
-                if loc1_sps == 0 and loc2_sps == 0:
-                    self.subpixel_shift = False
-
-            else:
-                loc1 = self.location[1]  # first dimension location coordiantes. [inner]
-                loc2 = self.location[2]  # second dimension location coordiantes. [further inner]
+#                if loc1_sps == 0 and loc2_sps == 0:
+#                    self.subpixel_shift = False
+#
+#            else:
+#                loc1 = self.location[1]  # first dimension location coordiantes. [inner]
+#                loc2 = self.location[2]  # second dimension location coordiantes. [further inner]
+#                loc1_sps = 0
+#                loc2_sps = 0
 
             locz = self.location[0]  # location coordinates of depth.
 
@@ -73,7 +75,7 @@ class ObserveStation:
             if self.debug is True:
                 print('original loc1 is ' + str(self.location[1]))
                 print('original loc2 is ' + str(self.location[2]))
-                print('loc2 is ' + str(loc2))
+                print('self.subpixel_shift is ' + str(self.subpixel_shift))
                 print('loc1 is ' + str(loc1))
                 print('loc2 is ' + str(loc2))
                 print('loc1 excess is ' + str(loc1_sps))
@@ -108,8 +110,7 @@ class ObserveStation:
                 # define interpolation function
                 f = interpolate.interp2d(locs2, locs1, stamp, kind='cubic')
                 stamp_sps = f(locs2new, locs1new)
-                stamp[1:stamp.shape[0] - 1, 1:stamp.shape[1] - 1] = stamp_sps;
-
+                stamp[1:stamp.shape[0] - 1, 1:stamp.shape[1] - 1] = stamp_sps
                 self.stamp = np.copy(stamp[psf1sta:psf1end, psf2sta:psf2end])
             else:
                 self.stamp = np.copy(self.psf[self.layerN, psf1sta:psf1end, psf2sta:psf2end])
@@ -128,7 +129,6 @@ class ObserveStation:
             if self.debug is True:
                 print('shape of observation: ' + str(self.imsize))
                 print('        shape of psf: ' + str(self.psf.shape))
-                print('     z0 index in psf: ' + str(self.psfz0))
                 print('     z0 index in psf: ' + str(self.psfz0))
                 print('              psf1hw: ' + str(psf1hw))
                 print('              psf2hw: ' + str(psf2hw))
@@ -149,8 +149,8 @@ class ObserveStation:
                 self.obswbox[loc1sta: loc1end, loc2sta] = c
                 self.obswbox[loc1sta: loc1end, loc2end - 1] = c
 
-    def observe_biplane_prep(self, psf, single_image_size, deltaz_plane1=-10, deltaz_plane2=10, psfz0=106,\
-                             observer_debugger=False, observer_edge_padding=True):
+    def observe_biplane_prep(self, psf, single_image_size, deltaz_plane1, deltaz_plane2, psfz0,\
+                             observer_debugger, observer_edge_padding):
         # prepare an observer for biplane observation
         # this method will only be executed once in the preparation before calculating the sensing matrix.
         self.biplane_observer = self.SingleObs() # this is the parent class.
@@ -184,8 +184,8 @@ class ObserveStation:
         self.biplane_observer.observation2 = self.biplane_observer.obs.ravel()  # record this second observation
 
         # the biplane_observer now returns the observation
-        blur = np.concatenate([self.biplane_observer.observation1, self.biplane_observer.observation2]).ravel()
-        return blur
+        observation = np.concatenate([self.biplane_observer.observation1, self.biplane_observer.observation2]).ravel()
+        return observation
 
 
 class PyPRIS:
@@ -193,7 +193,6 @@ class PyPRIS:
         self.name = 'PyPRIS object'
         self.positivity = True  # positivity constraint.
         self.observation = np.ndarray(0)  # this should be the observation vector
-
         self.current_relReF = list([1, 2, 2])    # current relative refinement factor. This is the relative refinement to be or have been performed
         #                               for this round of pris as compared to the last round of pris.
         self.current_PRIS_ItN = list([0])  # current PRIS iteration count, starting from 0.
