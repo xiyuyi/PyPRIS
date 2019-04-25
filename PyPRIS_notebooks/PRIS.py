@@ -487,6 +487,8 @@ class LinBreg:
         if self.save is True:
             if currit % step == 1:
                 self.A = 0
+                import sys
+                setattr(sys.modules[__name__], 'Kick', self.Kick)
                 with open("../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_{}.file".format(self.id, currit), "wb") as f:
                     pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
                     print ("Successfully saved Linbreg ID {} at iteration {} to directory.".format(self.id, currit))
