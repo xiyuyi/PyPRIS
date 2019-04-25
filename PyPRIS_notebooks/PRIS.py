@@ -11,10 +11,12 @@ import matplotlib
 
 
 class ObserveStation:
+    
     def __init__(self):
         self.biplane_observer = None
 
     class SingleObs:
+        
         def __init__(self):
             self.psf = np.arange(1, 31).reshape(2, 3, 5)
             self.location = [0, 1, 2]
@@ -181,6 +183,7 @@ class ObserveStation:
 
 
 class PyPRIS:
+    
     def __init__(self):
         self.name = 'PyPRIS object'
         self.positivity = True  # positivity constraint.
@@ -197,7 +200,6 @@ class PyPRIS:
         self.hist_candidates_intervals = list()  # keep a record of the full history.
         self.hist_PRIS_ItN = list()
         self.hist_check_mark_id = list()  # checkmark ID. ascending each time after you make a check_mark
-
         self.observator = None  # this should be a function that needs to be defined.
 
     def prep_for_new_refinement(self):
@@ -278,7 +280,9 @@ class PyPRIS:
 
 
 class LinBreg:
+    
     import time
+    
     def __init__(self):
         self.id = []  # ID unique to PRIS object
         # solve for x from Ax = b.
@@ -292,7 +296,11 @@ class LinBreg:
         self.it_check_rem = 1
         self.iterations = list()
         self.hist_res = list()
-        self.hist_resDrop = list()
+        self.hist_delta_res = list()
+        self.hist_percent_delta_res = list()
+        # now initialize a threshold value for abs(log(abs(x)))*sign(x) with x=hist_delta_res; it suppose to be a negative value.
+        self.stopping_loghistpercdelres_thres = -11; # iteration will stop with the value is below this value.
+        self.stopping_loghistpercdelres = np.Inf;
         self.save_obj_int = 100
         self.bg = list()
         self.alpha = 1
@@ -301,11 +309,10 @@ class LinBreg:
         self.save = True
         self.obs_dim0 = 0
         self.obs_dim1 = 0
-
         self.kick = self.Kick(self)
-        
         self.A_dir = ''  # directory to store sensing matrix when saving
-
+        
+        
     class Kick:
         def __init__(self, LinBreg):
             self.parent = LinBreg
@@ -347,6 +354,7 @@ class LinBreg:
             # update kick.reference for follow-up kicking evaluation
             self.reference = copy.deepcopy(self.parent.x)
 
+            
     def get_ready(self):
         self.x = np.zeros(self.A.shape[1])
         self.stepsize = np.ones(self.x.shape)  # stepsize.
@@ -354,6 +362,8 @@ class LinBreg:
         self.erpj = np.zeros(self.x.shape)
         self.cumerr = np.zeros(self.x.shape)
         self.recb = np.zeros(self.b.shape)
+        print('stopping threshold is '+str(self.stopping_loghistpercdelres_thres))
+        print('alpha is '+str(self.alpha))
         
         import os
         # define the name of the directory to be created.
@@ -406,7 +416,8 @@ class LinBreg:
         t1 = time.time()
         it_count = 0
         self.hist_res.append(0)
-        self.hist_resDrop.append(0)
+        self.hist_delta_res.append(0)
+        self.hist_percent_delta_res.append(0)
         self.iterations.append(it_count)
         self.bg.append(self.x[self.x.size - 1])
         # main linearized bregman iteration with kicking option.
@@ -454,18 +465,24 @@ class LinBreg:
             self.x = self.alpha * self.shrink(self.x)
             if self.deep_debug is True: self.debug_output(it_count, appstr='_g_x_updated')
 
-            # decide on the termination of iterations.
-            if it_count > self.maxit: self.flag_stop = True
-
             # update the quantities for status tracking purposes.
             self.track_status(it_count, self.er)
 
+            # decide on the termination of iterations.
+            # set termination signal if maximum iteration is reached:
+            if it_count >= self.maxit: self.flag_stop = True
+            # set termination signal if stopping criteria is met:
+            if self.stopping_loghistpercdelres < self.stopping_loghistpercdelres_thres: 
+                self.flag_stop = True
+                print('stopping criteria fulfilled')
+                
             # check intermediate outputs. (Valid under debug mode).
             self.debug_output(it_count, appstr='_h_track_status_updated')
 
             # save object into separate file every assigned step
             self.save_obj(it_count, self.save_obj_int)
-
+            
+                
     def save_obj(self, currit, step):
         if self.save is True:
             if currit % step == 1:
@@ -475,6 +492,14 @@ class LinBreg:
                     print ("Successfully saved Linbreg ID {} at iteration {} to directory.".format(self.id, currit))
                 with open('../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_SensingMx.file'.format(self.id), "rb") as s:
                     self.A = pickle.load(s)
+            elif self.flag_stop is True:
+                self.A = 0
+                with open("../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_{}_stopped.file".format(self.id, currit), "wb") as f:
+                    pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
+                    print ("Successfully saved Linbreg ID {} at iteration {} to directory.".format(self.id, currit))
+                with open('../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_SensingMx.file'.format(self.id), "rb") as s:
+                    self.A = pickle.load(s)
+                
                     
     def candidate_vis(self):
         intervals = self.candidate_intervals
@@ -500,12 +525,12 @@ class LinBreg:
     def debug_output(self, it_count, appstr):
         # Generate intermediate output under debug mode.
         if self.debug is True:
-            if np.remainder(it_count, self.debug_it_int) == self.it_check_rem:
+            if np.remainder(it_count, self.debug_it_int) == self.it_check_rem or self.flag_stop is True:
                 print('intermediate output it#' + str(it_count))
                 vis = self.candidate_vis()
-                nrow = 4
+                nrow = 5
                 ncol = 5
-                plt.figure(figsize=(13, 8))
+                plt.figure(figsize=(14, 9))
                 plt.subplot(nrow, ncol, 1)
                 if len(vis) is 0:
                     t = plt.title("No signal yet.")
@@ -541,13 +566,13 @@ class LinBreg:
 
                 plt.subplot(nrow, ncol, 7)
                 plt.plot(self.cumerr.ravel(), '.')
-                t = plt.title('cum-err')
+                t = plt.title('cum err')
                 t.set_position([.5, 1.15])
 
                 plt.subplot(nrow, ncol, 8)
                 plt.plot(self.cumerr.ravel(), '.')
                 plt.plot([0, len(self.cumerr.ravel())], [self.mu, self.mu], 'r')
-                t = plt.title('cum-err and mu')
+                t = plt.title('cum err and mu')
                 t.set_position([.5, 1.15])
 
                 plt.subplot(nrow, ncol, 9)
@@ -561,35 +586,75 @@ class LinBreg:
                 t.set_position([.5, 1.15])
 
                 plt.subplot(nrow, ncol, 11)
-                plt.plot(self.stepsize.ravel(), '.')
-                t = plt.title('stepsize distribution')
+                plt.plot(self.iterations, (self.hist_res), '.')
+                t = plt.title('L2(res)')
                 t.set_position([.5, 1.15])
 
                 plt.subplot(nrow, ncol, 12)
-                plt.plot(self.iterations, np.log(self.hist_res), '.')
-                t = plt.title('Log(L2(res))')
-                t.set_position([.5, 1.15])
-
+                plt.plot(self.iterations, self.hist_delta_res, '.')
+                t = plt.title('delta L2(res)')
+                t.set_position([.5, 1])
+                
                 plt.subplot(nrow, ncol, 13)
-                plt.plot(self.er.ravel(), '.')
-                t = plt.title('err')
-                t.set_position([.5, 1.15])
-
+                plt.plot(self.iterations, self.hist_percent_delta_res, '.')
+                t = plt.title('percent delta L2(res)')
+                t.set_position([.5, 1])
+                
                 plt.subplot(nrow, ncol, 14)
+                plt.plot(self.er.ravel(), '.')
+                t = plt.title('res')
+                t.set_position([.5, 1])
+
+                plt.subplot(nrow, ncol, 15)
+                plt.plot(self.stepsize.ravel(), '.')
+                t = plt.title('stepsize distribution')
+                t.set_position([.5, 1])
+                
+
+                plt.subplot(nrow, ncol, 16)
+                plt.plot(self.iterations, abs(np.log(abs(np.asarray(self.hist_res)))) \
+                                          *np.sign(self.hist_res), \
+                         '.')
+                t = plt.title('abs(log(abs(x)))*sign(x) \n x = Log(L2(res))')
+                t.set_position([.5, 1])
+
+                plt.subplot(nrow, ncol, 17)
+                plt.plot(self.iterations, abs(np.log(abs(np.asarray(self.hist_delta_res)))) \
+                                          *np.sign(self.hist_delta_res), \
+                         '.')
+                t = plt.title('abs(log(abs(x)))*sign(x) \n x = delta_L2(res)')
+                t.set_position([.5, 1])
+
+                plt.subplot(nrow, ncol, 18)
+                plt.plot(self.iterations, abs(np.log(abs(np.asarray(self.hist_percent_delta_res)))) \
+                                          *np.sign(self.hist_percent_delta_res), \
+                         '.')
+                plt.plot([self.iterations[0],self.iterations[-1]], \
+                         [self.stopping_loghistpercdelres_thres,self.stopping_loghistpercdelres_thres],'r')
+                t = plt.title('abs(log(abs(x)))*sign(x) \n x = percent_delta_L2(res)')
+                t.set_position([.5, 1])
+                
+
+                plt.subplot(nrow, ncol, 19)
+                plt.hist(self.er.ravel(), 100)
+                t = plt.title('histogram of residual')
+                t.set_position([.5, 1])
+
+                plt.subplot(nrow, ncol, 20)
                 if len(self.kick.hist_eval_counts) > 2:
                     t = list(zip(*self.kick.hist_eval_counts))
                     plt.scatter(t[0], t[1], c=t[1])
                     t = plt.title('kicking history')
-                    t.set_position([.5, 1.15])
-
-                plt.subplot(nrow, ncol, 16)
-                plt.text(0, 0.9, 'mu: ' + str(np.floor(self.mu)), fontsize=16)
-                plt.text(0, 0.6, 'stepsize: ' + str(np.floor(self.stepsize)), fontsize=16)
-                plt.text(0, 0.3, 'current kicking flag is: ' + str(self.kick.flag), fontsize=16)
-                plt.text(0, 0, 'current figure: plots_it' + str(it_count) + appstr, fontsize=16)
+                    t.set_position([.5, 1])      
+                
+                plt.subplot(nrow, ncol, 24)
+                plt.text(0, 1, 'mu: ' + str(np.floor(self.mu)), fontsize=14)
+                plt.text(0, 0.8, 'stepsize: ' + str(np.floor(self.stepsize)), fontsize=14)
+                plt.text(0, 0.6, 'current kicking flag is: ' + str(self.kick.flag), fontsize=14)
+                plt.text(0, 0.4, 'current figure:', fontsize=14)
+                plt.text(0, 0.2, 'plots_it' + str(it_count) + appstr, fontsize=14)
                 plt.axis('off')
-
-                plt.subplots_adjust(top=0.95, left=0, right=1, bottom=0, wspace=0.5, hspace=1)
+                plt.subplots_adjust(top=0.95, left=0.1, right=0.9, bottom=0.1, wspace=0.5, hspace=1)
                 plt.savefig(
                     '../../PyPRIS_Scratch/debug_output/PyPRIS_{}_plots_it{}{}.png'.format(self.id, it_count, appstr),
                     dpi=300, figsize=(100, 80))
@@ -597,11 +662,17 @@ class LinBreg:
 
     def track_status(self, it_count, er):
         self.hist_res.append(np.linalg.norm(er))
-        self.hist_resDrop.append((self.hist_res[it_count] - self.hist_res[it_count - 1]) / self.hist_res[it_count - 1])
+        self.hist_delta_res.append((self.hist_res[it_count] - self.hist_res[it_count - 1]))
+        self.hist_percent_delta_res.append( \
+                                           (self.hist_res[it_count] - self.hist_res[it_count - 1]) \
+                                           /self.hist_res[it_count - 1] \
+                                          )
         self.iterations.append(it_count)
         self.bg.append(self.x[self.x.size - 1])
+        stopping_tag = copy.deepcopy(self.hist_percent_delta_res[-1])
+        self.stopping_loghistpercdelres = abs(np.log(abs(stopping_tag)))*np.sign(stopping_tag)
 
-
+        
 def loadPyPRIS(PRIS_iter, step):
     with open('../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_{}.file'.format(PRIS_iter, step), "rb") as f:
         PyPRIS = pickle.load(f)
