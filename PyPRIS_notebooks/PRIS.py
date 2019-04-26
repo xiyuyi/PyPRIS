@@ -1,186 +1,13 @@
 import numpy as np
-from scipy import interpolate
 import time
 import copy
 import pickle
 from matplotlib import pyplot as plt
 import matplotlib
+from ObserveStation import *
 
 #  Authors: Xiyu Yi, Xingjia Wang @ UCLA, 2019.
 #  PI: Shimon Weiss, Department of Chemistry and Biochemistry, UCLA.
-
-
-class ObserveStation:
-    
-    def __init__(self):
-        self.biplane_observer = None
-
-    class SingleObs:
-        
-        def __init__(self):
-            self.psf = np.arange(1, 31).reshape(2, 3, 5)
-            self.location = [0, 1, 2]
-            self.imsize = [4, 4]
-            self.psfz0 = 3
-            self.debug = True
-            self.edge_padding = False
-            self.subpixel_shift = True
-
-        def single_obs(self):
-            """ 
-            opts.psf   numpy.ndarray, 3D psf matrix, x-y should be odd numbers.  
-            opts.location list, location coordinte for z-x-y
-            opts.imsize list, x-y dimension of the observation image.
-            opts.psfz0 list, with a single integer. 
-            """
-
-            if self.debug is True:
-                print('---------------------- debug message ----------------------')
-                print('Warning: Avoid rectangular PSF matrix in xy plane!')
-                print('')
-
-            if self.subpixel_shift is True:
-                loc1 = np.int(np.floor(self.location[1]))
-                loc2 = np.int(np.floor(self.location[2]))
-                loc1_sps = self.location[1] - loc1  # the subpixel shift component
-                loc2_sps = self.location[2] - loc2  # the subpixel shift component
-
-            locz = self.location[0]  # location coordinates of depth.
-
-            obs1w = self.imsize[0];  # first dimension size
-            obs2w = self.imsize[1];  # second dimension size
-
-            psfdim = self.psf.shape
-            psf1hw = (psfdim[1] - 1) // 2  # half width of the psf matrix in dimension 1, excluding the center point.
-            psf2hw = (psfdim[2] - 1) // 2  # half width of the psf matrix in dimension 2, excluding the center point.
-
-            self.layerN = np.int(locz + self.psfz0)
-
-            loc1sta = int(max(loc1 - psf1hw, 0))
-            loc1end = int(min(loc1 + psf1hw + 1, obs1w))
-            loc2sta = int(max(loc2 - psf2hw, 0))
-            loc2end = int(min(loc2 + psf2hw + 1, obs2w))
-
-            psf1sta = int(psf1hw - (loc1 - loc1sta));  # need to think about whether I should add 1 or not.
-            psf1end = int(psf1hw + (loc1end - loc1));
-            psf2sta = int(psf2hw - (loc2 - loc2sta));  # need to think about whether I should add 1 or not.
-            psf2end = int(psf2hw + (loc2end - loc2));
-
-            if self.debug is True:
-                print('original loc1 is ' + str(self.location[1]))
-                print('original loc2 is ' + str(self.location[2]))
-                print('self.subpixel_shift is ' + str(self.subpixel_shift))
-                print('loc1 is ' + str(loc1))
-                print('loc2 is ' + str(loc2))
-                print('loc1 excess is ' + str(loc1_sps))
-                print('loc2 excess is ' + str(loc2_sps))
-                print(' location coordiante: locz=' + str(locz) + ', loc1=' + str(loc1) + ', loc2=' + str(loc2))
-                print('')
-                print('layerN = ' + str(self.layerN))
-                print('loc1sta = ' + str(loc1sta) + '; loc1end = ' + str(loc1end))
-                print('loc2sta = ' + str(loc2sta) + '; loc2end = ' + str(loc2end))
-                print('psf1sta = ' + str(psf1sta) + '; psf1end = ' + str(psf1end))
-                print('psf2sta = ' + str(psf2sta) + '; psf2end = ' + str(psf2end))
-
-            if self.subpixel_shift is True:
-                # get the stamp with only the integer part
-                stamp = np.copy(self.psf[self.layerN, :, :])
-                # up perform sub-pixel interpolation to include the sub-pixel shifts in the stamp.
-
-                locs1 = np.arange(0, stamp.shape[0])
-                locs2 = np.arange(0, stamp.shape[1])
-                # find interpolation coordinates based on the sub-pixel shifts
-                locs1new = locs1[1:locs1.size - 1] - loc1_sps
-                locs2new = locs2[1:locs2.size - 1] - loc2_sps
-                # find the shifted stamp and assin        
-                if self.debug is True:
-                    print('-------------------------- Now interpoltion ')
-                    print('     stamp shape is: ' + str(stamp.shape))
-                    print('     locs1 shape is: ' + str(locs1.shape))
-                    print('     locs2 shape is: ' + str(locs2.shape))
-                    print('  locs1new shape is: ' + str(locs1new.shape))
-                    print('  locs2new shape is: ' + str(locs2new.shape))
-
-                # define interpolation function
-                f = interpolate.interp2d(locs2, locs1, stamp, kind='cubic')
-                stamp_sps = f(locs2new, locs1new)
-                stamp[1:stamp.shape[0] - 1, 1:stamp.shape[1] - 1] = stamp_sps
-                self.stamp = np.copy(stamp[psf1sta:psf1end, psf2sta:psf2end])
-            else:
-                self.stamp = np.copy(self.psf[self.layerN, psf1sta:psf1end, psf2sta:psf2end])
-
-            if self.edge_padding is True:
-                ev1 = self.psf[self.layerN, [1, psf1hw * 2], :].ravel()
-                ev2 = self.psf[self.layerN, :, [1, psf2hw * 2]].ravel()
-                edge_value = np.concatenate((ev1, ev2), axis=0).ravel().mean()
-
-                self.obs = np.ones(self.imsize) * edge_value
-                self.obs[loc1sta:loc1end, loc2sta:loc2end] = self.stamp
-            else:
-                self.obs = np.zeros(self.imsize)
-                self.obs[loc1sta:loc1end, loc2sta:loc2end] = self.stamp
-
-            if self.debug is True:
-                print('shape of observation: ' + str(self.imsize))
-                print('        shape of psf: ' + str(self.psf.shape))
-                print('     z0 index in psf: ' + str(self.psfz0))
-                print('              psf1hw: ' + str(psf1hw))
-                print('              psf2hw: ' + str(psf2hw))
-                print('')
-                print('')
-
-                self.psfwbox = np.copy(self.psf[self.layerN, :, :])
-                c = max(self.psfwbox.ravel())
-                self.psfwbox[psf1sta, psf2sta: psf2end] = c
-                self.psfwbox[psf1end - 1, psf2sta: psf2end] = c
-                self.psfwbox[psf1sta: psf1end, psf2sta] = c
-                self.psfwbox[psf1sta: psf1end, psf2end - 1] = c
-
-                self.obswbox = np.copy(self.obs)
-                c = max(self.obswbox.ravel())
-                self.obswbox[loc1sta, loc2sta: loc2end] = c
-                self.obswbox[loc1end - 1, loc2sta: loc2end] = c
-                self.obswbox[loc1sta: loc1end, loc2sta] = c
-                self.obswbox[loc1sta: loc1end, loc2end - 1] = c
-
-    def observe_biplane_prep(self, psf, single_image_size, deltaz_plane1, deltaz_plane2, psfz0,\
-                             observer_debugger, observer_edge_padding):
-        # prepare an observer for biplane observation
-        # this method will only be executed once in the preparation before calculating the sensing matrix.
-        self.biplane_observer = self.SingleObs() # this is the parent class.
-        self.biplane_observer.psf = np.copy(psf)
-        self.biplane_observer.psfz0 = psfz0
-        self.biplane_observer.debug = observer_debugger
-        self.biplane_observer.imsize = single_image_size  # this should be the image size of the single plane observation
-        self.biplane_observer.edge_padding = observer_edge_padding  # yes we want edge padding.
-        self.biplane_observer.deltaz_1 = deltaz_plane1  # the observer now knows the plane shift for the first plane.
-        self.biplane_observer.deltaz_2 = deltaz_plane2  # the observer now knows the plane shift for the second plane.
-
-    def observe_biplane(self, loc):
-        # take the biplane observation
-        # this method will be passed into the sensing matrix generator, and
-        # be executed iterative throughout the course of sensing matrix generation.
-        #
-        # get the depth positions of the two observation planes for the biplane_observer.
-        loc1 = np.copy(loc);
-        loc1[0] = np.copy(loc[0]) + self.biplane_observer.deltaz_1
-        loc2 = np.copy(loc);
-        loc2[0] = np.copy(loc[0]) + self.biplane_observer.deltaz_2
-
-        # the biplane_observer now observe the first plane.
-        self.biplane_observer.location = loc1  # focus at the position
-        self.biplane_observer.single_obs()  # take the observation
-        self.biplane_observer.observation1 = self.biplane_observer.obs.ravel()  # record this first observation
-
-        # the biplane_observer now observe the second plane.
-        self.biplane_observer.location = loc2  # focus at the position
-        self.biplane_observer.single_obs()  # take the observation
-        self.biplane_observer.observation2 = self.biplane_observer.obs.ravel()  # record this second observation
-
-        # the biplane_observer now returns the observation
-        observation = np.concatenate([self.biplane_observer.observation1, self.biplane_observer.observation2]).ravel()
-        return observation
-
 
 class PyPRIS:
     
@@ -271,8 +98,14 @@ class LinBreg:
     
     import time
     
-    def __init__(self):
-        self.id = []  # ID unique to PRIS object
+    def __init__(self, PyPRIS_n):
+        self.PyPRIS_iter = []  # Associated PyPRIS iter number
+        self.PyPRIS_name = PyPRIS_n # Associated PyPRIS name
+        
+        self.path_0 = "../../PyPRIS_Scratch/"
+        self.path_s = "../../PyPRIS_Scratch/saved_objects"
+        self.path_d = "../../PyPRIS_Scratch/debug_output"
+        
         # solve for x from Ax = b.
         self.A = 0  # sensing matrix.
         self.x = 0
@@ -355,44 +188,41 @@ class LinBreg:
         
         import os
         # define the name of the directory to be created.
-        path_0 = "../../PyPRIS_Scratch/"
-        path_s = "../../PyPRIS_Scratch/saved_objects"
-        path_d = "../../PyPRIS_Scratch/debug_output"
         
         try:
-            if not os.path.exists(path_0):
-                os.mkdir(path_0)
+            if not os.path.exists(self.path_0):
+                os.mkdir(self.path_0)
         except OSError:
-            print ("Creation of the directory %s failed" % path_0)
+            print ("Creation of the directory %s failed" % self.path_0)
         else:
-            print ("Successfully created Scratch directory %s " % path_0)
+            print ("Successfully created Scratch directory %s " % self.path_0)
 
         if self.save is True:   
             try:
-                if not os.path.exists(path_s):
-                    os.mkdir(path_s)
+                if not os.path.exists(self.path_s):
+                    os.mkdir(self.path_s)
 
                 try:
-                    with open("../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_SensingMx.file".format(self.id), "wb") as f:
+                    with open("{}/PyPRIS_{}_{}_SensingMx.file".format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter), "wb") as f:
                         pickle.dump(self.A, f, pickle.HIGHEST_PROTOCOL)
                 except OSError:
-                    print ("Failed to write sensing matrix to directory %s " % path_s)
+                    print ("Failed to write sensing matrix to directory %s " % self.path_s)
                 else: 
-                    print ("Successfully wrote sensing matrix to directory %s " % path_s)
+                    print ("Successfully wrote sensing matrix to directory %s " % self.path_s)
 
             except OSError:
-                print ("Creation of the directory %s failed" % path_s)
+                print ("Creation of the directory %s failed" % self.path_s)
             else:
-                print ("Successfully created Object-saving directory %s " % path_s)
+                print ("Successfully created Object-saving directory %s " % self.path_s)
 
         if self.debug is True:
             try:
-                if not os.path.exists(path_d):
-                    os.mkdir(path_d)
+                if not os.path.exists(self.path_d):
+                    os.mkdir(self.path_d)
             except OSError:
-                print ("Creation of the directory %s failed" % path_d)
+                print ("Creation of the directory %s failed" % self.path_d)
             else:
-                print ("Successfully created Debug directory %s " % path_d)
+                print ("Successfully created Debug directory %s " % self.path_d)
 
     def shrink(self, sk):
         sk[np.where((sk >= -self.mu) * (sk <= self.mu))] = 0
@@ -477,17 +307,17 @@ class LinBreg:
                 self.A = 0
                 import sys
                 setattr(sys.modules[__name__], 'Kick', self.Kick)
-                with open("../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_{}.file".format(self.id, currit), "wb") as f:
+                with open("{}/PyPRIS_{}_{}_{}.file".format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter, currit), "wb") as f:
                     pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
-                    print ("Successfully saved Linbreg ID {} at iteration {} to directory.".format(self.id, currit))
-                with open('../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_SensingMx.file'.format(self.id), "rb") as s:
+                    print ("Successfully saved Linbreg ID {} at iteration {} to directory.".format(self.PyPRIS_iter, currit))
+                with open('{}/PyPRIS_{}_{}_SensingMx.file'.format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter), "rb") as s:
                     self.A = pickle.load(s)
             elif self.flag_stop is True:
                 self.A = 0
-                with open("../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_{}_stopped.file".format(self.id, currit), "wb") as f:
+                with open("{}/PyPRIS_{}_{}_{}.file".format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter, currit), "wb") as f:
                     pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
-                    print ("Successfully saved Linbreg ID {} at iteration {} to directory.".format(self.id, currit))
-                with open('../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_SensingMx.file'.format(self.id), "rb") as s:
+                    print ("Successfully saved Linbreg ID {} at iteration {} to directory.".format(self.PyPRIS_iter, currit))
+                with open('{}/PyPRIS_{}_{}_SensingMx.file'.format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter), "rb") as s:
                     self.A = pickle.load(s)
                 
                     
@@ -646,7 +476,7 @@ class LinBreg:
                 plt.axis('off')
                 plt.subplots_adjust(top=0.95, left=0.1, right=0.9, bottom=0.1, wspace=0.5, hspace=1)
                 plt.savefig(
-                    '../../PyPRIS_Scratch/debug_output/PyPRIS_{}_plots_it{}{}.png'.format(self.id, it_count, appstr),
+                    '{}/PyPRIS_{}_{}_plots_it{}{}.png'.format(self.path_d, self.PyPRIS_name, self.PyPRIS_iter, it_count, appstr),
                     dpi=300, figsize=(100, 80))
                 plt.close()
 
@@ -662,10 +492,9 @@ class LinBreg:
         stopping_tag = copy.deepcopy(self.hist_percent_delta_res[-1])
         self.stopping_loghistpercdelres = abs(np.log(abs(stopping_tag)))*np.sign(stopping_tag)
 
-        
-def loadPyPRIS(PRIS_iter, step):
-    with open('../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_{}.file'.format(PRIS_iter, step), "rb") as f:
+def loadCSSolver(PyPRIS_name, path, PyPRIS_iter, CS_iter):
+    with open('{}/PyPRIS_{}_{}_{}.file'.format(path, PyPRIS_name, PyPRIS_iter, CS_iter), "rb") as f:
         PyPRIS = pickle.load(f)
-    with open('../../PyPRIS_Scratch/saved_objects/PyPRIS_{}_SensingMx.file'.format(PRIS_iter), "rb") as s:
+    with open('{}/PyPRIS_{}_{}_SensingMx.file'.format(path, PyPRIS_name, PyPRIS_iter), "rb") as s:
         PyPRIS.A = pickle.load(s)
     return PyPRIS
