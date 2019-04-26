@@ -208,14 +208,14 @@ class PyPRIS:
         self.hist_PRIS_ItN.append(copy.deepcopy(self.current_PRIS_ItN))
         self.set_check_mark()
 
-    def refine_candidates(self, linbreg):
-    # this will take the current candidates and the result in the linbreg object,
+    def refine_candidates(self, cs_solver):
+    # this will take the current candidates and the result in the compressive sensing solver object,
     # and generate refined pool of candidates.
         # create a check mark.
         self.set_check_mark()
 
-        # Get the non_zero_coordinates from the existing linbreg results.
-        non_zero_inds = np.argwhere(linbreg.x[0:len(linbreg.x) - 1] > 0)
+        # Get the non_zero_coordinates from the existing cs_solver results.
+        non_zero_inds = np.argwhere(cs_solver.x[0:len(cs_solver.x) - 1] > 0)
         non_zero_coordinates = [self.current_candidates[i] for i in list(non_zero_inds.ravel())]
 
         self.current_candidates_intervals = copy.deepcopy(
@@ -286,6 +286,7 @@ class LinBreg:
         self.hist_res = list()
         self.hist_delta_res = list()
         self.hist_percent_delta_res = list()
+        self.stopping_moni_start = 1000
         # now initialize a threshold value for abs(log(abs(x)))*sign(x) with x=hist_delta_res; it suppose to be a negative value.
         self.stopping_loghistpercdelres_thres = -11; # iteration will stop with the value is below this value.
         self.stopping_loghistpercdelres = np.Inf;
@@ -460,7 +461,7 @@ class LinBreg:
             # set termination signal if maximum iteration is reached:
             if it_count >= self.maxit: self.flag_stop = True
             # set termination signal if stopping criteria is met:
-            if self.stopping_loghistpercdelres < self.stopping_loghistpercdelres_thres: 
+            if self.stopping_loghistpercdelres < self.stopping_loghistpercdelres_thres and it_count > self.stopping_moni_start: 
                 self.flag_stop = True
                 print('stopping criteria fulfilled')
                 
