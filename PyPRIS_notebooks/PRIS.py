@@ -287,6 +287,7 @@ class LinBreg:
         self.hist_delta_res = list()
         self.hist_percent_delta_res = list()
         self.stopping_moni_start = 1000
+        self.it_count = 0
         # now initialize a threshold value for abs(log(abs(x)))*sign(x) with x=hist_delta_res; it suppose to be a negative value.
         self.stopping_loghistpercdelres_thres = -11; # iteration will stop with the value is below this value.
         self.stopping_loghistpercdelres = np.Inf;
@@ -345,6 +346,7 @@ class LinBreg:
 
             
     def get_ready(self):
+        self.it_count = -1
         self.x = np.zeros(self.A.shape[1])
         self.stepsize = np.ones(self.x.shape)  # stepsize.
         self.er = np.zeros(self.b.shape)
@@ -403,16 +405,16 @@ class LinBreg:
 
     def go(self):
         t1 = time.time()
-        it_count = 0
         self.hist_res.append(0)
         self.hist_delta_res.append(0)
         self.hist_percent_delta_res.append(0)
-        self.iterations.append(it_count)
+        self.iterations.append(self.it_count)
         self.bg.append(self.x[self.x.size - 1])
         # main linearized bregman iteration with kicking option.
         while self.flag_stop is False:
             # incrementation of the iteration number.
-            it_count += 1
+            self.it_count += 1
+            it_count = self.it_count
 
             # calculate distance (error)
             self.recb = np.dot(self.A, self.x)
