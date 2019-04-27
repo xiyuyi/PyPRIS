@@ -4,7 +4,6 @@ import copy
 import pickle
 from matplotlib import pyplot as plt
 import matplotlib
-from ObserveStation import *
 
 #  Authors: Xiyu Yi, Xingjia Wang @ UCLA, 2019.
 #  PI: Shimon Weiss, Department of Chemistry and Biochemistry, UCLA.
