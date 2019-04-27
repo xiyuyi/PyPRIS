@@ -500,3 +500,8 @@ def loadCSSolver(PyPRIS_name, path, PyPRIS_iter, CS_iter):
     with open('{}/PyPRIS_{}_{}_SensingMx.file'.format(path, PyPRIS_name, PyPRIS_iter), "rb") as s:
         PyPRIS.A = pickle.load(s)
     return PyPRIS
+
+def get_order(order_path):
+    with open(order_path, "rb") as f:
+        order = pickle.load(f)
+    return order
