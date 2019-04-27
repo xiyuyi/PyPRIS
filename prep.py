@@ -29,7 +29,7 @@ ticket.tobserver_edge_padding = True
 
 "output settings"
 ticket.output_file_header = 'Demo'
-ticket.output_path = '../PyPRIS_Scratch'
+ticket.output_path = 'C:/Users/xiyu/Desktop/PyPRIS_test'
 
 "linbreg configurations"
 ticket.linbreg_alpha = LinBreg("Demo")
