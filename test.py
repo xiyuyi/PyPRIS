@@ -1,10 +1,14 @@
 from PyPRIS import *
-print("hello world!")
+print("")
+print("")
+print("")
+print("PyPRIS")
 import warnings
 warnings.filterwarnings("ignore")
 
 # take a PRIS recovery order
-ticket = get_order('./Demo.pris_ticket')
+ticket = get_ticket('./Demo.pris_ticket')
+
 # prep the order according to the ticket
 psf = io.imread(ticket.psf_path)
 blur1 = io.imread(ticket.plane1_path)
@@ -21,6 +25,7 @@ observer.observe_biplane_prep(psf, single_image_size = blur1.shape,
                            psfz0 = ticket.psfz0,
                            observer_debugger = ticket.observer_debugger,
                            observer_edge_padding = ticket.observer_edge_padding)
+
 # this observer will perform observation for the pypris object as seen below in the next section titled 'Initialize PyPRIS'.
 # get a PyPRIS object:
 pypris = PyPRIS()
@@ -69,8 +74,28 @@ linbreg.candidate_intervals = pypris.current_candidates_intervals
 linbreg.A = pypris.current_A
 linbreg.b = pypris.observation.ravel()
 linbreg.id = 0
-print("check point")
+print("---------------- PRIS refinement #0 ------------------")
 # recover
 linbreg.get_ready()
 linbreg.go()
 
+
+# construct sensing matrix,
+for PRIS_iter in np.arange(0,ticket.PRIS_iter_end):
+    pypris.prep_for_new_refinement()
+    pypris.refine_candidates(linbreg)
+    pypris.generate_sensing_mx()
+    # prepare the inner sparse recovery
+    pypris.current_A = pypris.current_A / ticket.psf_norm_factor
+    c = np.sum(np.dot(pypris.observation.ravel(), pypris.current_A[:, len(pypris.current_candidates) - 1]))
+    pypris.current_A[:, len(pypris.current_candidates)] = np.sum(c) / np.sum(pypris.observation.ravel()) * ticket.bg_scaling_coef
+    linbreg = copy.deepcopy(linbreg_ori)
+    linbreg.candidate_coords = pypris.current_candidates
+    linbreg.candidate_intervals = pypris.current_candidates_intervals
+    linbreg.A = pypris.current_A
+    linbreg.b = pypris.observation.ravel()
+    linbreg.id = PRIS_iter
+    print("---------------- PRIS refinement #" + str(PRIS_iter) + " ------------------")
+    # recover
+    linbreg.get_ready()
+    linbreg.go()

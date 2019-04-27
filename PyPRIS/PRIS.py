@@ -100,11 +100,7 @@ class LinBreg:
     def __init__(self, PyPRIS_n):
         self.PyPRIS_iter = []  # Associated PyPRIS iter number
         self.PyPRIS_name = PyPRIS_n # Associated PyPRIS name
-        
-        self.path_0 = "../../PyPRIS_Scratch/"
-        self.path_s = "../../PyPRIS_Scratch/saved_objects"
-        self.path_d = "../../PyPRIS_Scratch/debug_output"
-        
+        self.path_0 = "../PyPRIS_Scratch"
         # solve for x from Ax = b.
         self.A = 0  # sensing matrix.
         self.x = 0
@@ -185,6 +181,8 @@ class LinBreg:
         self.erpj = np.zeros(self.x.shape)
         self.cumerr = np.zeros(self.x.shape)
         self.recb = np.zeros(self.b.shape)
+        self.path_s = self.path_0 + "/saved_objects"
+        self.path_d = self.path_0 + "/debug_output"
         print('stopping threshold is '+str(self.stopping_loghistpercdelres_thres))
         print('alpha is '+str(self.alpha))
         
@@ -301,7 +299,6 @@ class LinBreg:
 
             # save object into separate file every assigned step
             self.save_obj(it_count, self.save_obj_int)
-            
                 
     def save_obj(self, currit, step):
         if self.save is True:
@@ -501,7 +498,7 @@ def loadCSSolver(PyPRIS_name, path, PyPRIS_iter, CS_iter):
         PyPRIS.A = pickle.load(s)
     return PyPRIS
 
-def get_order(order_path):
-    with open(order_path, "rb") as f:
-        order = pickle.load(f)
-    return order
+def get_ticket(ticket_path):
+    with open(ticket_path, "rb") as f:
+        ticket = pickle.load(f)
+    return ticket

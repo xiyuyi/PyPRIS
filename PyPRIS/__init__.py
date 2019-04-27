@@ -1,6 +1,6 @@
 from PyPRIS.PRIS import *
 from PyPRIS.module_observe_station import *
-from PyPRIS.config import *
+from PyPRIS.config_tickets import *
 import numpy as np
 from matplotlib import pyplot as plt
 from skimage import io

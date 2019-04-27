@@ -1,5 +1,5 @@
 from PyPRIS import *
-ticket = BiplaneConfig()
+ticket = BiplaneTicket()
 
 "the name of this pris ticket"
 ticket.name = 'Demo'
@@ -23,14 +23,13 @@ ticket.init_ax0_range = list([-36, 36])
 ticket.init_ax1_range = list([5, 66])
 ticket.init_ax2_range = list([5, 66])
 
-
 "debug configurations"
 ticket.observer_debugger = False
 ticket.tobserver_edge_padding = True
 
 "output settings"
 ticket.output_file_header = 'Demo'
-ticket.output_path = './DemoOutput'
+ticket.output_path = '../PyPRIS_Scratch'
 
 "linbreg configurations"
 ticket.linbreg_alpha = LinBreg("Demo")
@@ -38,7 +37,7 @@ ticket.linbreg_alpha.debug = True
 ticket.linbreg_alpha.deep_debug = False
 ticket.linbreg_alpha.mu = 1000000000
 ticket.linbreg_alpha.alpha = 1e-8
-ticket.linbreg_alpha.maxit = 200
+ticket.linbreg_alpha.maxit = 2000
 ticket.linbreg_alpha.it_check_rem = 1
 ticket.linbreg_alpha.debug_it_int = 100
 ticket.linbreg_alpha.kick.ints = 10
@@ -46,7 +45,13 @@ ticket.linbreg_alpha.kick.flag = True
 ticket.linbreg_alpha.kick.thres = 1e-3
 ticket.linbreg_alpha.save_obj_int = 100
 ticket.linbreg_alpha.save = True
+ticket.linbreg_alpha.PyPRIS_iter = ticket.name
+ticket.linbreg_alpha.path_0 = ticket.output_path
+
 ticket.bg_scaling_coef = 1.5
+
+"others"
+ticket.PRIS_iter_end = 5
 
 with open("{}.pris_ticket".format(ticket.name), "wb") as f:
     pickle.dump(ticket, f, pickle.HIGHEST_PROTOCOL)
