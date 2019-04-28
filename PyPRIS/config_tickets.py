@@ -38,7 +38,7 @@ class BiplaneTicket:
 
         "linbreg configurations"
         self.linbreg_alpha = LinBreg("Demo")
-        self.linbreg_alpha.debug = True
+        self.linbreg_alpha.debug = False
         self.linbreg_alpha.deep_debug = False
         self.linbreg_alpha.mu = 1000000000
         self.linbreg_alpha.alpha = 1e-8

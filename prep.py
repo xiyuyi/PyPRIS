@@ -33,8 +33,15 @@ ticket.output_path = '../PyPRIS_Demo_output'
 
 "linbreg configurations"
 ticket.linbreg_alpha = LinBreg("Demo")
-ticket.linbreg_alpha.debug = True
-ticket.linbreg_alpha.deep_debug = False
+
+try:
+    import matplotlib.pyplot as plt
+    ticket.linbreg_alpha.debug = False
+    ticket.linbreg_alpha.deep_debug = False
+except RuntimeError:
+    ticket.linbreg_alpha.debug = False
+    ticket.linbreg_alpha.deep_debug = False
+
 ticket.linbreg_alpha.mu = 1000000000
 ticket.linbreg_alpha.alpha = 1e-11
 ticket.linbreg_alpha.maxit = 2000
