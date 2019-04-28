@@ -2,8 +2,12 @@ import numpy as np
 import time
 import copy
 import pickle
-from matplotlib import pyplot as plt
 import matplotlib
+
+try:
+    from matplotlib import pyplot as plt
+except RuntimeError:
+    pass
 
 #  Authors: Xiyu Yi, Xingjia Wang @ UCLA, 2019.
 #  PI: Shimon Weiss, Department of Chemistry and Biochemistry, UCLA.
@@ -122,8 +126,6 @@ class LinBreg:
         self.save_obj_int = 100
         self.bg = list()
         self.alpha = 1
-        self.debug = False
-        self.deep_debug = False
         self.save = True
         self.obs_dim0 = 0
         self.obs_dim1 = 0
