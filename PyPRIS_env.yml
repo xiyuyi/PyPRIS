@@ -10,6 +10,6 @@ dependencies:
   - ipykernel
   - pip
   - pip:
-    - pillow=5.2.0
+    - pillow==5.2.0
     - libtiff
     
