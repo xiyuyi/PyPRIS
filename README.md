@@ -45,9 +45,9 @@ To log-out from the PyPRIS environment, type:
 
 `conda deactivate`
 
-#### to test the demo case:
+### Test the demo case on hoffman2:
 
-Checkout a computation node with:
+Checkout a computation session with:
 
 `qrsh`
 
