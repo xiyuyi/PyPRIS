@@ -37,6 +37,10 @@ Install the PyPRIS_env enviroenemt to your home directory with:
 
 `conda env create -f PyPRIS_env.yml` (This step may take about 10 minutes)
 
+Activate the environment with:
+
+`source activate PyPRIS_env`
+
 To log-out from the PyPRIS environment, type: 
 
 `conda deactivate`
