@@ -29,14 +29,14 @@ ticket.tobserver_edge_padding = True
 
 "output settings"
 ticket.output_file_header = 'Demo'
-ticket.output_path = 'C:/Users/xiyu/Desktop/PyPRIS_test'
+ticket.output_path = '../PyPRIS_Demo_output'
 
 "linbreg configurations"
 ticket.linbreg_alpha = LinBreg("Demo")
 ticket.linbreg_alpha.debug = True
 ticket.linbreg_alpha.deep_debug = False
 ticket.linbreg_alpha.mu = 1000000000
-ticket.linbreg_alpha.alpha = 1e-8
+ticket.linbreg_alpha.alpha = 1e-11
 ticket.linbreg_alpha.maxit = 2000
 ticket.linbreg_alpha.it_check_rem = 1
 ticket.linbreg_alpha.debug_it_int = 100
