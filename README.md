@@ -45,5 +45,16 @@ To log-out from the PyPRIS environment, type:
 
 `conda deactivate`
 
+#### to test the demo case:
 
+Checkout a computation node with:
 
+`qrsh`
+
+Generate pypyrs configuration ticket with:
+
+`python prep.py`
+
+Run the PRIS recovery demo case with:
+
+`python test.py`
