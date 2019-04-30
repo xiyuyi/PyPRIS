@@ -1,8 +1,17 @@
+#!/u/home/x/xiyuyi/.conda/envs/PyPRIS_env/bin/python
+
+print("PyPRIS: [add some description]")
+print("Developers: Xiyu Yi, Xingjia Wang @ UCLA, 2019")
+print("PI: Shimon Weiss")
+print("[some more description]")
+
+import sys
+sys.path.append("/u/home/x/xiyuyi/bin")
 from PyPRIS import *
 print("")
 print("")
 print("")
-print("PyPRIS")
+print("PyPRIS Go!")
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -61,6 +70,7 @@ pypris.observe = observer.observe_biplane
 linbreg_ori = ticket.linbreg_alpha
 linbreg_ori.obs_dim0 = blur.shape[0]
 linbreg_ori.obs_dim1 = blur.shape[1]
+linbreg_ori.PyPRIS_name = ticket.name
 
 # construct sensing matrix,
 pypris.generate_sensing_mx()
@@ -73,15 +83,14 @@ linbreg.candidate_coords = pypris.current_candidates
 linbreg.candidate_intervals = pypris.current_candidates_intervals
 linbreg.A = pypris.current_A
 linbreg.b = pypris.observation.ravel()
-linbreg.id = 0
+linbreg.PyPRIS_iter = "pris0"
 print("---------------- PRIS refinement #0 ------------------")
 # recover
 linbreg.get_ready()
 linbreg.go()
 
-
 # construct sensing matrix,
-for PRIS_iter in np.arange(0,ticket.PRIS_iter_end):
+for PRIS_iter in np.arange(1,ticket.PRIS_iter_end):
     pypris.prep_for_new_refinement()
     pypris.refine_candidates(linbreg)
     pypris.generate_sensing_mx()
@@ -94,7 +103,7 @@ for PRIS_iter in np.arange(0,ticket.PRIS_iter_end):
     linbreg.candidate_intervals = pypris.current_candidates_intervals
     linbreg.A = pypris.current_A
     linbreg.b = pypris.observation.ravel()
-    linbreg.id = PRIS_iter
+    linbreg.PyPRIS_iter = "pris"+ str(PRIS_iter)
     print("---------------- PRIS refinement #" + str(PRIS_iter) + " ------------------")
     # recover
     linbreg.get_ready()
