@@ -164,7 +164,7 @@ class LinBreg:
             i0 = np.where(self.parent.x == 0)  # zero entries on x [x entries where there kicking is in demand]
             i1 = np.where(
                 self.parent.x != 0)  # none zero entries in x. [x entries where there is a value, no need for kicking]
-            si = (self.parent.mu * np.sign(self.parent.erpj[i0]) - self.parent.cumerr[i0]) / self.parent.erpj[
+            si = (self.parent.mu * np.sign(self.parent.respj[i0]) - self.parent.cumres[i0]) / self.parent.respj[
                 i0]  # stepsie for entries that needs kicking
             self.parent.stepsize[i0] = np.min(si)
             self.parent.stepsize[i1] = 1
@@ -179,9 +179,9 @@ class LinBreg:
         self.it_count = -1
         self.x = np.zeros(self.A.shape[1])
         self.stepsize = np.ones(self.x.shape)  # stepsize.
-        self.er = np.zeros(self.b.shape)
-        self.erpj = np.zeros(self.x.shape)
-        self.cumerr = np.zeros(self.x.shape)
+        self.res = np.zeros(self.b.shape)
+        self.respj = np.zeros(self.x.shape)
+        self.cumres = np.zeros(self.x.shape)
         self.recb = np.zeros(self.b.shape)
         self.path_s = self.path_0 + "/saved_objects"
         self.path_d = self.path_0 + "/debug_output"
@@ -245,20 +245,20 @@ class LinBreg:
             self.it_count += 1
             it_count = self.it_count
 
-            # calculate distance (error)
+            # calculate distance (residuals)
             self.recb = np.dot(self.A, self.x)
-            self.er = self.b - self.recb
-            if self.deep_debug is True: self.debug_output(it_count, appstr='_a_er_updated')
+            self.res = self.b - self.recb
+            if self.deep_debug is True: self.debug_output(it_count, appstr='_a_res_updated')
 
-            # perform back projection of the error ('adding the errors back').
-            self.erpj = np.dot(self.er, self.A)
-            if self.deep_debug is True: self.debug_output(it_count, appstr='_b_erpj_updated')
+            # perform back projection of the residuals ('adding the residuals back').
+            self.respj = np.dot(self.res, self.A)
+            if self.deep_debug is True: self.debug_output(it_count, appstr='_b_respj_updated')
 
             # check if kicking is needed 
             #
-            # "Kicking" rescales the backprojected error (self.erpj) with two different stepsizes
+            # "Kicking" rescales the back projected residual (self.respj) with two different stepsizes
             # we'll have stepsize > 1 for kicking area, and stepsize = 1 for non-kicking area. 
-            # kicking boosts the tip of the cumulated backprojected errors towards the shrinkage 
+            # kicking boosts the tip of the cumulated backprojected residuals towards the shrinkage 
             # threshold.
             # In this implementation, the effect of kicking is realized throught a modified. 
             # distribution of stepsizes (self.stepsize). 
@@ -271,22 +271,22 @@ class LinBreg:
                     self.kick.go()
                 if self.deep_debug is True: self.debug_output(it_count, appstr='_c2_kicking_updated')
 
-            # get the acumulation of the back projected error.
-            self.cumerr += self.erpj * self.stepsize
-            if self.deep_debug is True: self.debug_output(it_count, appstr='_d_cumerr_updated')
+            # get the acumulation of the back projected residuals.
+            self.cumres += self.respj * self.stepsize
+            if self.deep_debug is True: self.debug_output(it_count, appstr='_d_cumres_updated')
 
             # perform positivity constraint:
             if self.flag_positivity is True: self.x[np.where(self.x < 0)] = 0
             if self.deep_debug is True: self.debug_output(it_count, appstr='_e_positivity_updated')
 
             # shrinkage to update the candidate coefficients.
-            self.x = copy.deepcopy(self.cumerr)
+            self.x = copy.deepcopy(self.cumres)
             if self.deep_debug is True: self.debug_output(it_count, appstr='_f_x_copied')
             self.x = self.alpha * self.shrink(self.x)
             if self.deep_debug is True: self.debug_output(it_count, appstr='_g_x_updated')
 
             # update the quantities for status tracking purposes.
-            self.track_status(it_count, self.er)
+            self.track_status(it_count, self.res)
 
             # decide on the termination of iterations.
             # set termination signal if maximum iteration is reached:
@@ -372,7 +372,7 @@ class LinBreg:
 
                 plt.subplot(nrow, ncol, 4)
                 plt.plot(self.recb.ravel(), '.')
-                t = plt.title('recovered obsrvation plot')
+                t = plt.title('recovered observation plot')
                 t.set_position([.5, 1.15])
 
                 plt.subplot(nrow, ncol, 5)
@@ -386,24 +386,24 @@ class LinBreg:
                 t.set_position([.5, 1.15])
 
                 plt.subplot(nrow, ncol, 7)
-                plt.plot(self.cumerr.ravel(), '.')
-                t = plt.title('cum err')
+                plt.plot(self.cumres.ravel(), '.')
+                t = plt.title('cum res')
                 t.set_position([.5, 1.15])
 
                 plt.subplot(nrow, ncol, 8)
-                plt.plot(self.cumerr.ravel(), '.')
-                plt.plot([0, len(self.cumerr.ravel())], [self.mu, self.mu], 'r')
-                t = plt.title('cum err and mu')
+                plt.plot(self.cumres.ravel(), '.')
+                plt.plot([0, len(self.cumres.ravel())], [self.mu, self.mu], 'r')
+                t = plt.title('cum res and mu')
                 t.set_position([.5, 1.15])
 
                 plt.subplot(nrow, ncol, 9)
-                plt.plot(self.erpj.ravel(), '.')
-                t = plt.title('erorr back projection (erpj)')
+                plt.plot(self.respj.ravel(), '.')
+                t = plt.title('residual back projection (respj)')
                 t.set_position([.5, 1.15])
 
                 plt.subplot(nrow, ncol, 10)
                 plt.plot(self.b.ravel(), '.')
-                t = plt.title('input obsrvation plot')
+                t = plt.title('input observation plot')
                 t.set_position([.5, 1.15])
 
                 plt.subplot(nrow, ncol, 11)
@@ -422,7 +422,7 @@ class LinBreg:
                 t.set_position([.5, 1])
                 
                 plt.subplot(nrow, ncol, 14)
-                plt.plot(self.er.ravel(), '.')
+                plt.plot(self.res.ravel(), '.')
                 t = plt.title('res')
                 t.set_position([.5, 1])
 
@@ -457,7 +457,7 @@ class LinBreg:
                 
 
                 plt.subplot(nrow, ncol, 19)
-                plt.hist(self.er.ravel(), 100)
+                plt.hist(self.res.ravel(), 100)
                 t = plt.title('histogram of residual')
                 t.set_position([.5, 1])
 
@@ -481,8 +481,8 @@ class LinBreg:
                     dpi=300, figsize=(100, 80))
                 plt.close()
 
-    def track_status(self, it_count, er):
-        self.hist_res.append(np.linalg.norm(er))
+    def track_status(self, it_count, res):
+        self.hist_res.append(np.linalg.norm(res))
         self.hist_delta_res.append((self.hist_res[it_count] - self.hist_res[it_count - 1]))
         self.hist_percent_delta_res.append( \
                                            (self.hist_res[it_count] - self.hist_res[it_count - 1]) \
