@@ -2,6 +2,7 @@ import numpy as np
 import time
 import copy
 import pickle
+import joblib
 import matplotlib
 
 try:
@@ -206,7 +207,7 @@ class LinBreg:
 
                 try:
                     with open("{}/PyPRIS_{}_{}_SensingMx.file".format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter), "wb") as f:
-                        pickle.dump(self.A, f, pickle.HIGHEST_PROTOCOL)
+                        joblib.dump(self.A, f, pickle.HIGHEST_PROTOCOL)
                 except OSError:
                     print ("Failed to write sensing matrix to directory %s " % self.path_s)
                 else: 
@@ -312,14 +313,14 @@ class LinBreg:
                     pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
                     print ("Successfully saved Linbreg ID {} at iteration {} to directory.".format(self.PyPRIS_iter, currit))
                 with open('{}/PyPRIS_{}_{}_SensingMx.file'.format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter), "rb") as s:
-                    self.A = pickle.load(s)
+                    self.A = joblib.load(s)
             elif self.flag_stop is True:
                 self.A = 0
                 with open("{}/PyPRIS_{}_{}_{}.file".format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter, currit), "wb") as f:
                     pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
                     print ("Successfully saved Linbreg ID {} at iteration {} to directory.".format(self.PyPRIS_iter, currit))
                 with open('{}/PyPRIS_{}_{}_SensingMx.file'.format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter), "rb") as s:
-                    self.A = pickle.load(s)
+                    self.A = joblib.load(s)
                 
                     
     def candidate_vis(self):
@@ -497,7 +498,7 @@ def loadCSSolver(path, PyPRIS_name, PyPRIS_SensMx_name):
     with open('{}/{}.file'.format(path, PyPRIS_name), "rb") as f:
         PyPRIS = pickle.load(f)
     with open('{}/{}.file'.format(path, PyPRIS_SensMx_name), "rb") as s:
-        PyPRIS.A = pickle.load(s)
+        PyPRIS.A = joblib.load(s)
     return PyPRIS
 
 def get_ticket(ticket_path):
