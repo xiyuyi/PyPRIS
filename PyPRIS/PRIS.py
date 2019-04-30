@@ -493,10 +493,10 @@ class LinBreg:
         stopping_tag = copy.deepcopy(self.hist_percent_delta_res[-1])
         self.stopping_loghistpercdelres = abs(np.log(abs(stopping_tag)))*np.sign(stopping_tag)
 
-def loadCSSolver(PyPRIS_name, path, PyPRIS_iter, CS_iter):
-    with open('{}/PyPRIS_{}_{}_{}.file'.format(path, PyPRIS_name, PyPRIS_iter, CS_iter), "rb") as f:
+def loadCSSolver(path, PyPRIS_name, PyPRIS_SensMx_name):
+    with open('{}/{}.file'.format(path, PyPRIS_name), "rb") as f:
         PyPRIS = pickle.load(f)
-    with open('{}/PyPRIS_{}_{}_SensingMx.file'.format(path, PyPRIS_name, PyPRIS_iter), "rb") as s:
+    with open('{}/{}.file'.format(path, PyPRIS_SensMx_name), "rb") as s:
         PyPRIS.A = pickle.load(s)
     return PyPRIS
 
