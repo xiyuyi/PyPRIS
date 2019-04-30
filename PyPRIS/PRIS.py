@@ -321,8 +321,7 @@ class LinBreg:
                     print ("Successfully saved Linbreg ID {} at iteration {} to directory.".format(self.PyPRIS_iter, currit))
                 with open('{}/PyPRIS_{}_{}_SensingMx.file'.format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter), "rb") as s:
                     self.A = joblib.load(s)
-                
-                    
+
     def candidate_vis(self):
         intervals = self.candidate_intervals
         locs = list(zip(*self.candidate_coords))
