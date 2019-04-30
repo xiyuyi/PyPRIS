@@ -31,7 +31,7 @@ ticket.observer_debugger = False
 ticket.tobserver_edge_padding = True
 
 "output settings"
-ticket.ticket_folder_header = 'Demo'
+ticket.ticket_folder= 'pris_tickets'
 
 "linbreg configurations"
 ticket.linbreg_alpha = LinBreg("X")
@@ -67,21 +67,26 @@ ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -15
 
 "others"
 ticket.PRIS_iter_end = 5
+try:
+    if not os.path.exists("../{}".format(ticket.ticket_folder)):
+        os.mkdir("../{}".format(ticket.ticket_folder))
+except OSError:
+    pass
 
 for bgSCF in list([0.8, 1, 1.5, 2]):
     for mu in list([1e9, 1e10, 1e11, 1e12]):
         ticket_new = copy.deepcopy(ticket)
-        ticket_new.name = 'Demo'
+        ticket_new.name = "bgSCF"+str(bgSCF)+"_mu"+str("%1.1e1"%mu)
         ticket_new.bg_scaling_coef = copy.deepcopy(bgSCF)
         ticket_new.linbreg_alpha.PyPRIS_name = ticket_new.name
         ticket.linbreg_alpha.mu = mu
         ticket.linbreg_alpha.alpha = mu*0.001
         try:
-            if not os.path.exists("../{}_{}".format(ticket_new.ticket_folder_header, ticket_new.name)):
-                os.mkdir("../{}_{}".format(ticket_new.ticket_folder_header, ticket_new.name))
+            if not os.path.exists("../{}/{}".format(ticket_new.ticket_folder, ticket_new.name)):
+                os.mkdir("../{}/{}".format(ticket_new.ticket_folder, ticket_new.name))
         except OSError:
             pass
 
-        with open("../{}_{}/Go.pris_ticket".format(ticket_new.ticket_folder_header, ticket_new.name), "wb") as f:
+        with open("../{}/{}/Go.pris_ticket".format(ticket_new.ticket_folder, ticket_new.name), "wb") as f:
             pickle.dump(ticket, f, pickle.HIGHEST_PROTOCOL)
 

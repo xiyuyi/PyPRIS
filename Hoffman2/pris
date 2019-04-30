@@ -41,6 +41,7 @@ observer.observe_biplane_prep(psf, single_image_size = blur1.shape,
                            observer_debugger = ticket.observer_debugger,
                            observer_edge_padding = ticket.observer_edge_padding)
 
+
 # this observer will perform observation for the pypris object as seen below in the next section titled 'Initialize PyPRIS'.
 # get a PyPRIS object:
 pypris = PyPRIS()
