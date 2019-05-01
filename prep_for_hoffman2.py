@@ -80,7 +80,7 @@ for bgSCF in list([0.8, 1, 1.5, 2]):
         ticket_new.bg_scaling_coef = copy.deepcopy(bgSCF)
         ticket_new.linbreg_alpha.PyPRIS_name = ticket_new.name
         ticket_new.linbreg_alpha.mu = mu
-        ticket_new.linbreg_alpha.alpha = mu*0.001
+        ticket_new.linbreg_alpha.alpha = mu*1e-20
         try:
             if not os.path.exists("../{}/{}".format(ticket_new.ticket_folder, ticket_new.name)):
                 os.mkdir("../{}/{}".format(ticket_new.ticket_folder, ticket_new.name))

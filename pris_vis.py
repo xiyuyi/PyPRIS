@@ -1,35 +1,33 @@
 import matplotlib.pyplot as plt
 from PyPRIS import *
 f = list()
-f.append("bgSCF0.8_mu1.0e+091")
-f.append("bgSCF0.8_mu1.0e+101")
-f.append("bgSCF0.8_mu1.0e+111")
-f.append("bgSCF0.8_mu1.0e+121")
-f.append("bgSCF0.8_mu8.0e-011")
-f.append("bgSCF1.5_mu1.0e+091")
-f.append("bgSCF1.5_mu1.0e+101")
-f.append("bgSCF1.5_mu1.0e+111")
-f.append("bgSCF1.5_mu1.0e+121")
-f.append("bgSCF1.5_mu1.5e+001")
-f.append("bgSCF1_mu1.0e+001")
-f.append("bgSCF1_mu1.0e+091")
-f.append("bgSCF1_mu1.0e+101")
-f.append("bgSCF1_mu1.0e+111")
-f.append("bgSCF1_mu1.0e+121")
-f.append("bgSCF2_mu1.0e+091")
-f.append("bgSCF2_mu1.0e+101")
-f.append("bgSCF2_mu1.0e+111")
-f.append("bgSCF2_mu1.0e+121")
-f.append("bgSCF2_mu2.0e+001")
+f.append("bgSCF0.8_mu1.0e+09")
+f.append("bgSCF0.8_mu1.0e+10")
+f.append("bgSCF0.8_mu1.0e+11")
+f.append("bgSCF0.8_mu1.0e+12")
+f.append("bgSCF1.5_mu1.0e+09")
+f.append("bgSCF1.5_mu1.0e+10")
+f.append("bgSCF1.5_mu1.0e+11")
+f.append("bgSCF1.5_mu1.0e+12")
+f.append("bgSCF1_mu1.0e+09")
+f.append("bgSCF1_mu1.0e+10")
+f.append("bgSCF1_mu1.0e+11")
+f.append("bgSCF1_mu1.0e+12")
+f.append("bgSCF2_mu1.0e+09")
+f.append("bgSCF2_mu1.0e+10")
+f.append("bgSCF2_mu1.0e+11")
+f.append("bgSCF2_mu1.0e+12")
+
+fitem = f[11]
+PyPRIS_SensMx_name = "PyPRIS_"+fitem+"_pris0_SensingMx" # specify sensing matrix file name.
 
 
 
-PyPRIS_SensMx_name = "PyPRIS_Demo_pris0_SensingMx" # specify sensing matrix file name.
 itN = 0
-for fitem in f:
-    path = "G:/DH_localization/PyPRIS_tickets2/"+fitem+"/saved_objects"  # specifie datafile position
+for itN in np.arange(0,8000,200):
+    path = "G:/DH_localization/PyPRIS_tickets/"+fitem+"/saved_objects"  # specifie datafile position
     for itN in np.arange(0,2200,200):
-        PyPRIS_name = "PyPRIS_Demo_pris0_"+str(1+itN)  # specify datafile name
+        PyPRIS_name = "PyPRIS_" + fitem + "_pris0_" + str(1 + itN)  # specify datafile name
         print(PyPRIS_name)
         try:
             linbreg = loadCSSolver(path, PyPRIS_name, PyPRIS_SensMx_name)

@@ -23,7 +23,7 @@ f.append("bgSCF2_mu1.0e+12")
 f.append("bgSCF2_mu2.0e+00")
 
 itN = 0
-fitem = f[0]
+fitem = f[14]
 
 PyPRIS_SensMx_name = "PyPRIS_"+fitem+"_pris0_SensingMx" # specify sensing matrix file name.
 path = "G:/DH_localization/PyPRIS_tickets/"+fitem+"/saved_objects"  # specifie datafile position
