@@ -454,7 +454,6 @@ class LinBreg:
                          [self.stopping_loghistpercdelres_thres,self.stopping_loghistpercdelres_thres],'r')
                 t = plt.title('abs(log(abs(x)))*sign(x) \n x = percent_delta_L2(res)')
                 t.set_position([.5, 1])
-                
 
                 plt.subplot(nrow, ncol, 19)
                 plt.hist(self.res.ravel(), 100)
