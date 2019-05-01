@@ -84,7 +84,10 @@ pypris.generate_sensing_mx()
 # prepare the inner sparse recovery
 pypris.current_A = pypris.current_A/ticket.psf_norm_factor
 c = np.dot(pypris.observation.ravel(),pypris.current_A)
-pypris.current_A[:,len(pypris.current_candidates)] = np.max(c[0:-2])/np.sum(pypris.observation.ravel())*ticket.bg_scaling_coef
+c1 = np.min(c[0:-2])
+c2 = np.max(c[0:-2])
+bgv = c1 + (c2-c1)*ticket.bg_scaling_coef
+pypris.current_A[:,-1] = bgv/np.sum(pypris.observation.ravel()) # the last column in A corresponds to the background component.
 linbreg = copy.deepcopy(linbreg_ori)
 linbreg.candidate_coords = pypris.current_candidates
 linbreg.candidate_intervals = pypris.current_candidates_intervals
@@ -103,8 +106,11 @@ for PRIS_iter in np.arange(1,ticket.PRIS_iter_end):
     pypris.generate_sensing_mx()
     # prepare the inner sparse recovery
     pypris.current_A = pypris.current_A / ticket.psf_norm_factor
-    c = np.dot(pypris.observation.ravel(), pypris.current_A[:, len(pypris.current_candidates)])
-    pypris.current_A[:, len(pypris.current_candidates)] = np.max(c[0:-2]) / np.sum(pypris.observation.ravel()) * ticket.bg_scaling_coef
+    c = np.dot(pypris.observation.ravel(), pypris.current_A)
+    c1 = np.min(c[0:-2])
+    c2 = np.max(c[0:-2])
+    bgv = c1 + (c2 - c1) * ticket.bg_scaling_coef
+    pypris.current_A[:, -1] = bgv / np.sum(pypris.observation.ravel())  # the last column in A corresponds to the background component.
     linbreg = copy.deepcopy(linbreg_ori)
     linbreg.candidate_coords = pypris.current_candidates
     linbreg.candidate_intervals = pypris.current_candidates_intervals
