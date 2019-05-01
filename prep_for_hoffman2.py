@@ -31,7 +31,7 @@ ticket.observer_debugger = False
 ticket.tobserver_edge_padding = True
 
 "output settings"
-ticket.ticket_folder= 'pris_tickets'
+ticket.ticket_folder= 'PyPRIS_tickets'
 
 "linbreg configurations"
 ticket.linbreg_alpha = LinBreg("X")
@@ -76,11 +76,11 @@ except OSError:
 for bgSCF in list([0.8, 1, 1.5, 2]):
     for mu in list([1e9, 1e10, 1e11, 1e12]):
         ticket_new = copy.deepcopy(ticket)
-        ticket_new.name = "bgSCF"+str(bgSCF)+"_mu"+str("%1.1e1"%mu)
+        ticket_new.name = "bgSCF"+str(bgSCF)+"_mu"+str("%1.1e"%mu)
         ticket_new.bg_scaling_coef = copy.deepcopy(bgSCF)
         ticket_new.linbreg_alpha.PyPRIS_name = ticket_new.name
-        ticket.linbreg_alpha.mu = mu
-        ticket.linbreg_alpha.alpha = mu*0.001
+        ticket_new.linbreg_alpha.mu = mu
+        ticket_new.linbreg_alpha.alpha = mu*1e-20
         try:
             if not os.path.exists("../{}/{}".format(ticket_new.ticket_folder, ticket_new.name)):
                 os.mkdir("../{}/{}".format(ticket_new.ticket_folder, ticket_new.name))
@@ -88,5 +88,5 @@ for bgSCF in list([0.8, 1, 1.5, 2]):
             pass
 
         with open("../{}/{}/Go.pris_ticket".format(ticket_new.ticket_folder, ticket_new.name), "wb") as f:
-            pickle.dump(ticket, f, pickle.HIGHEST_PROTOCOL)
+            pickle.dump(ticket_new, f, pickle.HIGHEST_PROTOCOL)
 
