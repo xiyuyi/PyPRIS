@@ -276,15 +276,18 @@ class LinBreg:
             self.cumres += self.respj * self.stepsize
             if self.deep_debug is True: self.debug_output(it_count, appstr='_d_cumres_updated')
 
-            # perform positivity constraint:
-            if self.flag_positivity is True: self.x[np.where(self.x < 0)] = 0
-            if self.deep_debug is True: self.debug_output(it_count, appstr='_e_positivity_updated')
-
             # shrinkage to update the candidate coefficients.
             self.x = copy.deepcopy(self.cumres)
             if self.deep_debug is True: self.debug_output(it_count, appstr='_f_x_copied')
             self.x = self.alpha * self.shrink(self.x)
             if self.deep_debug is True: self.debug_output(it_count, appstr='_g_x_updated')
+
+            # perform positivity constraint:
+            bg = self.x[-1]
+            if self.flag_positivity is True:
+                self.x[np.where(self.x < 0)] = 0
+                self.x[-1]=bg # release the background component from the positivity constraint
+            if self.deep_debug is True: self.debug_output(it_count, appstr='_e_positivity_updated')
 
             # update the quantities for status tracking purposes.
             self.track_status(it_count, self.res)
