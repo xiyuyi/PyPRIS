@@ -24,7 +24,7 @@ PyPRIS_SensMx_name = "PyPRIS_"+fitem+"_pris0_SensingMx" # specify sensing matrix
 
 
 itN = 0
-for itN in np.arange(0,8000,200):
+for fitem in f:
     path = "G:/DH_localization/PyPRIS_tickets/"+fitem+"/saved_objects"  # specifie datafile position
     for itN in np.arange(0,2200,200):
         PyPRIS_name = "PyPRIS_" + fitem + "_pris0_" + str(1 + itN)  # specify datafile name
