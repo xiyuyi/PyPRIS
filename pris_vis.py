@@ -14,14 +14,14 @@ f.append("bgSCF1_mu1.0e+10_alpha1.0e-09")
 f.append("bgSCF1_mu1.0e+10_alpha1.0e-10")
 f.append("bgSCF1_mu1.0e+10_alpha1.0e-11")
 
-#for ll in [1]:
-for fitem in f:
-    #fitem = f[-1]
-    PyPRIS_SensMx_name = "PyPRIS_" + fitem + "_pris0_SensingMx"  # specify sensing matrix file name.
+for ll in [1]:
+#for fitem in list(f[9]):
+    fitem = f[7]
     path = "G:/DH_localization/PyPRIS_tickets_set2/"+fitem+"/saved_objects"  # specifie datafile position
-    for itN in np.arange(0,62001,2000):
+    for itN in np.arange(0,162001,2000):
         for prisIter in np.arange(0,6):
             PyPRIS_name = "PyPRIS_" + fitem + "_pris"+str(prisIter)+"_" + str(1 + itN)  # specify datafile name
+            PyPRIS_SensMx_name = "PyPRIS_" + fitem + "_pris"+str(prisIter)+"_SensingMx"  # specify datafile name
             print(PyPRIS_name)
             try:
                 linbreg = loadCSSolver(path, PyPRIS_name, PyPRIS_SensMx_name)

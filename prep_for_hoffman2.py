@@ -31,7 +31,7 @@ ticket.observer_debugger = False
 ticket.tobserver_edge_padding = True
 
 "output settings"
-ticket.ticket_folder= 'PyPRIS_tickets_set3'
+ticket.ticket_folder= 'PyPRIS_tickets_set4'
 
 "linbreg configurations"
 ticket.linbreg_alpha = LinBreg("X")
@@ -73,9 +73,9 @@ try:
 except OSError:
     pass
 
-for bgSCF in list([1]):
-    for mu in list([1e10]):
-        for alpha in list([ 1e-9 ]):
+for bgSCF in list([1.5]):
+    for mu in list([5e9, 7.5e9, 10e9]):
+        for alpha in list([ 1e-9, 5e-9  ]):
             ticket_new = copy.deepcopy(ticket)
             ticket_new.name = "bgSCF"+str(bgSCF)+"_mu"+str("%1.1e"%mu)+"_alpha"+str("%1.1e"%alpha)
             ticket_new.bg_scaling_coef = copy.deepcopy(bgSCF)
