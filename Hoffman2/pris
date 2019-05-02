@@ -117,7 +117,7 @@ for PRIS_iter in np.arange(1,ticket.PRIS_iter_end):
     linbreg.A = pypris.current_A
     linbreg.b = pypris.observation.ravel()
     linbreg.PyPRIS_iter = "pris"+ str(PRIS_iter)
-    linbreg.stopping_loghistpercdelres_thres -= PRIS_iter
+    linbreg.stopping_loghistpercdelres_thres -= PRIS_iter*2
     print("---------------- PRIS refinement #" + str(PRIS_iter) + " ------------------")
     # recover
     linbreg.get_ready()
