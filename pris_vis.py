@@ -1,32 +1,25 @@
 import matplotlib.pyplot as plt
 from PyPRIS import *
 f = list()
-f.append("bgSCF0.8_mu1.0e+09")
-f.append("bgSCF0.8_mu1.0e+10")
-f.append("bgSCF0.8_mu1.0e+11")
-f.append("bgSCF0.8_mu1.0e+12")
-f.append("bgSCF1.5_mu1.0e+09")
-f.append("bgSCF1.5_mu1.0e+10")
-f.append("bgSCF1.5_mu1.0e+11")
-f.append("bgSCF1.5_mu1.0e+12")
-f.append("bgSCF1_mu1.0e+09")
-f.append("bgSCF1_mu1.0e+10")
-f.append("bgSCF1_mu1.0e+11")
-f.append("bgSCF1_mu1.0e+12")
-f.append("bgSCF2_mu1.0e+09")
-f.append("bgSCF2_mu1.0e+10")
-f.append("bgSCF2_mu1.0e+11")
-f.append("bgSCF2_mu1.0e+12")
+f.append("bgSCF0.5_mu1.0e+10_alpha1.0e-09")
+f.append("bgSCF0.5_mu1.0e+10_alpha1.0e-10")
+f.append("bgSCF0.5_mu1.0e+10_alpha1.0e-11")
+f.append("bgSCF0.8_mu1.0e+10_alpha1.0e-09")
+f.append("bgSCF0.8_mu1.0e+10_alpha1.0e-10")
+f.append("bgSCF0.8_mu1.0e+10_alpha1.0e-11")
+f.append("bgSCF1.2_mu1.0e+10_alpha1.0e-09")
+f.append("bgSCF1.2_mu1.0e+10_alpha1.0e-10")
+f.append("bgSCF1.2_mu1.0e+10_alpha1.0e-11")
+f.append("bgSCF1_mu1.0e+10_alpha1.0e-09")
+f.append("bgSCF1_mu1.0e+10_alpha1.0e-10")
+f.append("bgSCF1_mu1.0e+10_alpha1.0e-11")
 
-fitem = f[11]
-PyPRIS_SensMx_name = "PyPRIS_"+fitem+"_pris0_SensingMx" # specify sensing matrix file name.
-
-
-
-itN = 0
+#for ll in [1]:
 for fitem in f:
-    path = "G:/DH_localization/PyPRIS_tickets/"+fitem+"/saved_objects"  # specifie datafile position
-    for itN in np.arange(0,2200,200):
+    #fitem = f[-1]
+    PyPRIS_SensMx_name = "PyPRIS_" + fitem + "_pris0_SensingMx"  # specify sensing matrix file name.
+    path = "G:/DH_localization/PyPRIS_tickets_set2/"+fitem+"/saved_objects"  # specifie datafile position
+    for itN in np.arange(0,62001,2000):
         PyPRIS_name = "PyPRIS_" + fitem + "_pris0_" + str(1 + itN)  # specify datafile name
         print(PyPRIS_name)
         try:

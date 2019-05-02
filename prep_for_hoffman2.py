@@ -22,7 +22,7 @@ ticket.observer_edge_padding = True
 
 "configure the initial candidate pool of this pris ticket"
 ticket.init_candidates_intervals = list([1,5,5])
-ticket.init_ax0_range = list([-36, 36])
+ticket.init_ax0_range = list([-65, 28])
 ticket.init_ax1_range = list([5, 66])
 ticket.init_ax2_range = list([5, 66])
 
@@ -31,7 +31,7 @@ ticket.observer_debugger = False
 ticket.tobserver_edge_padding = True
 
 "output settings"
-ticket.ticket_folder= 'PyPRIS_tickets'
+ticket.ticket_folder= 'PyPRIS_tickets_set3'
 
 "linbreg configurations"
 ticket.linbreg_alpha = LinBreg("X")
@@ -51,19 +51,19 @@ ticket.linbreg_alpha.deep_debug = False
 
 "ticket.linbreg_alpha.mu = 1000000000" # move to loop
 "ticket.linbreg_alpha.alpha = 1e-11" # move to loop
-ticket.linbreg_alpha.maxit = 200000
+ticket.linbreg_alpha.maxit = 600000
 ticket.linbreg_alpha.it_check_rem = 1
 ticket.linbreg_alpha.debug_it_int = 100
 ticket.linbreg_alpha.kick.ints = 10
 ticket.linbreg_alpha.kick.flag = True
 ticket.linbreg_alpha.kick.thres = 1e-3
-ticket.linbreg_alpha.save_obj_int = 200
+ticket.linbreg_alpha.save_obj_int = 2000
 ticket.linbreg_alpha.save = True
 ticket.linbreg_alpha.PyPRIS_iter = 0
 "ticket.linbreg_alpha.PyPRIS_name = ticket.name" # moved to loop
 ticket.linbreg_alpha.path_0 = '.'
 "ticket.bg_scaling_coef = 1.5 "  # moved to loop
-ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -15
+ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -20
 
 "others"
 ticket.PRIS_iter_end = 5
@@ -73,20 +73,21 @@ try:
 except OSError:
     pass
 
-for bgSCF in list([0.8, 1, 1.5, 2]):
-    for mu in list([1e9, 1e10, 1e11, 1e12]):
-        ticket_new = copy.deepcopy(ticket)
-        ticket_new.name = "bgSCF"+str(bgSCF)+"_mu"+str("%1.1e"%mu)
-        ticket_new.bg_scaling_coef = copy.deepcopy(bgSCF)
-        ticket_new.linbreg_alpha.PyPRIS_name = ticket_new.name
-        ticket_new.linbreg_alpha.mu = mu
-        ticket_new.linbreg_alpha.alpha = mu*1e-20
-        try:
-            if not os.path.exists("../{}/{}".format(ticket_new.ticket_folder, ticket_new.name)):
-                os.mkdir("../{}/{}".format(ticket_new.ticket_folder, ticket_new.name))
-        except OSError:
-            pass
+for bgSCF in list([1]):
+    for mu in list([1e10]):
+        for alpha in list([ 1e-9 ]):
+            ticket_new = copy.deepcopy(ticket)
+            ticket_new.name = "bgSCF"+str(bgSCF)+"_mu"+str("%1.1e"%mu)+"_alpha"+str("%1.1e"%alpha)
+            ticket_new.bg_scaling_coef = copy.deepcopy(bgSCF)
+            ticket_new.linbreg_alpha.PyPRIS_name = ticket_new.name
+            ticket_new.linbreg_alpha.mu = mu
+            ticket_new.linbreg_alpha.alpha = alpha
+            try:
+                if not os.path.exists("../{}/{}".format(ticket_new.ticket_folder, ticket_new.name)):
+                    os.mkdir("../{}/{}".format(ticket_new.ticket_folder, ticket_new.name))
+            except OSError:
+                pass
 
-        with open("../{}/{}/Go.pris_ticket".format(ticket_new.ticket_folder, ticket_new.name), "wb") as f:
-            pickle.dump(ticket_new, f, pickle.HIGHEST_PROTOCOL)
+            with open("../{}/{}/Go.pris_ticket".format(ticket_new.ticket_folder, ticket_new.name), "wb") as f:
+                pickle.dump(ticket_new, f, pickle.HIGHEST_PROTOCOL)
 
