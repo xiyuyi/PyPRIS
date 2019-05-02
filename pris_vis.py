@@ -11,12 +11,12 @@ f.append("bgSCF1.5_mu7.5e+09_alpha5.0e-09")
 
 for ll in [1]:
 #for fitem in f:
-    fitem = f[2]
+    fitem = f[0]
     #fitem="bgSCF1_mu1.0e+10_alpha1.0e-09"
-    path = "G:/DH_localization/PyPRIS_tickets_set4/"+fitem+"/saved_objects"  # specifie datafile position
+    path = "G:/DH_localization/PyPRIS_tickets_set4/"+fitem+"_cont/saved_objects"  # specifie datafile position
     for prisIter in np.arange(0,5):
         PyPRIS_SensMx_name = "PyPRIS_" + fitem + "_pris" + str(prisIter) + "_SensingMx"  # specify datafile name
-        for itN in np.arange(0,874001,8000):
+        for itN in np.arange(0,204001,2000):
             PyPRIS_name = "PyPRIS_" + fitem + "_pris"+str(prisIter)+"_" + str(1 + itN)  # specify datafile name
             print(PyPRIS_name)
             try:
