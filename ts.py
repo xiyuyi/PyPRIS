@@ -26,7 +26,7 @@ itN = 0
 fitem = f[14]
 
 PyPRIS_SensMx_name = "PyPRIS_"+fitem+"_pris0_SensingMx" # specify sensing matrix file name.
-path = "G:/DH_localization/PyPRIS_tickets/"+fitem+"/saved_objects"  # specifie datafile position
+path = "G:/DH_localization/PyPRIS_tickets_set3/"+fitem+"/saved_objects"  # specifie datafile position
 PyPRIS_name = "PyPRIS_"+fitem+"_pris0_"+str(1+itN)  # specify datafile name
 print(path+"/"+PyPRIS_name)
 try:
