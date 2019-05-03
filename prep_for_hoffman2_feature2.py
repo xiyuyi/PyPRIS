@@ -76,12 +76,13 @@ except OSError:
 for bgSCF in list([1.5]):
     for mu in list([1e7, 1e8, 1e9, 1e10, 1e11]):
         for alphaFactor in list([ 1e-19, 1e-20, 1e-21]):
+            alpha = mu*alphaFactor
             ticket_new = copy.deepcopy(ticket)
             ticket_new.name = "bgSCF"+str(bgSCF)+"_mu"+str("%1.1e"%mu)+"_alpha"+str("%1.1e"%alpha)
             ticket_new.bg_scaling_coef = copy.deepcopy(bgSCF)
             ticket_new.linbreg_alpha.PyPRIS_name = ticket_new.name
             ticket_new.linbreg_alpha.mu = mu
-            ticket_new.linbreg_alpha.alpha = mu*alphaFactor
+            ticket_new.linbreg_alpha.alpha = alpha
             try:
                 if not os.path.exists("../{}/{}".format(ticket_new.ticket_folder, ticket_new.name)):
                     os.mkdir("../{}/{}".format(ticket_new.ticket_folder, ticket_new.name))
