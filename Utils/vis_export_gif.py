@@ -4,16 +4,16 @@ matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import numpy as np
 
-fitem="bgSCF1.5_mu7.5e+09_alpha1.0e-09"
+fitem="bgSCF1.5_mu7.5e+09_alpha5.0e-09"
 path_d="G:/DH_localization/PyPRIS_tickets_set4/"+fitem+"/saved_objects"
-r = imageio.get_writer(path_d + '_3projections.gif', mode='I')
-#r = imageio.get_writer(path_d + '_plots.gif', mode='I')
+#r = imageio.get_writer(path_d + '_3projections.gif', mode='I')
+r = imageio.get_writer(path_d + '_plots.gif', mode='I')
 
 
 fnames=list()
 for itN in np.arange(1,908002,2000):
-    fnames.append("PyPRIS__Proj_vies_"+fitem+"_pris0_plots_it"+str(itN)+".png")
-    #fnames.append("PyPRIS_"+fitem+"_pris0_plots_it"+str(itN)+"visualize.png")
+    #fnames.append("PyPRIS__Proj_vies_"+fitem+"_pris0_plots_it"+str(itN)+".png")
+    fnames.append("PyPRIS_"+fitem+"_pris0_plots_it"+str(itN)+"visualize.png")
 
 for fname in fnames:
     try:
