@@ -1,27 +1,23 @@
 import matplotlib.pyplot as plt
 from PyPRIS import *
 f = list()
-f.append("bgSCF0.5_mu1.0e+10_alpha1.0e-09")
-f.append("bgSCF0.5_mu1.0e+10_alpha1.0e-10")
-f.append("bgSCF0.5_mu1.0e+10_alpha1.0e-11")
-f.append("bgSCF0.8_mu1.0e+10_alpha1.0e-09")
-f.append("bgSCF0.8_mu1.0e+10_alpha1.0e-10")
-f.append("bgSCF0.8_mu1.0e+10_alpha1.0e-11")
-f.append("bgSCF1.2_mu1.0e+10_alpha1.0e-09")
-f.append("bgSCF1.2_mu1.0e+10_alpha1.0e-10")
-f.append("bgSCF1.2_mu1.0e+10_alpha1.0e-11")
-f.append("bgSCF1_mu1.0e+10_alpha1.0e-09")
-f.append("bgSCF1_mu1.0e+10_alpha1.0e-10")
-f.append("bgSCF1_mu1.0e+10_alpha1.0e-11")
+f.append("bgSCF1.5_mu1.0e+10_alpha1.0e-09")
+f.append("bgSCF1.5_mu1.0e+10_alpha5.0e-09")
+f.append("bgSCF1.5_mu5.0e+09_alpha1.0e-09")
+f.append("bgSCF1.5_mu5.0e+09_alpha5.0e-09")
+f.append("bgSCF1.5_mu7.5e+09_alpha1.0e-09")
+f.append("bgSCF1.5_mu7.5e+09_alpha5.0e-09")
+
 
 for ll in [1]:
-#for fitem in list(f[9]):
-    fitem = f[7]
-    path = "G:/DH_localization/PyPRIS_tickets_set2/"+fitem+"/saved_objects"  # specifie datafile position
-    for itN in np.arange(0,162001,2000):
-        for prisIter in np.arange(0,6):
+#for fitem in f:
+    fitem = f[0]
+    #fitem="bgSCF1_mu1.0e+10_alpha1.0e-09"
+    path = "G:/DH_localization/PyPRIS_tickets_set4/"+fitem+"_cont2/saved_objects"  # specifie datafile position
+    for prisIter in np.arange(0,5):
+        PyPRIS_SensMx_name = "PyPRIS_" + fitem + "_pris" + str(prisIter) + "_SensingMx"  # specify datafile name
+        for itN in np.arange(104000, 204001,2000):
             PyPRIS_name = "PyPRIS_" + fitem + "_pris"+str(prisIter)+"_" + str(1 + itN)  # specify datafile name
-            PyPRIS_SensMx_name = "PyPRIS_" + fitem + "_pris"+str(prisIter)+"_SensingMx"  # specify datafile name
             print(PyPRIS_name)
             try:
                 linbreg = loadCSSolver(path, PyPRIS_name, PyPRIS_SensMx_name)
