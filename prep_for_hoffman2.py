@@ -31,7 +31,7 @@ ticket.observer_debugger = False
 ticket.tobserver_edge_padding = True
 
 "output settings"
-ticket.ticket_folder= 'PyPRIS_tickets_set5'
+ticket.ticket_folder= 'PyPRIS_tickets_set5-long'
 
 "linbreg configurations"
 ticket.linbreg_alpha = LinBreg("X")
@@ -57,13 +57,13 @@ ticket.linbreg_alpha.debug_it_int = 100
 ticket.linbreg_alpha.kick.ints = 10
 ticket.linbreg_alpha.kick.flag = True
 ticket.linbreg_alpha.kick.thres = 1e-3
-ticket.linbreg_alpha.save_obj_int = 2000
+ticket.linbreg_alpha.save_obj_int = 4000
 ticket.linbreg_alpha.save = True
 ticket.linbreg_alpha.PyPRIS_iter = 0
 "ticket.linbreg_alpha.PyPRIS_name = ticket.name" # moved to loop
 ticket.linbreg_alpha.path_0 = '.'
 "ticket.bg_scaling_coef = 1.5 "  # moved to loop
-ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -15
+ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -20
 
 "others"
 ticket.PRIS_iter_end = 5
@@ -73,9 +73,9 @@ try:
 except OSError:
     pass
 
-for bgSCF in list([1.5, 2]):
-    for mu in list([1e8, 1e9]):
-        for alpha in list([ 1e-9, 1e-10  ]):
+for bgSCF in list([1.5]):
+    for mu in list([1e8, 1e9, 5e9]):
+        for alpha in list([ 1e-9, 1e-10]):
             ticket_new = copy.deepcopy(ticket)
             ticket_new.name = "bgSCF"+str(bgSCF)+"_mu"+str("%1.1e"%mu)+"_alpha"+str("%1.1e"%alpha)
             ticket_new.bg_scaling_coef = copy.deepcopy(bgSCF)
