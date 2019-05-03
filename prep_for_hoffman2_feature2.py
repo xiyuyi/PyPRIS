@@ -8,9 +8,9 @@ ticket = BiplaneTicket()
 "ticket.name = 'Demo'" # moved to loop
 
 "where to find the data files, for both blur and observation"
-ticket.datapath = '/u/scratch/flashscratch2/x/xiyuyi/PyPRIS_data'
-ticket.plane1_path = "{}/blur_plane1.tif".format(ticket.datapath)
-ticket.plane2_path = "{}/blur_plane7.tif".format(ticket.datapath)
+ticket.datapath = '/u/scratch/x/xiyuyi/PyPRIS_data/S7_fov1516'
+ticket.plane1_path = "{}/DH_plane21.tif".format(ticket.datapath)
+ticket.plane2_path = "{}/DH_plane27.tif".format(ticket.datapath)
 ticket.psf_path = "{}/psf.tif".format(ticket.datapath)
 ticket.psf_norm_factor = 80
 
@@ -21,17 +21,17 @@ ticket.plane2_dz = np.int8(12)
 ticket.observer_edge_padding = True
 
 "configure the initial candidate pool of this pris ticket"
-ticket.init_candidates_intervals = list([1,5,5])
+ticket.init_candidates_intervals = list([1,10,10])
 ticket.init_ax0_range = list([-65, 28])
-ticket.init_ax1_range = list([5, 66])
-ticket.init_ax2_range = list([5, 66])
+ticket.init_ax1_range = list([1, 161])
+ticket.init_ax2_range = list([1, 161])
 
 "debug configurations"
 ticket.observer_debugger = False
 ticket.tobserver_edge_padding = True
 
 "output settings"
-ticket.ticket_folder= 'PyPRIS_tickets_set5-long'
+ticket.ticket_folder= 'PyPRIS_tickets_F2_set1'
 
 "linbreg configurations"
 ticket.linbreg_alpha = LinBreg("X")
@@ -74,14 +74,14 @@ except OSError:
     pass
 
 for bgSCF in list([1.5]):
-    for mu in list([1e8, 1e9, 5e9]):
-        for alpha in list([ 1e-9, 1e-10]):
+    for mu in list([1e7, 1e8, 1e9, 1e10, 1e11]):
+        for alphaFactor in list([ 1e-19, 1e-20, 1e-21]):
             ticket_new = copy.deepcopy(ticket)
             ticket_new.name = "bgSCF"+str(bgSCF)+"_mu"+str("%1.1e"%mu)+"_alpha"+str("%1.1e"%alpha)
             ticket_new.bg_scaling_coef = copy.deepcopy(bgSCF)
             ticket_new.linbreg_alpha.PyPRIS_name = ticket_new.name
             ticket_new.linbreg_alpha.mu = mu
-            ticket_new.linbreg_alpha.alpha = alpha
+            ticket_new.linbreg_alpha.alpha = mu*alphaFactor
             try:
                 if not os.path.exists("../{}/{}".format(ticket_new.ticket_folder, ticket_new.name)):
                     os.mkdir("../{}/{}".format(ticket_new.ticket_folder, ticket_new.name))
