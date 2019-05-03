@@ -171,3 +171,4 @@ class ObserveStation:
         # the biplane_observer now returns the observation
         observation = np.concatenate([self.biplane_observer.observation1, self.biplane_observer.observation2]).ravel()
         return observation
+
