@@ -497,7 +497,7 @@ class LinBreg:
 
 def loadCSSolver(path, PyPRIS_name, PyPRIS_SensMx_name):
     with open('{}/{}.file'.format(path, PyPRIS_name), "rb") as f:
-        linbreg = pickle.load(f)
+        linbreg = pickle.load(f) #the loaded object is a LinBreg object
     with open('{}/{}.file'.format(path, PyPRIS_SensMx_name), "rb") as s:
         linbreg.A = joblib.load(s)
     return linbreg
