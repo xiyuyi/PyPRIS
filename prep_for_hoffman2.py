@@ -22,7 +22,7 @@ ticket.observer_edge_padding = True
 
 "configure the initial candidate pool of this pris ticket"
 ticket.init_candidates_intervals = list([1,5,5])
-ticket.init_ax0_range = list([-65, 28])
+ticket.init_ax0_range = list([-55, 28])
 ticket.init_ax1_range = list([5, 66])
 ticket.init_ax2_range = list([5, 66])
 
@@ -31,7 +31,7 @@ ticket.observer_debugger = False
 ticket.tobserver_edge_padding = True
 
 "output settings"
-ticket.ticket_folder= 'PyPRIS_tickets_set5-long'
+ticket.ticket_folder= 'PyPRIS_tickets_set6'
 
 "linbreg configurations"
 ticket.linbreg_alpha = LinBreg("X")
@@ -63,10 +63,10 @@ ticket.linbreg_alpha.PyPRIS_iter = 0
 "ticket.linbreg_alpha.PyPRIS_name = ticket.name" # moved to loop
 ticket.linbreg_alpha.path_0 = '.'
 "ticket.bg_scaling_coef = 1.5 "  # moved to loop
-ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -20
+ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -15
 
 "others"
-ticket.PRIS_iter_end = 5
+ticket.PRIS_iter_end = 7
 try:
     if not os.path.exists("../{}".format(ticket.ticket_folder)):
         os.mkdir("../{}".format(ticket.ticket_folder))
@@ -74,8 +74,9 @@ except OSError:
     pass
 
 for bgSCF in list([1.5]):
-    for mu in list([1e8, 1e9, 5e9]):
-        for alpha in list([ 1e-9, 1e-10]):
+    for mu in list([1e4, 1e5, 1e6, 1e7, 5e7]):
+        for alphaFactor in list([ 1e-19, 1e-18, 1e-17, 1e-16]):
+            alpha = mu*alphaFactor
             ticket_new = copy.deepcopy(ticket)
             ticket_new.name = "bgSCF"+str(bgSCF)+"_mu"+str("%1.1e"%mu)+"_alpha"+str("%1.1e"%alpha)
             ticket_new.bg_scaling_coef = copy.deepcopy(bgSCF)
