@@ -497,10 +497,10 @@ class LinBreg:
 
 def loadCSSolver(path, PyPRIS_name, PyPRIS_SensMx_name):
     with open('{}/{}.file'.format(path, PyPRIS_name), "rb") as f:
-        PyPRIS = pickle.load(f)
+        linbreg = pickle.load(f)
     with open('{}/{}.file'.format(path, PyPRIS_SensMx_name), "rb") as s:
-        PyPRIS.A = joblib.load(s)
-    return PyPRIS
+        linbreg.A = joblib.load(s)
+    return linbreg
 
 def get_ticket(ticket_path):
     with open(ticket_path, "rb") as f:
