@@ -31,7 +31,7 @@ ticket.observer_debugger = False
 ticket.tobserver_edge_padding = True
 
 "output settings"
-ticket.ticket_folder= 'PyPRIS_tickets_F2_set2-short'
+ticket.ticket_folder= 'PyPRIS_tickets_F2_set3'
 
 "linbreg configurations"
 ticket.linbreg_alpha = LinBreg("X")
@@ -51,13 +51,13 @@ ticket.linbreg_alpha.deep_debug = False
 
 "ticket.linbreg_alpha.mu = 1000000000" # move to loop
 "ticket.linbreg_alpha.alpha = 1e-11" # move to loop
-ticket.linbreg_alpha.maxit = 600000
+ticket.linbreg_alpha.maxit = 400000
 ticket.linbreg_alpha.it_check_rem = 1
 ticket.linbreg_alpha.debug_it_int = 100
 ticket.linbreg_alpha.kick.ints = 10
 ticket.linbreg_alpha.kick.flag = True
 ticket.linbreg_alpha.kick.thres = 1e-3
-ticket.linbreg_alpha.save_obj_int = 4000
+ticket.linbreg_alpha.save_obj_int = 5000
 ticket.linbreg_alpha.save = True
 ticket.linbreg_alpha.PyPRIS_iter = 0
 "ticket.linbreg_alpha.PyPRIS_name = ticket.name" # moved to loop
@@ -73,9 +73,9 @@ try:
 except OSError:
     pass
 
-for bgSCF in list([1.5]):
-    for mu in list([1e6, 1e7, 1e8]):
-        for alphaFactor in list([ 1e-19]):
+for bgSCF in list([1.5, 2, 4, 6]):
+    for mu in list([1e5, 1e6, 1e7, 1e8]):
+        for alphaFactor in list([ 1e-17, 1e-18, 1e-19, 1e-20]):
             alpha = mu*alphaFactor
             ticket_new = copy.deepcopy(ticket)
             ticket_new.name = "bgSCF"+str(bgSCF)+"_mu"+str("%1.1e"%mu)+"_alpha"+str("%1.1e"%alpha)
