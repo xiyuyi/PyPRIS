@@ -5,21 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 thedir = 'G:\\DH_localization\\PyPRIS_tickets_F2_set1'
-
 f = [name for name in os.listdir(thedir) if os.path.isdir(os.path.join(thedir, name))]
-# f = list()
-# f.append("bgSCF0.5_mu1.0e+10_alpha1.0e-09")
-# f.append("bgSCF0.5_mu1.0e+10_alpha1.0e-10")
-# f.append("bgSCF0.5_mu1.0e+10_alpha1.0e-11")
-# f.append("bgSCF0.8_mu1.0e+10_alpha1.0e-09")
-# f.append("bgSCF0.8_mu1.0e+10_alpha1.0e-10")
-# f.append("bgSCF0.8_mu1.0e+10_alpha1.0e-11")
-# f.append("bgSCF1.2_mu1.0e+10_alpha1.0e-09")
-# f.append("bgSCF1.2_mu1.0e+10_alpha1.0e-10")
-# f.append("bgSCF1.2_mu1.0e+10_alpha1.0e-11")
-# f.append("bgSCF1_mu1.0e+10_alpha1.0e-09")
-# f.append("bgSCF1_mu1.0e+10_alpha1.0e-10")
-# f.append("bgSCF1_mu1.0e+10_alpha1.0e-11")
 
 for fitem in f:
     path_d= thedir + "/"+fitem+"/saved_objects"

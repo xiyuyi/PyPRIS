@@ -39,13 +39,10 @@ for path, PyPRIS_name in zip(filepaths, filenames):
     PyPRIS_SensMx_name = "_".join(tp[0:-1])+"_SensingMx"  # specify datafile name
     print(PyPRIS_name)
     try:
-        linbreg = loadCSSolver(path, PyPRIS_name, PyPRIS_SensMx_name)
+        with open('{}/{}.file'.format(path, PyPRIS_name), "rb") as f:
+            linbreg = pickle.load(f)  # the loaded object is a LinBreg object
         linbreg.path_d = path
         linbreg.debug = True
-        try:
-            linbreg.debug_output(linbreg.it_count,'visualize')
-        except:
-            pass
         v = linbreg.candidate_vis()
         vis = v[:,:,:]
         prj_ax0 = copy.deepcopy(np.mean(vis, axis=0))
@@ -60,5 +57,6 @@ for path, PyPRIS_name in zip(filepaths, filenames):
         plt.savefig(
             '{}/PyPRIS__{}_{}_{}_plots_it{}.png'.format( linbreg.path_d, 'Proj_vies', linbreg.PyPRIS_name, linbreg.PyPRIS_iter, linbreg.it_count),
             dpi=300, figsize=(100, 80))
+        plt.close()
     except:
         pass
