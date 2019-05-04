@@ -21,17 +21,17 @@ ticket.plane2_dz = np.int8(12)
 ticket.observer_edge_padding = True
 
 "configure the initial candidate pool of this pris ticket"
-ticket.init_candidates_intervals = list([1,10,10])
-ticket.init_ax0_range = list([-15, 78])
-ticket.init_ax1_range = list([1, 161])
-ticket.init_ax2_range = list([1, 161])
+ticket.init_candidates_intervals = list([1,6,6])
+ticket.init_ax0_range = list([-30, 63])
+ticket.init_ax1_range = list([21, 121])
+ticket.init_ax2_range = list([21, 121])
 
 "debug configurations"
 ticket.observer_debugger = False
 ticket.tobserver_edge_padding = True
 
 "output settings"
-ticket.ticket_folder= 'PyPRIS_tickets_F2_set1'
+ticket.ticket_folder= 'PyPRIS_tickets_F2_set2'
 
 "linbreg configurations"
 ticket.linbreg_alpha = LinBreg("X")
@@ -74,8 +74,8 @@ except OSError:
     pass
 
 for bgSCF in list([1.5]):
-    for mu in list([1e7, 1e8, 1e9, 1e10, 1e11]):
-        for alphaFactor in list([ 1e-19, 1e-20, 1e-21]):
+    for mu in list([1e6, 1e7, 1e8]):
+        for alphaFactor in list([ 1e-19]):
             alpha = mu*alphaFactor
             ticket_new = copy.deepcopy(ticket)
             ticket_new.name = "bgSCF"+str(bgSCF)+"_mu"+str("%1.1e"%mu)+"_alpha"+str("%1.1e"%alpha)
