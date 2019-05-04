@@ -9,7 +9,7 @@ create png files for all the results in the specified directory and sub director
 
 """
 # put in the file folder where you want all the linbreg objects to be visualized.
-path = 'G:\\DH_localization\\PyPRIS_tickets_set5'
+path = 'G:\\DH_localization\\PyPRIS_tickets_set5-long'
 
 
 files = []

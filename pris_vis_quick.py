@@ -57,5 +57,6 @@ for path, PyPRIS_name in zip(filepaths, filenames):
         plt.savefig(
             '{}/PyPRIS__{}_{}_{}_plots_it{}.png'.format( linbreg.path_d, 'Proj_vies', linbreg.PyPRIS_name, linbreg.PyPRIS_iter, linbreg.it_count),
             dpi=300, figsize=(100, 80))
+        plt.close()
     except:
         pass
