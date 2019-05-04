@@ -31,7 +31,7 @@ ticket.observer_debugger = False
 ticket.tobserver_edge_padding = True
 
 "output settings"
-ticket.ticket_folder= 'PyPRIS_tickets_F2_set2'
+ticket.ticket_folder= 'PyPRIS_tickets_F2_set2-short' 
 
 "linbreg configurations"
 ticket.linbreg_alpha = LinBreg("X")
@@ -63,7 +63,7 @@ ticket.linbreg_alpha.PyPRIS_iter = 0
 "ticket.linbreg_alpha.PyPRIS_name = ticket.name" # moved to loop
 ticket.linbreg_alpha.path_0 = '.'
 "ticket.bg_scaling_coef = 1.5 "  # moved to loop
-ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -20
+ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -15
 
 "others"
 ticket.PRIS_iter_end = 5
