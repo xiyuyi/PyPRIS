@@ -31,7 +31,7 @@ ticket.observer_debugger = False
 ticket.tobserver_edge_padding = True
 
 "output settings"
-ticket.ticket_folder= 'PyPRIS_tickets_F2_set2-short' 
+ticket.ticket_folder= 'PyPRIS_tickets_F2_set2-short'
 
 "linbreg configurations"
 ticket.linbreg_alpha = LinBreg("X")
