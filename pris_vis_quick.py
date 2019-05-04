@@ -9,7 +9,7 @@ create png files for all the results in the specified directory and sub director
 
 """
 # put in the file folder where you want all the linbreg objects to be visualized.
-path = 'G:\\DH_localization\\PyPRIS_tickets_set5'
+path = 'G:\\DH_localization\\PyPRIS_tickets_set5-long'
 
 
 files = []
@@ -39,13 +39,10 @@ for path, PyPRIS_name in zip(filepaths, filenames):
     PyPRIS_SensMx_name = "_".join(tp[0:-1])+"_SensingMx"  # specify datafile name
     print(PyPRIS_name)
     try:
-        linbreg = loadCSSolver(path, PyPRIS_name, PyPRIS_SensMx_name)
+        with open('{}/{}.file'.format(path, PyPRIS_name), "rb") as f:
+            linbreg = pickle.load(f)  # the loaded object is a LinBreg object
         linbreg.path_d = path
         linbreg.debug = True
-        try:
-            linbreg.debug_output(linbreg.it_count,'visualize')
-        except:
-            pass
         v = linbreg.candidate_vis()
         vis = v[:,:,:]
         prj_ax0 = copy.deepcopy(np.mean(vis, axis=0))
