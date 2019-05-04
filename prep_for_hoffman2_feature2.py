@@ -22,7 +22,7 @@ ticket.observer_edge_padding = True
 
 "configure the initial candidate pool of this pris ticket"
 ticket.init_candidates_intervals = list([1,10,10])
-ticket.init_ax0_range = list([-65, 28])
+ticket.init_ax0_range = list([-15, 78])
 ticket.init_ax1_range = list([1, 161])
 ticket.init_ax2_range = list([1, 161])
 
