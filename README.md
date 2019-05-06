@@ -46,8 +46,8 @@ To log-out from the PyPRIS environment, type:
 `conda deactivate`
 
 ### Computation on Hoffman2
-* upload the observation files (for example: blur_plane1.tif, blur_plane7.tif and psf.tif) to hoffman2. keep both files under the same file folder 
-* prepare tickets by updating and executing prep_for_hoffman2.py.
+* upload the observation files (for example: blur_plane1.tif, blur_plane7.tif and psf.tif in test_data) to hoffman2. keep both files under the same file folder 
+* prepare tickets by updating and executing prep_for_hoffman2.py locally (recommended.)
 Examples include prep_for_hoffman2_Feature2.py and prep_for_hoffman2_feature3.py
   * specify file names and file paths for each plane.
   * specify ticket.ticket_folder
