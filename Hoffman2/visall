@@ -1,0 +1,120 @@
+#!/u/home/x/xiyuyi/.conda/envs/PyPRIS_env/bin/python
+import sys
+sys.path.append("/u/home/x/xiyuyi/bin")
+
+from PyPRIS import *
+import os
+import matplotlib.pyplot as plt
+import copy
+import numpy as np
+import matplotlib
+import imageio
+
+"""
+
+create png files for all the results in the specified directory and sub directories
+
+"""
+# put in the file folder where you want all the linbreg objects to be visualized.
+path = 'G:\\DH_localization\\PyPRIS_tickets_set5-long'
+path = '.'
+
+files = []
+filenames = []
+filepaths = []
+# r=root, d=directories, f = files
+for r, d, f in os.walk(path):
+    for file in f:
+        if file.endswith('.file'):
+            files.append(os.path.join(r, file))
+            filenames.append(file[0:-5])
+            filepaths.append(r)
+
+for f, fname, fpath in zip(files, filenames, filepaths):
+    print(f)
+    print(fname)
+    print(fpath)
+    print("--------------")
+
+for path, PyPRIS_name in zip(filepaths, filenames):
+    #PyPRIS_name =  "PyPRIS_" + fitem + "_pris"+str(prisIter)+"_" + str(1 + itN)  # specify datafile name
+    tp = PyPRIS_name.split('_')
+    PyPRIS_SensMx_name = "_".join(tp[0:-1])+"_SensingMx"  # specify datafile name
+    print(PyPRIS_name)
+    try:
+        with open('{}/{}.file'.format(path, PyPRIS_name), "rb") as f:
+            linbreg = pickle.load(f)  # the loaded object is a LinBreg object
+        linbreg.path_d = path
+        linbreg.debug = True
+        v = linbreg.candidate_vis()
+        vis = v[:,:,:]
+        prj_ax0 = copy.deepcopy(np.mean(vis, axis=0))
+        prj_ax1 = copy.deepcopy(np.mean(vis, axis=1))
+        prj_ax2 = copy.deepcopy(np.mean(vis, axis=2).T)
+        patch = np.zeros((vis.shape[0],vis.shape[0]))
+        cat1 = np.concatenate([prj_ax0, prj_ax2], axis = 1)
+        cat2 = np.concatenate([prj_ax1, patch], axis = 1)
+        cat = np.concatenate([cat1, cat2], axis = 0)
+        plt.switch_backend('agg')
+        plt.figure(figsize=(3,3))
+        plt.imshow(cat)
+        plt.savefig(
+            '{}/PyPRIS__{}_{}_{}_plots_it{}.png'.format( linbreg.path_d, 'Proj_vies', linbreg.PyPRIS_name, linbreg.PyPRIS_iter, linbreg.it_count),
+            dpi=300, figsize=(100, 80))
+        plt.close()
+    except:
+        pass
+
+thedir = '.'
+f = [name for name in os.listdir(thedir) if os.path.isdir(os.path.join(thedir, name))]
+
+for fitem in f:
+    path_d= thedir + "/"+fitem+"/saved_objects"
+    r1 = imageio.get_writer(path_d + '_3projections_prisAll.gif', mode='I')
+    r2 = imageio.get_writer(path_d + '_plots_prisAll.gif', mode='I')
+    fnames1 = list()
+    fnames2 = list()
+    for prisIter in np.arange(0,6):
+        for itN in np.arange(1,908002,2000):
+            fnames1.append("PyPRIS__Proj_vies_"+fitem+"_pris"+str(prisIter)+"_plots_it"+str(itN)+".png")
+            fnames2.append("PyPRIS_"+fitem+"_pris"+str(prisIter)+"_plots_it"+str(itN)+"visualize.png")
+
+        for fname in fnames1:
+            try:
+                im = imageio.imread(path_d+"/"+fname)
+                plt.switch_backend('agg')
+                f = plt.figure()
+                ax = f.add_subplot(111)
+                plt.imshow(im)
+                plt.text(-0.3, 1.1,fname, ha='left', va='top', transform=ax.transAxes)
+                # Make a random plot...
+                # If we haven't already shown or saved the plot, then we need to
+                # draw the figure first...
+                f.canvas.draw()
+                # Now we can save it to a numpy array.
+                data = np.frombuffer(f.canvas.tostring_rgb(), dtype=np.uint8)
+                data = data.reshape(f.canvas.get_width_height()[::-1] + (3,))
+                plt.close()
+                r1.append_data(data)
+            except:
+                pass
+
+        for fname in fnames2:
+            try:
+                im = imageio.imread(path_d+"/"+fname)
+                plt.switch_backend('agg')
+                f = plt.figure()
+                ax = f.add_subplot(111)
+                plt.imshow(im)
+                plt.text(-0.3, 1.1,fname, ha='left', va='top', transform=ax.transAxes)
+                # Make a random plot...
+                # If we haven't already shown or saved the plot, then we need to
+                # draw the figure first...
+                f.canvas.draw()
+                # Now we can save it to a numpy array.
+                data = np.frombuffer(f.canvas.tostring_rgb(), dtype=np.uint8)
+                data = data.reshape(f.canvas.get_width_height()[::-1] + (3,))
+                plt.close()
+                r2.append_data(data)
+            except:
+                pass
