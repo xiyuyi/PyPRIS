@@ -45,16 +45,15 @@ To log-out from the PyPRIS environment, type:
 
 `conda deactivate`
 
-### Test the demo case on hoffman2:
-
-Checkout a computation session with:
-
-`qrsh`
-
-Generate pypyrs configuration ticket with:
-
-`python prep.py`
-
-Run the PRIS recovery demo case with:
-
-`python test.py`
+### Computation on Hoffman2
+* upload the observation files (for example: blur_plane1.tif, blur_plane7.tif and psf.tif) to hoffman2. keep both files under the same file folder 
+* prepare tickets by updating and executing prep_for_hoffman2.py.
+Examples include prep_for_hoffman2_Feature2.py and prep_for_hoffman2_feature3.py
+  * specify file names and file paths for each plane.
+  * specify ticket.ticket_folder
+  * specify index range for x,y,z dimensions (the range need to match your fov size)
+  * set a wide range for bgCSF, mu, and alpha values, in the form of absolute values.
+  * upload to hoffman2.
+  * put in the pris and pris.Ini files into each folder. 
+  * **Perform Single Job test!** extremley important. test with a single job first. Because if you fail a big batch of jobs, your priority will be reduced in the queue.
+      * if any error arises, open an interactive session to debug on the server. 
