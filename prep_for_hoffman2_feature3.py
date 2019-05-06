@@ -8,9 +8,9 @@ ticket = BiplaneTicket()
 "ticket.name = 'Demo'" # moved to loop
 
 "where to find the data files, for both blur and observation"
-ticket.datapath = '/u/scratch/x/xiyuyi/PyPRIS_data/S7_fov1516'
-ticket.plane1_path = "{}/DH_plane21.tif".format(ticket.datapath)
-ticket.plane2_path = "{}/DH_plane27.tif".format(ticket.datapath)
+ticket.datapath = '/u/scratch/x/xiyuyi/PyPRIS_data/S7_fov578_v2'
+ticket.plane1_path = "{}/DH_plane8.tif".format(ticket.datapath)
+ticket.plane2_path = "{}/DH_plane14.tif".format(ticket.datapath)
 ticket.psf_path = "{}/psf.tif".format(ticket.datapath)
 ticket.psf_norm_factor = 80
 
@@ -31,7 +31,7 @@ ticket.observer_debugger = False
 ticket.tobserver_edge_padding = True
 
 "output settings"
-ticket.ticket_folder= 'PyPRIS_tickets_F2_set4'
+ticket.ticket_folder= 'PyPRIS_tickets_F3_set1'
 
 "linbreg configurations"
 ticket.linbreg_alpha = LinBreg("X")
@@ -63,7 +63,7 @@ ticket.linbreg_alpha.PyPRIS_iter = 0
 "ticket.linbreg_alpha.PyPRIS_name = ticket.name" # moved to loop
 ticket.linbreg_alpha.path_0 = '.'
 "ticket.bg_scaling_coef = 1.5 "  # moved to loop
-ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -15
+ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -14
 
 "others"
 ticket.PRIS_iter_end = 5
@@ -73,8 +73,8 @@ try:
 except OSError:
     pass
 
-for bgSCF in list([1.5]):
-    for mu in list([1e4, 1e5, 1e6, 1e7, 1e8]):
+for bgSCF in list([1.5, 2, 4, 8]):
+    for mu in list([1e4, 1e5, 1e6, 1e7, 1e8, 1e9]):
         for alpha in list([ 1e-8, 1e-9, 1e-10, 1e-11, 1e-12, 1e-13]):
             ticket_new = copy.deepcopy(ticket)
             ticket_new.name = "bgSCF"+str(bgSCF)+"_mu"+str("%1.1e"%mu)+"_alpha"+str("%1.1e"%alpha)
@@ -89,4 +89,3 @@ for bgSCF in list([1.5]):
                 pass
             with open("../{}/{}/Go.pris_ticket".format(ticket_new.ticket_folder, ticket_new.name), "wb") as f:
                 pickle.dump(ticket_new, f, pickle.HIGHEST_PROTOCOL)
-
