@@ -56,7 +56,8 @@ Examples include prep_for_hoffman2_Feature2.py and prep_for_hoffman2_feature3.py
   * upload to hoffman2.
   * put in the pris and pris.Ini files into each folder. 
   * **Perform Single Job test!** extremley important. test with a single job first. Because if you fail a big batch of jobs, your priority will be reduced in the queue.
-      * if any error arises, open an interactive session to debug on the server. 
+      * if any error arises, open an interactive session to debug on the server by activating an interactive python session
       * fix bugs until a linbreg recovery can be successfully executed in the interactive session.
       * **perform single JOb test before moving on!**
+      * test with `python pris` from the terminal.
   * submit batch jobs
