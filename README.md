@@ -24,7 +24,7 @@ Before running notebook files, set up the environment of Ipython kernel as well 
 Finally, after starting jupyter notebook, switch kernel to current environment by clicking "Kernel -> Change kernel -> PyPRIS_env".
 
 ## On Hoffman2:
-Upload: upload test_data, PyPRIS and .py files to hoffman2 under your home directory.
+Upload: upload test_data, PyPRIS, PyPRIS_env.yml and \*.py files to hoffman2 under your home directory.
 
 #### configure environment for PyPRIS (PyPRIS_env) on Hoffman2 from terminal (recommended terminals include MobaXTerm and Putty) 
 After log-in from the terminal, start an interactive session with: `qrsh` (this step may take a few minutes)
