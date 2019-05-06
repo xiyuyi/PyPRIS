@@ -21,10 +21,10 @@ ticket.plane2_dz = np.int8(12)
 ticket.observer_edge_padding = True
 
 "configure the initial candidate pool of this pris ticket"
-ticket.init_candidates_intervals = list([1,6,6])
+ticket.init_candidates_intervals = list([1,4,4])
 ticket.init_ax0_range = list([-30, 60])
-ticket.init_ax1_range = list([21, 121])
-ticket.init_ax2_range = list([21, 121])
+ticket.init_ax1_range = list([1, 81])
+ticket.init_ax2_range = list([11, 81])
 
 "debug configurations"
 ticket.observer_debugger = False
