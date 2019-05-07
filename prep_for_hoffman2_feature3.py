@@ -21,10 +21,10 @@ ticket.plane2_dz = np.int8(12)
 ticket.observer_edge_padding = True
 
 "configure the initial candidate pool of this pris ticket"
-ticket.init_candidates_intervals = list([1,6,6])
+ticket.init_candidates_intervals = list([1,4,4])
 ticket.init_ax0_range = list([-30, 60])
-ticket.init_ax1_range = list([21, 121])
-ticket.init_ax2_range = list([21, 121])
+ticket.init_ax1_range = list([1, 81])
+ticket.init_ax2_range = list([11, 81])
 
 "debug configurations"
 ticket.observer_debugger = False
@@ -57,7 +57,7 @@ ticket.linbreg_alpha.debug_it_int = 100
 ticket.linbreg_alpha.kick.ints = 10
 ticket.linbreg_alpha.kick.flag = True
 ticket.linbreg_alpha.kick.thres = 1e-3
-ticket.linbreg_alpha.save_obj_int = 5000
+ticket.linbreg_alpha.save_obj_int = 2000
 ticket.linbreg_alpha.save = True
 ticket.linbreg_alpha.PyPRIS_iter = 0
 "ticket.linbreg_alpha.PyPRIS_name = ticket.name" # moved to loop
