@@ -8,7 +8,7 @@ ticket = BiplaneTicket()
 "ticket.name = 'Demo'" # moved to loop
 
 "where to find the data files, for both blur and observation"
-ticket.datapath = '/u/scratch/x/xiyuyi/PyPRIS_data/S7_fov578_v2'
+ticket.datapath = '/u/scratch/x/xiyuyi/PyPRIS_data/S7_fov578_v4_set6_ox1122_oy1452'
 ticket.plane1_path = "{}/DH_plane8.tif".format(ticket.datapath)
 ticket.plane2_path = "{}/DH_plane14.tif".format(ticket.datapath)
 ticket.psf_path = "{}/psf.tif".format(ticket.datapath)
@@ -21,8 +21,8 @@ ticket.plane2_dz = np.int8(12)
 ticket.observer_edge_padding = True
 
 "configure the initial candidate pool of this pris ticket"
-ticket.init_candidates_intervals = list([1,4,4])
-ticket.init_ax0_range = list([-30, 60])
+ticket.init_candidates_intervals = list([1,6,6])
+ticket.init_ax0_range = list([-50, 60])
 ticket.init_ax1_range = list([1, 81])
 ticket.init_ax2_range = list([11, 81])
 
@@ -31,7 +31,7 @@ ticket.observer_debugger = False
 ticket.tobserver_edge_padding = True
 
 "output settings"
-ticket.ticket_folder= 'PyPRIS_tickets_F3_set1'
+ticket.ticket_folder= 'PyPRIS_tickets_F3_set2_v4_set6'
 
 "linbreg configurations"
 ticket.linbreg_alpha = LinBreg("X")
@@ -51,19 +51,19 @@ ticket.linbreg_alpha.deep_debug = False
 
 "ticket.linbreg_alpha.mu = 1000000000" # move to loop
 "ticket.linbreg_alpha.alpha = 1e-11" # move to loop
-ticket.linbreg_alpha.maxit = 400000
+ticket.linbreg_alpha.maxit = 600000
 ticket.linbreg_alpha.it_check_rem = 1
 ticket.linbreg_alpha.debug_it_int = 100
 ticket.linbreg_alpha.kick.ints = 10
 ticket.linbreg_alpha.kick.flag = True
 ticket.linbreg_alpha.kick.thres = 1e-3
-ticket.linbreg_alpha.save_obj_int = 2000
+ticket.linbreg_alpha.save_obj_int = 5000
 ticket.linbreg_alpha.save = True
 ticket.linbreg_alpha.PyPRIS_iter = 0
 "ticket.linbreg_alpha.PyPRIS_name = ticket.name" # moved to loop
 ticket.linbreg_alpha.path_0 = '.'
 "ticket.bg_scaling_coef = 1.5 "  # moved to loop
-ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -14
+ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -15
 
 "others"
 ticket.PRIS_iter_end = 5
@@ -73,9 +73,9 @@ try:
 except OSError:
     pass
 
-for bgSCF in list([1.5, 2, 4, 8]):
-    for mu in list([1e4, 1e5, 1e6, 1e7, 1e8, 1e9]):
-        for alpha in list([ 1e-8, 1e-9, 1e-10, 1e-11, 1e-12, 1e-13]):
+for bgSCF in list([1.5]):
+    for mu in list([1e5, 1e6, 1e7]):
+        for alpha in list([1e-10, 1e-11]):
             ticket_new = copy.deepcopy(ticket)
             ticket_new.name = "bgSCF"+str(bgSCF)+"_mu"+str("%1.1e"%mu)+"_alpha"+str("%1.1e"%alpha)
             ticket_new.bg_scaling_coef = copy.deepcopy(bgSCF)
