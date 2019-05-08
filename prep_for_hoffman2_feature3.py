@@ -8,7 +8,7 @@ ticket = BiplaneTicket()
 "ticket.name = 'Demo'" # moved to loop
 
 "where to find the data files, for both blur and observation"
-ticket.datapath = '/u/scratch/x/xiyuyi/PyPRIS_data/S7_fov578_v4_set3_ox1143_oy1412'
+ticket.datapath = '/u/scratch/x/xiyuyi/PyPRIS_data/S7_fov578_v4_set4_ox1132_oy1432'
 ticket.plane1_path = "{}/DH_plane8.tif".format(ticket.datapath)
 ticket.plane2_path = "{}/DH_plane14.tif".format(ticket.datapath)
 ticket.psf_path = "{}/psf.tif".format(ticket.datapath)
@@ -31,7 +31,7 @@ ticket.observer_debugger = False
 ticket.tobserver_edge_padding = True
 
 "output settings"
-ticket.ticket_folder= 'PyPRIS_tickets_F3_set2_v4_set3'
+ticket.ticket_folder= 'PyPRIS_tickets_F3_set2_v4_set4'
 
 "linbreg configurations"
 ticket.linbreg_alpha = LinBreg("X")
