@@ -10,12 +10,12 @@ import os
 import scipy.misc
 pixel_size = 62.75 # pixel size is 62.75 nanometers. notes: Measure pixel size #79   link: https://github.com/xiyuyi/PyPRIS/issues/79
 z_step_size = 25
+
 ticket = get_ticket("G:\\DH_localization\\PyPRIS\\Documents\\Feature1\\good_ticket_for_Feature1\\Go.pris_ticket")
-linbreg_paths = list()
 pathAll= "G:/DH_localization/PyPRIS_data_archive/PyPRIS_tickets_F1_F2_results5.5/" \
                 "PyPRIS_tickets_F1_set6/bgSCF1.5_mu1.0e+05_alpha1.0e-11/saved_objects/"
 
-
+linbreg_paths = list()
 linbreg_paths.append(pathAll + "PyPRIS_bgSCF1.5_mu1.0e+05_alpha1.0e-11_pris0_113519.file")
 linbreg_paths.append(pathAll + "PyPRIS_bgSCF1.5_mu1.0e+05_alpha1.0e-11_pris1_157908.file")
 linbreg_paths.append(pathAll + "PyPRIS_bgSCF1.5_mu1.0e+05_alpha1.0e-11_pris2_218371.file")
