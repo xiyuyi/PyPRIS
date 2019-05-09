@@ -33,6 +33,31 @@ class PyPRIS:
         self.hist_check_mark_id = list()  # checkmark ID. ascending each time after you make a check_mark
         self.observator = None  # this should be a function that needs to be defined.
 
+    def apply_mask(self, cs_solver, mask):
+    # this will take the current candidates and the result in the compressive sensing solver object,
+    # and generate  pool of candidates.
+        # create a check mark.
+        self.set_check_mark()
+        
+        vis1 = cs_solver.candidate_vis()
+        # Apply the mask to current recovery result
+        vis1 += mask
+        # Get rid of extra signals
+        vis1[np.where(vis1<1)] = 0
+        # Remove mask
+        vis1 -= mask
+        # Update masked result in CS Solver
+        cs_solver.candidate_vis_inv(vis1)
+        
+        # Get the non_zero_coordinates from the existing cs_solver results.
+        non_zero_inds = np.argwhere(cs_solver.x[0:len(cs_solver.x) - 1] > 0)
+        non_zero_coordinates = [self.current_candidates[i] for i in list(non_zero_inds.ravel())]
+
+        self.current_candidates = copy.deepcopy(non_zero_coordinates)
+
+        # set a check mark for tracking purposes.
+        self.set_check_mark()
+        
     def prep_for_new_refinement(self):
         self.hist_candidates.append(copy.deepcopy(self.current_candidates))
         self.hist_candidates_intervals.append(copy.deepcopy(self.current_candidates_intervals))
@@ -345,6 +370,32 @@ class LinBreg:
                 (coords[2] - minimals[2]) // intervals[2])] = intensity
 
         return vis
+    
+    def candidate_vis_inv(self, vis):
+                
+        intervals = self.candidate_intervals
+        locs = list(zip(*self.candidate_coords))
+        dims = list()
+        minimals = list()
+        maximums = list()
+
+        for inds, interval in zip(locs, intervals):
+            maximum = np.max(inds)
+            minimal = np.min(inds)
+            dims.append(1 + np.int((maximum - minimal) // interval))
+            minimals.append(minimal)
+            maximums.append(maximum)
+        
+        new_x = []
+        
+        for coords, intensity in zip(self.candidate_coords, self.x[0:len(self.x) - 1]):
+            new_x.append(vis[coords[0] - minimals[0] - 1, int((coords[1] - minimals[1]) // intervals[1]), int(
+                (coords[2] - minimals[2]) // intervals[2])] )
+                    
+        new_x.append(self.x[-1])
+        
+        self.x = copy.deepcopy(np.array(new_x))
+
 
     def debug_output(self, it_count, appstr):
         # Generate intermediate output under debug mode.
