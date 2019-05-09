@@ -55,7 +55,7 @@ Examples include prep_for_hoffman2_Feature2.py and prep_for_hoffman2_feature3.py
   * set a wide range for bgCSF, mu, and alpha values, in the form of absolute values.
   * upload to hoffman2.
   * put in the pris and pris.Ini files into each ticket folder.
-  * To ensure the pris and the ticket files are readable and executable, use `chmod -R u+rwx * `
+  * To ensure the pris file, the ticket files and the associated file folders are readable, writable and executable, use `chmod -R u+rwx * `
   * **Perform Single Job test!** extremley important. test with a single job first. Because if you fail a big batch of jobs, your priority will be reduced in the queue.
       * if any error arises, open an interactive session to debug on the server by activating an interactive python session. To initiate an interactive python session from the terminal on hoffman2 (recommended to use Putty), type `Python`
       * fix bugs until a linbreg recovery can be successfully executed in the interactive session.
