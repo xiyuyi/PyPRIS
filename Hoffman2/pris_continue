@@ -13,7 +13,9 @@ print("[some more description]")
 
 import sys
 sys.path.append("/u/home/a/alejandr/bin")
+sys.path.append("/u/home/x/xiyuyi/bin")
 from PyPRIS import *
+import os
 print("")
 print("")
 print("")
@@ -25,10 +27,11 @@ warnings.filterwarnings("ignore")
 ticket = get_ticket('./Go.pris_ticket')
 
 # Get the latest saved linbreg filename
-import os
+
 
 # put in the file folder where you saved all the linbreg objects.
-path = 'C:\\Users\\wxjpp\\Desktop\\PyPRIS-master\\saved_objects'
+# path = 'C:\\Users\\wxjpp\\Desktop\\PyPRIS-master\\saved_objects'
+path = './saved_objects'
 
 mxnames = []
 objIter = []
@@ -37,7 +40,8 @@ for r, d, f in os.walk(path):
     for file in f:
         if file.endswith('SensingMx.file'):
             mxnames.append(file[0:-5])
-            
+
+
 mxName = mxnames[-1]
 
 for r, d, f in os.walk(path):
@@ -45,6 +49,7 @@ for r, d, f in os.walk(path):
         if file.startswith(mxName[0:-9]):
             if not file.endswith('SensingMx.file'):
                 objIter.append(int(file[len(mxName[0:-9]):-5]))
+
 
 objName = mxName[0:-9] + str(max(objIter))
 
@@ -57,12 +62,11 @@ print(objName)
 with open('{}/{}.file'.format(path, objName), "rb") as f:
     linbreg_ori = pickle.load(f) #the loaded object is a LinBreg object
 
+
 linbreg = copy.deepcopy(linbreg_ori)
 
 with open('{}/{}.file'.format(path, mxName), "rb") as s:
     linbreg.A = joblib.load(s)
-    
-Iter = max(objIter)+1
 
 
 # Create a PyPRIS object and initialize according to the loaded LinBreg object
@@ -72,9 +76,8 @@ pypris.current_candidates_intervals = linbreg.candidate_intervals
 pypris.current_A = linbreg.A
 
 linbreg_ori.A = 0
-
+Iter = linbreg.PyPRIS_iter[4:]
 print("---------------- PRIS refinement #" + str(Iter) + " ------------------")
-linbreg.get_ready()
 linbreg.go()
 
 
