@@ -104,11 +104,17 @@ for PRIS_iter in np.arange(1,ticket.PRIS_iter_end):
     pypris.prep_for_new_refinement()
     pypris.refine_candidates(linbreg)
     """
+    
+    pypris.apply_mask(linbreg)
+        this step should update the pypris.current_candidates based on the linbreg object (the x, the mask)
+    
     for Xingjia:
+    
     define a mask to discard some of the candidates.
     selectively delete items form this list: linbreg.current_candidates
     to quickly visualize:
     type vis = linbreg.visuali!@#$#klsdjf;asd;
+    
     """
     pypris.generate_sensing_mx()
     # prepare the inner sparse recovery
