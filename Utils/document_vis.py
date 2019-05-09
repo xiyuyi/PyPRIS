@@ -10,18 +10,16 @@ import os
 import scipy.misc
 pixel_size = 62.75 # pixel size is 62.75 nanometers. notes: Measure pixel size #79   link: https://github.com/xiyuyi/PyPRIS/issues/79
 z_step_size = 25
-
-ticket = get_ticket("G:\\DH_localization\\PyPRIS\\Documents\\Feature1\\good_ticket_for_Feature1\\Go.pris_ticket")
-pathAll= "G:/DH_localization/PyPRIS_data_archive/PyPRIS_tickets_F1_F2_results5.5/" \
-                "PyPRIS_tickets_F1_set6/bgSCF1.5_mu1.0e+05_alpha1.0e-11/saved_objects/"
+ticket_path = "G:/DH_localization/PyPRIS_tickets_F3_set1/bgSCF1.5_mu1.0e+05_alpha1.0e-11"
+ticket = get_ticket(ticket_path+'/Go.pris_ticket')
+pathAll= ticket_path + "/saved_objects/"
 
 linbreg_paths = list()
-linbreg_paths.append(pathAll + "PyPRIS_bgSCF1.5_mu1.0e+05_alpha1.0e-11_pris0_113519.file")
-linbreg_paths.append(pathAll + "PyPRIS_bgSCF1.5_mu1.0e+05_alpha1.0e-11_pris1_157908.file")
-linbreg_paths.append(pathAll + "PyPRIS_bgSCF1.5_mu1.0e+05_alpha1.0e-11_pris2_218371.file")
-linbreg_paths.append(pathAll + "PyPRIS_bgSCF1.5_mu1.0e+05_alpha1.0e-11_pris3_128001.file")
-output_path="G:/DH_localization/PyPRIS_data_archive/PyPRIS_tickets_F1_F2_results5.5/" \
-                "PyPRIS_tickets_F1_set6/bgSCF1.5_mu1.0e+05_alpha1.0e-11"
+linbreg_paths.append(pathAll + "PyPRIS_bgSCF1.5_mu1.0e+05_alpha1.0e-11_pris0_36838.file")
+linbreg_paths.append(pathAll + "PyPRIS_bgSCF1.5_mu1.0e+05_alpha1.0e-11_pris1_75208.file")
+linbreg_paths.append(pathAll + "PyPRIS_bgSCF1.5_mu1.0e+05_alpha1.0e-11_pris2_400000.file")
+linbreg_paths.append(pathAll + "PyPRIS_bgSCF1.5_mu1.0e+05_alpha1.0e-11_pris3_400000.file")
+output_path= ticket_path
 
 prj_ax0s = []
 prj_ax1s = []
@@ -73,7 +71,10 @@ for name_head, prj_ax0, prj_ax1, prj_ax2, b, interv in zip(name_heads, prj_ax0s,
     scipy.misc.toimage(im, cmin=0.0, cmax=np.max(prj_ax2.ravel())).save(this_path)
     #
     this_path = output_path + '/b' + name_head + '.png'
-    im = np.kron(np.resize(b,(71*2,71)), np.ones((100, 100))).T
+    d1 = 81
+    d2 = 81
+
+    im = np.kron(np.resize(b,(d1*2,d2)), np.ones((100, 100))).T
     # draw a scale bar of length 800 nm
     pcounts = np.round(300 / (1 * pixel_size / 100))
     ysta = np.int(im.shape[0] * 0.92)
