@@ -1,4 +1,4 @@
-#!/u/home/x/xiyuyi/.conda/envs/PyPRIS_env/bin/python
+#!/u/home/a/alejandr/.conda/envs/PyPRIS_env/bin/python
 
 print("")
 print("")
@@ -25,6 +25,23 @@ warnings.filterwarnings("ignore")
 
 # load the original ticket
 ticket = get_ticket('./Go.pris_ticket')
+
+# prep the order according to the ticket
+psf = io.imread(ticket.psf_path)
+blur1 = io.imread(ticket.plane1_path)
+blur2 = io.imread(ticket.plane2_path)
+blur = np.concatenate([blur1, blur2],axis=0)
+
+# prepare a observer for pypris. [from one candidate, to one observation]
+# summon an observer from the ObserveStation (ObserveStation class) (Cheers~)
+observer = ObserveStation()
+"configure this observer with biplane observation specifics"
+observer.observe_biplane_prep(psf, single_image_size = blur1.shape,
+                           deltaz_plane1 = ticket.plane1_dz,
+                           deltaz_plane2 = ticket.plane2_dz,
+                           psfz0 = ticket.psfz0,
+                           observer_debugger = ticket.observer_debugger,
+                           observer_edge_padding = ticket.observer_edge_padding)
 
 # Get the latest saved linbreg filename
 
@@ -69,23 +86,45 @@ with open('{}/{}.file'.format(path, mxName), "rb") as s:
     linbreg.A = joblib.load(s)
 
 
-# Create a PyPRIS object and initialize according to the loaded LinBreg object
-pypris = PyPRIS()
-pypris.current_candidates = linbreg.candidate_coords
-pypris.current_candidates_intervals = linbreg.candidate_intervals
-pypris.current_A = linbreg.A
+# # Create a PyPRIS object and initialize according to the loaded LinBreg object
+# pypris = PyPRIS()
+# pypris.current_candidates = linbreg.candidate_coords
+# pypris.current_candidates_intervals = linbreg.candidate_intervals
+# pypris.current_A = linbreg.A
+# pypris.observation = blur.ravel()
+
+pypris = loadPyPRIS(path, 'PyPRIS_pris{}'.format(linbreg.PyPRIS_iter[4:]), mxName)
+
+# set a check mark for pypris:
+pypris.set_check_mark()
+
+
+# put the configured observer to the pypris to perform the tasks of 'observe_biplane'
+# when a pypris object observes, it is through the observer and it is
+# done with the observer's observe_biplane skill (skill = method).
+pypris.observe = observer.observe_biplane
+
 
 linbreg_ori.A = 0
 Iter = linbreg.PyPRIS_iter[4:]
 print("---------------- PRIS refinement #" + str(Iter) + " ------------------")
 linbreg.go()
 
+with open('PyPRIS_mask.file', "rb") as s:
+    mask = joblib.load(s)
+
+linbreg.apply_mask(mask)
 
 # construct sensing matrix,
-for PRIS_iter in np.arange(Iter,ticket.PRIS_iter_end):
+for PRIS_iter in np.arange(int(Iter)+1,ticket.PRIS_iter_end):
     pypris.prep_for_new_refinement()
     pypris.refine_candidates(linbreg)
     pypris.generate_sensing_mx()
+    
+    pypris.save()
+    
+    
+    pypris.observe = observer.observe_biplane
     # prepare the inner sparse recovery
     pypris.current_A = pypris.current_A / ticket.psf_norm_factor
     c = np.dot(pypris.observation.ravel(), pypris.current_A)
@@ -98,6 +137,10 @@ for PRIS_iter in np.arange(Iter,ticket.PRIS_iter_end):
     linbreg.candidate_intervals = pypris.current_candidates_intervals
     linbreg.A = pypris.current_A
     linbreg.b = pypris.observation.ravel()
+    
+    pris.current_PRIS_ItN = PRIS_iter
+    pris.set_check_mark()
+    
     linbreg.PyPRIS_iter = "pris"+ str(PRIS_iter)
     linbreg.stopping_loghistpercdelres_thres -= PRIS_iter*2
     print("---------------- PRIS refinement #" + str(PRIS_iter) + " ------------------")
