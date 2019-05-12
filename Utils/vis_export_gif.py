@@ -4,13 +4,13 @@ matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-thedir = 'G:\\DH_localization\\PyPRIS_tickets_F2_set1'
+thedir = 'G:\\DH_localization\\PyPRIS_tickets_F1_F2_results5.5\\PyPRIS_tickets_set6'
 f = [name for name in os.listdir(thedir) if os.path.isdir(os.path.join(thedir, name))]
 
 for fitem in f:
     path_d= thedir + "/"+fitem+"/saved_objects"
+    r1 = imageio.get_writer(path_d + '_3projections_pris.gif', mode='I')
     for prisIter in np.arange(0,6):
-        r1 = imageio.get_writer(path_d + '_3projections_pris'+str(prisIter)+'.gif', mode='I')
         r2 = imageio.get_writer(path_d + '_plots_pris'+str(prisIter)+'.gif', mode='I')
         fnames1 = list()
         fnames2 = list()
