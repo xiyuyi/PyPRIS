@@ -22,7 +22,7 @@ ticket.observer_edge_padding = True
 
 "configure the initial candidate pool of this pris ticket"
 ticket.init_candidates_intervals = list([1,6,6])
-ticket.init_ax0_range = list([-30, 60])
+ticket.init_ax0_range = list([-20, 50])
 ticket.init_ax1_range = list([1, 81])
 ticket.init_ax2_range = list([11, 81])
 
@@ -31,7 +31,7 @@ ticket.observer_debugger = False
 ticket.tobserver_edge_padding = True
 
 "output settings"
-ticket.ticket_folder= 'PyPRIS_tickets_F3_set3_v4_set1'
+ticket.ticket_folder= 'PyPRIS_tickets_F3_set3_fov1'
 
 "linbreg configurations"
 ticket.linbreg_alpha = LinBreg("X")
@@ -73,9 +73,9 @@ try:
 except OSError:
     pass
 
-for bgSCF in list([1.5]):
-    for mu in list([1e5, 1e6, 1e7]):
-        for alpha in list([1e-10, 1e-11]):
+for bgSCF in list([2]):
+    for mu in list([1e4]):
+        for alpha in list([1e-11]):
             ticket_new = copy.deepcopy(ticket)
             ticket_new.name = "bgSCF"+str(bgSCF)+"_mu"+str("%1.1e"%mu)+"_alpha"+str("%1.1e"%alpha)
             ticket_new.bg_scaling_coef = copy.deepcopy(bgSCF)
