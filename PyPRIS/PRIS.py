@@ -46,7 +46,7 @@ class PyPRIS:
         else:
             print ("Successfully created Scratch directory %s " % self.path_s)
         if self.ifsave is True:
-            self.current_A = 0
+            self.current_A = np.ndarray(0)
             with open("{}/PyPRIS_pris{}.file".format(self.path_s, self.current_PRIS_ItN), "wb") as f:
                 pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
                 print ("Successfully saved PyPRIS ID {} to directory.".format(self.current_PRIS_ItN))
@@ -66,7 +66,6 @@ class PyPRIS:
         # Get the non_zero_coordinates from the existing cs_solver results.
         non_zero_inds = np.argwhere(cs_solver.x[0:len(cs_solver.x) - 1] > 0)
         non_zero_coordinates = [self.current_candidates[i] for i in list(non_zero_inds.ravel())]
-
         self.current_candidates_intervals = copy.deepcopy(
             [pre / ref for pre, ref in zip(self.current_candidates_intervals, self.current_relReF)]
         )
@@ -117,10 +116,8 @@ class PyPRIS:
 
 
 class LinBreg:
-    
-    import time
-    
     def __init__(self, PyPRIS_n):
+        import time
         self.PyPRIS_iter = []  # Associated PyPRIS iter number
         self.PyPRIS_name = PyPRIS_n # Associated PyPRIS name
         self.path_0 = "../PyPRIS_Scratch"
@@ -150,7 +147,7 @@ class LinBreg:
         self.obs_dim1 = 0
         self.kick = self.Kick(self)
         self.A_dir = ''  # directory to store sensing matrix when saving
-        
+
         
     class Kick:
         def __init__(self, LinBreg):
@@ -216,6 +213,7 @@ class LinBreg:
 #         self.set_check_mark()
             
     def get_ready(self):
+        import os
         self.it_count = -1
         self.x = np.zeros(self.A.shape[1])
         self.stepsize = np.ones(self.x.shape)  # stepsize.
@@ -566,7 +564,7 @@ def loadCSSolver(path, PyPRIS_name, PyPRIS_SensMx_name):
         linbreg.A = joblib.load(s)
     return linbreg
                        
-def loadPyPRIS(path, PyPRIS_name, PyPRIS_SensMx_name):
+def loadPyPRIS(path, PyPRIS_name):
     with open('{}/{}.file'.format(path, PyPRIS_name), "rb") as f:
         pris = pickle.load(f) #the loaded object is a PyPRIS object
     return pris

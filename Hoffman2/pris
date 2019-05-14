@@ -13,6 +13,7 @@ print("[some more description]")
 
 import sys
 sys.path.append("/u/home/x/xiyuyi/bin")
+sys.path.append("G:\\DH_localization\\PyPRIS")
 from PyPRIS import *
 print("")
 print("")
@@ -104,6 +105,7 @@ linbreg.go()
 
 # construct sensing matrix,
 for PRIS_iter in np.arange(1,ticket.PRIS_iter_end):
+    pypris.current_PRIS_ItN = PRIS_iter
     pypris.prep_for_new_refinement()
     pypris.refine_candidates(linbreg) 
     
