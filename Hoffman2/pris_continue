@@ -48,6 +48,7 @@ observer.observe_biplane_prep(psf, single_image_size = blur1.shape,
                            psfz0 = ticket.psfz0,
                            observer_debugger = ticket.observer_debugger,
                            observer_edge_padding = ticket.observer_edge_padding)
+
 # Get the latest saved linbreg filename
 # put in the file folder where you saved all the linbreg objects.
 # path = 'C:\\Users\\wxjpp\\Desktop\\PyPRIS-master\\saved_objects'
@@ -180,7 +181,6 @@ else:
     linbreg.go()
     Iter=0
 
-
 # construct sensing matrix,
 for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
     pypris.prep_for_new_refinement()
@@ -200,7 +200,7 @@ for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
     c1 = np.min(c[0:-2])
     c2 = np.max(c[0:-2])
     bgv = c1 + (c2 - c1) * ticket.bg_scaling_coef
-    pypris.current_A[:, -1] = bgv / np.sum(pypris.observation.ravel())  # the last column in A corresponds to the background component.
+    pypris.current_A[:, -1] = bgv / np.sum(pypris.observation.ravel())  # the last column in A corresponds to the background component.   
     linbreg = copy.deepcopy(linbreg_ori)
     linbreg.candidate_coords = pypris.current_candidates
     linbreg.candidate_intervals = pypris.current_candidates_intervals

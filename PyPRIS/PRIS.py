@@ -250,7 +250,7 @@ class LinBreg:
         print('alpha is '+str(self.alpha))
         
         # define the name of the directory to be created.
-        
+        import os
         try:
             if not os.path.exists(self.path_0):
                 os.mkdir(self.path_0)
@@ -590,6 +590,8 @@ def loadCSSolver(path, PyPRIS_name, PyPRIS_SensMx_name):
 def loadPyPRIS(path, PyPRIS_name):
     with open('{}/{}.file'.format(path, PyPRIS_name), "rb") as f:
         pris = pickle.load(f) #the loaded object is a PyPRIS object
+#     with open('{}/{}.file'.format(path, PyPRIS_SensMx_name), "rb") as s:
+#         pris.current_A = joblib.load(s)
     return pris
 
 def get_ticket(ticket_path):
