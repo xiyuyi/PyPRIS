@@ -175,6 +175,7 @@ else:
 # construct sensing matrix,
 for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
     pypris.prep_for_new_refinement()
+    pypris.expansion = ticket.expansion
     pypris.refine_candidates(linbreg)
     pypris.current_PRIS_ItN += 1
     pypris.save()

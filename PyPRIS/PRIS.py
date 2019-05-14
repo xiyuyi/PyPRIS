@@ -72,6 +72,7 @@ class PyPRIS:
         current_interval = self.current_candidates_intervals
     # get new coordinates with 2-fold refinement.
         new_coords = list()
+        print('expansion is ' + str(self.expansion))
         for i in non_zero_coordinates:
             if self.expansion is False:
                 extra_coords = [[i[0], i[1] - current_interval[1] / 2, i[2] - current_interval[2] / 2], \
