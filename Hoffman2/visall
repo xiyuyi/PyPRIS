@@ -1,7 +1,7 @@
 #!/u/home/x/xiyuyi/.conda/envs/PyPRIS_env/bin/python
 import sys
 sys.path.append("/u/home/x/xiyuyi/bin")
-
+sys.path.append("G:/DH_localization/PyPRIS")
 from PyPRIS import *
 import os
 import matplotlib.pyplot as plt

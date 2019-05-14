@@ -1,4 +1,3 @@
-#!/u/home/a/alejandr/.conda/envs/PyPRIS_env/bin/python
 #!/u/home/x/xiyuyi/.conda/envs/PyPRIS_env/bin/python
 
 print("")
@@ -26,16 +25,19 @@ warnings.filterwarnings("ignore")
 
 # load the original ticket
 ticket = get_ticket('./Go.pris_ticket')
+
 # prep the order according to the ticket
 psf = io.imread(ticket.psf_path)
 blur1 = io.imread(ticket.plane1_path)
 blur2 = io.imread(ticket.plane2_path)
 blur = np.concatenate([blur1, blur2],axis=0)
+
 # define linbreg_ori
 linbreg_ori = ticket.linbreg_alpha
 linbreg_ori.obs_dim0 = blur.shape[0]
 linbreg_ori.obs_dim1 = blur.shape[1]
 linbreg_ori.PyPRIS_name = ticket.name
+
 # prepare a observer for pypris. [from one candidate, to one observation]
 # summon an observer from the ObserveStation (ObserveStation class) (Cheers~)
 observer = ObserveStation()
@@ -53,14 +55,17 @@ observer.observe_biplane_prep(psf, single_image_size = blur1.shape,
 path = './saved_objects'
 mxnames = []
 objIter = []
+
 # r=root, d=directories, f = files
 for r, d, f in os.walk(path):
     for file in f:
         if file.endswith('SensingMx.file'):
             mxnames.append(file[0:-5])
 
+
 if len(mxnames) is not 0:
     print("PyPRIS Continue!")
+    print("")
     mxName = mxnames[-1]
     for r, d, f in os.walk(path):
         for file in f:
@@ -100,9 +105,11 @@ if len(mxnames) is not 0:
     pypris.observe = observer.observe_biplane
     Iter = int(linbreg.PyPRIS_iter[4:])
     print("---------------- PRIS refinement #" + str(Iter) + " ------------------")
+    print("")
     linbreg.go()
 else:
     print("PyPRIS Begin!")
+    ptint("")
     # condition a main linbreg object that carries the basic configurations.
     # for each PRIS iteration, a new linbreg object will be cloned from this one for its own task.
     # the purpose here is just to simplify the parameter configuration process.
@@ -166,7 +173,9 @@ else:
     linbreg.A = pypris.current_A
     linbreg.b = pypris.observation.ravel()
     linbreg.PyPRIS_iter = "pris0"
+    print("")
     print("---------------- PRIS refinement #0 ------------------")
+    print("")
     # recover
     linbreg.get_ready()
     linbreg.go()
@@ -175,6 +184,8 @@ else:
 # construct sensing matrix,
 for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
     pypris.prep_for_new_refinement()
+    pypris.expansion = ticket.expansion
+    #
     pypris.refine_candidates(linbreg)
     pypris.current_PRIS_ItN += 1
     pypris.save()
@@ -196,10 +207,11 @@ for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
     linbreg.A = pypris.current_A
     linbreg.b = pypris.observation.ravel()
     linbreg.PyPRIS_iter = "pris"+ str(PRIS_iter)
-    #linbreg.stopping_loghistpercdelres_thres -= PRIS_iter
+    linbreg.stopping_loghistpercdelres_thres -= PRIS_iter
     linbreg.alpha = linbreg_ori.alpha/PRIS_iter
-
+    print("")
     print("---------------- PRIS refinement #" + str(PRIS_iter) + " ------------------")
+    print("")
     # recover
     linbreg.get_ready()
     linbreg.go()

@@ -28,12 +28,12 @@ ax0_ranges.append(list([-45, 25]))
 ax0_ranges.append(list([-45, 25]))
 
 ticket_folders = []
-ticket_folders.append('PyPRIS_Feature3_set4_fov1')
-ticket_folders.append('PyPRIS_Feature3_set4_fov2')
-ticket_folders.append('PyPRIS_Feature3_set4_fov3')
-ticket_folders.append('PyPRIS_Feature3_set4_fov4')
-ticket_folders.append('PyPRIS_Feature3_set4_fov5')
-ticket_folders.append('PyPRIS_Feature3_set4_fov6')
+ticket_folders.append('PyPRIS_Feature3_set5_fov1')
+ticket_folders.append('PyPRIS_Feature3_set5_fov2')
+ticket_folders.append('PyPRIS_Feature3_set5_fov3')
+ticket_folders.append('PyPRIS_Feature3_set5_fov4')
+ticket_folders.append('PyPRIS_Feature3_set5_fov5')
+ticket_folders.append('PyPRIS_Feature3_set5_fov6')
 
 for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges,ticket_folders):
     ticket.datapath = datapath
@@ -82,14 +82,15 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges,ticket_folders):
 
     "ticket.linbreg_alpha.mu = 1000000000" # move to loop
     "ticket.linbreg_alpha.alpha = 1e-11" # move to loop
-    ticket.linbreg_alpha.maxit = 600000
+    ticket.linbreg_alpha.maxit = 40000
     ticket.linbreg_alpha.it_check_rem = 1
     ticket.linbreg_alpha.debug_it_int = 100
     ticket.linbreg_alpha.kick.ints = 10
     ticket.linbreg_alpha.kick.flag = True
     ticket.linbreg_alpha.kick.thres = 1e-3
-    ticket.linbreg_alpha.save_obj_int = 5000
+    ticket.linbreg_alpha.save_obj_int = 100
     ticket.linbreg_alpha.save = True
+    ticket.expansion = True
     ticket.linbreg_alpha.PyPRIS_iter = 0
     "ticket.linbreg_alpha.PyPRIS_name = ticket.name" # moved to loop
     ticket.linbreg_alpha.path_0 = '.'
