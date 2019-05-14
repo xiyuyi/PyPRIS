@@ -17,7 +17,12 @@ paths.append('/u/scratch/x/xiyuyi/PyPRIS_data/S7_fov578_v4_set5_ox1122_oy1452')
 paths.append('/u/scratch/x/xiyuyi/PyPRIS_data/S7_fov578_v4_set6_ox1112_oy1472')
 
 ax0_ranges = []
-ax0_ranges.append(list([-30, 60]))
+ax0_ranges.append(list([-20, 50]))
+ax0_ranges.append(list([-30, 40]))
+ax0_ranges.append(list([-30, 40]))
+ax0_ranges.append(list([-40, 30]))
+ax0_ranges.append(list([-45, 25]))
+ax0_ranges.append(list([-45, 25]))
 
 ticket_folders = []
 ticket_folder.append('PyPRIS_Feature3_set4_fov1')
@@ -89,7 +94,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges,ticket_folders)
     ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -13
     
     "others"
-    ticket.PRIS_iter_end = 5
+    ticket.PRIS_iter_end = 6
     try:
         if not os.path.exists("../{}".format(ticket.ticket_folder)):
             os.mkdir("../{}".format(ticket.ticket_folder))
