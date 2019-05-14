@@ -14,6 +14,7 @@ print("[some more description]")
 import sys
 sys.path.append("/u/home/a/alejandr/bin")
 sys.path.append("/u/home/x/xiyuyi/bin")
+sys.path.append("G:\\DH_localization\\PyPRIS")
 from PyPRIS import *
 import os
 print("")
