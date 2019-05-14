@@ -28,18 +28,18 @@ ax0_ranges.append(list([-45, 25]))
 ax0_ranges.append(list([-45, 25]))
 
 ticket_folders = []
-ticket_folders.append('PyPRIS_Feature3_set5_fov1')
-ticket_folders.append('PyPRIS_Feature3_set5_fov2')
-ticket_folders.append('PyPRIS_Feature3_set5_fov3')
-ticket_folders.append('PyPRIS_Feature3_set5_fov4')
-ticket_folders.append('PyPRIS_Feature3_set5_fov5')
-ticket_folders.append('PyPRIS_Feature3_set5_fov6')
+ticket_folders.append('PyPRIS_Feature3_set6_fov1')
+ticket_folders.append('PyPRIS_Feature3_set6_fov2')
+ticket_folders.append('PyPRIS_Feature3_set6_fov3')
+ticket_folders.append('PyPRIS_Feature3_set6_fov4')
+ticket_folders.append('PyPRIS_Feature3_set6_fov5')
+ticket_folders.append('PyPRIS_Feature3_set6_fov6')
 
 for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges,ticket_folders):
     ticket.datapath = datapath
 
-    ticket.plane1_path = "{}/DH_plane2.tif".format(ticket.datapath)
-    ticket.plane2_path = "{}/DH_plane8.tif".format(ticket.datapath)
+    ticket.plane1_path = "{}/DH_plane8.tif".format(ticket.datapath)
+    ticket.plane2_path = "{}/DH_plane14.tif".format(ticket.datapath)
     ticket.psf_path = "{}/psf.tif".format(ticket.datapath)
     ticket.psf_norm_factor = 80
 
