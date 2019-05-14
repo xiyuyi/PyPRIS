@@ -35,7 +35,7 @@ class PyPRIS:
         
         self.ifsave = True
         self.path_s = "./saved_objects"
-        
+        self.expansion = False
     def save(self):
         import os
         try:
@@ -73,10 +73,32 @@ class PyPRIS:
     # get new coordinates with 2-fold refinement.
         new_coords = list()
         for i in non_zero_coordinates:
-            extra_coords = [[i[0], i[1] - current_interval[1] / 2, i[2] - current_interval[2] / 2], \
-                            [i[0], i[1] - current_interval[1] / 2, i[2] + current_interval[2] / 2], \
-                            [i[0], i[1] + current_interval[1] / 2, i[2] - current_interval[2] / 2], \
-                            [i[0], i[1] + current_interval[1] / 2, i[2] + current_interval[2] / 2]]
+            if self.expansion is False:
+                extra_coords = [[i[0], i[1] - current_interval[1] / 2, i[2] - current_interval[2] / 2], \
+                                [i[0], i[1] - current_interval[1] / 2, i[2] + current_interval[2] / 2], \
+                                [i[0], i[1] + current_interval[1] / 2, i[2] - current_interval[2] / 2], \
+                                [i[0], i[1] + current_interval[1] / 2, i[2] + current_interval[2] / 2]]
+            else:
+                extra_coords = [[i[0], i[1] -     current_interval[1] / 2, i[2] -     current_interval[2] / 2], \
+                                [i[0], i[1] - 3 * current_interval[1] / 2, i[2] -     current_interval[2] / 2], \
+                                [i[0], i[1] -     current_interval[1] / 2, i[2] - 3 * current_interval[2] / 2], \
+                                [i[0], i[1] - 3 * current_interval[1] / 2, i[2] - 3 * current_interval[2] / 2], \
+                                \
+                                [i[0], i[1] -     current_interval[1] / 2, i[2] +     current_interval[2] / 2], \
+                                [i[0], i[1] - 3 * current_interval[1] / 2, i[2] +     current_interval[2] / 2], \
+                                [i[0], i[1] -     current_interval[1] / 2, i[2] + 3 * current_interval[2] / 2], \
+                                [i[0], i[1] - 3 * current_interval[1] / 2, i[2] + 3 * current_interval[2] / 2], \
+                                \
+                                [i[0], i[1] +     current_interval[1] / 2, i[2] -     current_interval[2] / 2], \
+                                [i[0], i[1] + 3 * current_interval[1] / 2, i[2] -     current_interval[2] / 2], \
+                                [i[0], i[1] +     current_interval[1] / 2, i[2] - 3 * current_interval[2] / 2], \
+                                [i[0], i[1] + 3 * current_interval[1] / 2, i[2] - 3 * current_interval[2] / 2], \
+                                \
+                                [i[0], i[1] +     current_interval[1] / 2, i[2] +     current_interval[2] / 2], \
+                                [i[0], i[1] + 3 * current_interval[1] / 2, i[2] +     current_interval[2] / 2], \
+                                [i[0], i[1] +     current_interval[1] / 2, i[2] + 3 * current_interval[2] / 2], \
+                                [i[0], i[1] + 3 * current_interval[1] / 2, i[2] + 3 * current_interval[2] / 2]]
+
             for i1 in extra_coords:
                 if i1 not in new_coords:
                     new_coords.append(i1)
