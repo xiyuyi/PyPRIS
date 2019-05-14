@@ -17,5 +17,6 @@ ticket.psf_path = "{}/psf.tif".format(ticket.datapath)
 ticket.linbreg_alpha.maxit = 60000
 ticket.linbreg_alpha.save_obj_int = 200
 ticket.linbreg_alpha.debug = True
+ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -12
 with open("./Go_local.pris_ticket", "wb") as f:
     pickle.dump(ticket, f, pickle.HIGHEST_PROTOCOL)

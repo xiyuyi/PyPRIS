@@ -94,7 +94,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges,ticket_folders):
     "ticket.linbreg_alpha.PyPRIS_name = ticket.name" # moved to loop
     ticket.linbreg_alpha.path_0 = '.'
     "ticket.bg_scaling_coef = 1.5 "  # moved to loop
-    ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -13
+    ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -11
     
     "others"
     ticket.PRIS_iter_end = 6
