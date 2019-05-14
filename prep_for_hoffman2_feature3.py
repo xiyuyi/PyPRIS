@@ -8,7 +8,7 @@ ticket = BiplaneTicket()
 "ticket.name = 'Demo'" # moved to loop
 
 "where to find the data files, for both blur and observation"
-ticket.datapath = '/u/scratch/x/xiyuyi/PyPRIS_data/S7_fov578_v4_set1_ox1165_oy1369'
+ticket.datapath = '/u/scratch/x/xiyuyi/PyPRIS_data/S7_fov578_v4_set6_ox1112_oy1472'
 ticket.plane1_path = "{}/DH_plane2.tif".format(ticket.datapath)
 ticket.plane2_path = "{}/DH_plane8.tif".format(ticket.datapath)
 ticket.psf_path = "{}/psf.tif".format(ticket.datapath)
@@ -22,7 +22,7 @@ ticket.observer_edge_padding = True
 
 "configure the initial candidate pool of this pris ticket"
 ticket.init_candidates_intervals = list([1,6,6])
-ticket.init_ax0_range = list([-30, 60])
+ticket.init_ax0_range = list([-45, 25])
 ticket.init_ax1_range = list([1, 81])
 ticket.init_ax2_range = list([11, 81])
 
@@ -31,7 +31,7 @@ ticket.observer_debugger = False
 ticket.tobserver_edge_padding = True
 
 "output settings"
-ticket.ticket_folder= 'PyPRIS_tickets_F3_set3_v4_set1'
+ticket.ticket_folder= 'PyPRIS_tickets_F3_set3_fov6'
 
 "linbreg configurations"
 ticket.linbreg_alpha = LinBreg("X")
@@ -73,9 +73,9 @@ try:
 except OSError:
     pass
 
-for bgSCF in list([1.5]):
-    for mu in list([1e5, 1e6, 1e7]):
-        for alpha in list([1e-10, 1e-11]):
+for bgSCF in list([2]):
+    for mu in list([1e4]):
+        for alpha in list([1e-11]):
             ticket_new = copy.deepcopy(ticket)
             ticket_new.name = "bgSCF"+str(bgSCF)+"_mu"+str("%1.1e"%mu)+"_alpha"+str("%1.1e"%alpha)
             ticket_new.bg_scaling_coef = copy.deepcopy(bgSCF)

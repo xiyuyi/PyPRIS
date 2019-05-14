@@ -21,7 +21,7 @@ class PyPRIS:
         self.observation = np.ndarray(0)  # this should be the observation vector
         self.current_relReF = list([1, 2, 2])    # current relative refinement factor. This is the relative refinement to be or have been performed
         #                               for this round of pris as compared to the last round of pris.
-        self.current_PRIS_ItN = list([0])  # current PRIS iteration count, starting from 0.
+        self.current_PRIS_ItN = 0  # current PRIS iteration count, starting from 0.
         self.current_A = np.ndarray(0)  # current sensing matrix.
         self.current_candidates = list()  # current pool of candidates.
         self.current_candidates_intervals = list()  # current intervals of neighboring candidate voxels.
@@ -32,7 +32,25 @@ class PyPRIS:
         self.hist_PRIS_ItN = list()
         self.hist_check_mark_id = list()  # checkmark ID. ascending each time after you make a check_mark
         self.observator = None  # this should be a function that needs to be defined.
-
+        
+        self.ifsave = True
+        self.path_s = "./saved_objects"
+        
+    def save(self):
+        import os
+        try:
+            if not os.path.exists(self.path_s):
+                os.mkdir(self.path_s)
+        except OSError:
+            print ("Creation of the directory %s failed" % self.path_s)
+        else:
+            print ("Successfully created Scratch directory %s " % self.path_s)
+        if self.ifsave is True:
+            self.current_A = np.ndarray(0)
+            with open("{}/PyPRIS_pris{}.file".format(self.path_s, self.current_PRIS_ItN), "wb") as f:
+                pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
+                print ("Successfully saved PyPRIS ID {} to directory.".format(self.current_PRIS_ItN))
+                    
     def prep_for_new_refinement(self):
         self.hist_candidates.append(copy.deepcopy(self.current_candidates))
         self.hist_candidates_intervals.append(copy.deepcopy(self.current_candidates_intervals))
@@ -48,7 +66,6 @@ class PyPRIS:
         # Get the non_zero_coordinates from the existing cs_solver results.
         non_zero_inds = np.argwhere(cs_solver.x[0:len(cs_solver.x) - 1] > 0)
         non_zero_coordinates = [self.current_candidates[i] for i in list(non_zero_inds.ravel())]
-
         self.current_candidates_intervals = copy.deepcopy(
             [pre / ref for pre, ref in zip(self.current_candidates_intervals, self.current_relReF)]
         )
@@ -99,10 +116,8 @@ class PyPRIS:
 
 
 class LinBreg:
-    
-    import time
-    
     def __init__(self, PyPRIS_n):
+        import time
         self.PyPRIS_iter = []  # Associated PyPRIS iter number
         self.PyPRIS_name = PyPRIS_n # Associated PyPRIS name
         self.path_0 = "../PyPRIS_Scratch"
@@ -132,7 +147,7 @@ class LinBreg:
         self.obs_dim1 = 0
         self.kick = self.Kick(self)
         self.A_dir = ''  # directory to store sensing matrix when saving
-        
+
         
     class Kick:
         def __init__(self, LinBreg):
@@ -175,8 +190,30 @@ class LinBreg:
             # update kick.reference for follow-up kicking evaluation
             self.reference = copy.deepcopy(self.parent.x)
 
+    def apply_mask(self, mask):
+    # this will take the current candidates and the result in the compressive sensing solver object,
+    # and generate  pool of candidates.        
+        vis1 = self.candidate_vis()
+        # Apply the mask to current recovery result
+        vis1 += mask
+        # Get rid of extra signals
+        vis1[np.where(vis1<1)] = 0
+        # Remove mask
+        vis1 -= mask
+        # Update masked result in CS Solver
+        self.x = copy.deepcopy(self.candidate_vis_inv(vis1))
+        
+#         # Get the non_zero_coordinates from the existing cs_solver results.
+#         non_zero_inds = np.argwhere(cs_solver.x[0:len(cs_solver.x) - 1] > 0)
+#         non_zero_coordinates = [self.current_candidates[i] for i in list(non_zero_inds.ravel())]
+
+#         self.current_candidates = copy.deepcopy(non_zero_coordinates)
+
+#         # set a check mark for tracking purposes.
+#         self.set_check_mark()
             
     def get_ready(self):
+        import os
         self.it_count = -1
         self.x = np.zeros(self.A.shape[1])
         self.stepsize = np.ones(self.x.shape)  # stepsize.
@@ -189,7 +226,6 @@ class LinBreg:
         print('stopping threshold is '+str(self.stopping_loghistpercdelres_thres))
         print('alpha is '+str(self.alpha))
         
-        import os
         # define the name of the directory to be created.
         
         try:
@@ -345,6 +381,32 @@ class LinBreg:
                 (coords[2] - minimals[2]) // intervals[2])] = intensity
 
         return vis
+    
+    def candidate_vis_inv(self, vis):
+                
+        intervals = self.candidate_intervals
+        locs = list(zip(*self.candidate_coords))
+        dims = list()
+        minimals = list()
+        maximums = list()
+
+        for inds, interval in zip(locs, intervals):
+            maximum = np.max(inds)
+            minimal = np.min(inds)
+            dims.append(1 + np.int((maximum - minimal) // interval))
+            minimals.append(minimal)
+            maximums.append(maximum)
+        
+        new_x = []
+        
+        for coords, intensity in zip(self.candidate_coords, self.x[0:len(self.x) - 1]):
+            new_x.append(vis[coords[0] - minimals[0] - 1, int((coords[1] - minimals[1]) // intervals[1]), int(
+                (coords[2] - minimals[2]) // intervals[2])] )
+                    
+        new_x.append(self.x[-1])
+        
+        return np.array(new_x)
+
 
     def debug_output(self, it_count, appstr):
         # Generate intermediate output under debug mode.
@@ -501,6 +563,11 @@ def loadCSSolver(path, PyPRIS_name, PyPRIS_SensMx_name):
     with open('{}/{}.file'.format(path, PyPRIS_SensMx_name), "rb") as s:
         linbreg.A = joblib.load(s)
     return linbreg
+                       
+def loadPyPRIS(path, PyPRIS_name):
+    with open('{}/{}.file'.format(path, PyPRIS_name), "rb") as f:
+        pris = pickle.load(f) #the loaded object is a PyPRIS object
+    return pris
 
 def get_ticket(ticket_path):
     with open(ticket_path, "rb") as f:
