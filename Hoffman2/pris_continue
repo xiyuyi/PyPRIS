@@ -24,12 +24,12 @@ import warnings
 warnings.filterwarnings("ignore")
 
 # load the original ticket
-ticket = get_ticket('./Go_local.pris_ticket')
+ticket = get_ticket('./Go.pris_ticket')
 # prep the order according to the ticket
 psf = io.imread(ticket.psf_path)
 blur1 = io.imread(ticket.plane1_path)
 blur2 = io.imread(ticket.plane2_path)
-blur = np.concatenate([blur1, blur2], axis=0)
+blur = np.concatenate([blur1, blur2],axis=0)
 # define linbreg_ori
 linbreg_ori = ticket.linbreg_alpha
 linbreg_ori.obs_dim0 = blur.shape[0]
@@ -190,17 +190,15 @@ for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
     c1 = np.min(c[0:-2])
     c2 = np.max(c[0:-2])
     bgv = c1 + (c2 - c1) * ticket.bg_scaling_coef
-    pypris.current_A[:, -1] = bgv / np.sum(
-        pypris.observation.ravel())  # the last column in A corresponds to the background component.
+    pypris.current_A[:, -1] = bgv / np.sum(pypris.observation.ravel())  # the last column in A corresponds to the background component.
     linbreg = copy.deepcopy(linbreg_ori)
     linbreg.candidate_coords = pypris.current_candidates
     linbreg.candidate_intervals = pypris.current_candidates_intervals
     linbreg.A = pypris.current_A
     linbreg.b = pypris.observation.ravel()
-    linbreg.PyPRIS_iter = "pris" + str(PRIS_iter)
-    linbreg.maxit = 2000
-    linbreg.stopping_loghistpercdelres_thres -= PRIS_iter * 2
-    print("")
+    linbreg.PyPRIS_iter = "pris"+ str(PRIS_iter)
+    linbreg.stopping_loghistpercdelres_thres -= PRIS_iter*2
+    linbreg.alpha = linbreg_ori.alpha/PRIS_iter
     print("---------------- PRIS refinement #" + str(PRIS_iter) + " ------------------")
     # recover
     linbreg.get_ready()
