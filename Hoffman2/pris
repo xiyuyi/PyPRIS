@@ -72,7 +72,6 @@ for i0 in range_ind0:
 
 # set a check mark for pypris:
 pypris.set_check_mark()
-
 pypris.save()
 
 # put the configured observer to the pypris to perform the tasks of 'observe_biplane'
@@ -80,8 +79,10 @@ pypris.save()
 # done with the observer's observe_biplane skill (skill = method).
 pypris.observe = observer.observe_biplane
 #pypris.show_attributes()
+
 # construct sensing matrix,
 pypris.generate_sensing_mx()
+
 # prepare the inner sparse recovery
 pypris.current_A = pypris.current_A/ticket.psf_norm_factor
 c = np.dot(pypris.observation.ravel(),pypris.current_A)
@@ -89,9 +90,6 @@ c1 = np.min(c[0:-2])
 c2 = np.max(c[0:-2])
 bgv = c1 + (c2-c1)*ticket.bg_scaling_coef
 pypris.current_A[:,-1] = bgv/np.sum(pypris.observation.ravel()) # the last column in A corresponds to the background component.
-
-
-
 linbreg = copy.deepcopy(linbreg_ori)
 linbreg.candidate_coords = pypris.current_candidates
 linbreg.candidate_intervals = pypris.current_candidates_intervals
@@ -99,6 +97,7 @@ linbreg.A = pypris.current_A
 linbreg.b = pypris.observation.ravel()
 linbreg.PyPRIS_iter = "pris0"
 print("---------------- PRIS refinement #0 ------------------")
+
 # recover
 linbreg.get_ready()
 linbreg.go()
@@ -107,28 +106,9 @@ linbreg.go()
 for PRIS_iter in np.arange(1,ticket.PRIS_iter_end):
     pypris.current_PRIS_ItN = PRIS_iter
     pypris.prep_for_new_refinement()
-<<<<<<< HEAD
-    pypris.refine_candidates(linbreg)
-    """
-    
-    pypris.apply_mask(linbreg)
-        this step should update the pypris.current_candidates based on the linbreg object (the x, the mask)
-    
-    for Xingjia:
-    
-    define a mask to discard some of the candidates.
-    selectively delete items form this list: linbreg.current_candidates
-    to quickly visualize:
-    type vis = linbreg.visuali!@#$#klsdjf;asd;
-    
-    """
-=======
     pypris.refine_candidates(linbreg) 
-    
     pypris.save()
-    
     pypris.observe = observer.observe_biplane
->>>>>>> abc3e51ae3d8a28540827c9f4eca28f75924fc51
     pypris.generate_sensing_mx()
     # prepare the inner sparse recovery
     pypris.current_A = pypris.current_A / ticket.psf_norm_factor
@@ -143,10 +123,8 @@ for PRIS_iter in np.arange(1,ticket.PRIS_iter_end):
     linbreg.A = pypris.current_A
     linbreg.b = pypris.observation.ravel()
     linbreg.PyPRIS_iter = "pris"+ str(PRIS_iter)
-    
     pris.current_PRIS_ItN = PRIS_iter
     pris.set_check_mark()
-    
     linbreg.stopping_loghistpercdelres_thres -= PRIS_iter*2
     print("---------------- PRIS refinement #" + str(PRIS_iter) + " ------------------")
     # recover
