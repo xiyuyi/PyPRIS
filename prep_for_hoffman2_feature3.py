@@ -1,6 +1,9 @@
 from PyPRIS import *
 import copy
 import os
+import sys
+sys.path.append("/u/home/x/xiyuyi/bin")
+sys.path.append("G:\\DH_localization\\PyPRIS")
 
 ticket = BiplaneTicket()
 
@@ -25,14 +28,14 @@ ax0_ranges.append(list([-45, 25]))
 ax0_ranges.append(list([-45, 25]))
 
 ticket_folders = []
-ticket_folder.append('PyPRIS_Feature3_set4_fov1')
-ticket_folder.append('PyPRIS_Feature3_set4_fov2')
-ticket_folder.append('PyPRIS_Feature3_set4_fov3')
-ticket_folder.append('PyPRIS_Feature3_set4_fov4')
-ticket_folder.append('PyPRIS_Feature3_set4_fov5')
-ticket_folder.append('PyPRIS_Feature3_set4_fov6')
+ticket_folders.append('PyPRIS_Feature3_set4_fov1')
+ticket_folders.append('PyPRIS_Feature3_set4_fov2')
+ticket_folders.append('PyPRIS_Feature3_set4_fov3')
+ticket_folders.append('PyPRIS_Feature3_set4_fov4')
+ticket_folders.append('PyPRIS_Feature3_set4_fov5')
+ticket_folders.append('PyPRIS_Feature3_set4_fov6')
 
-for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges,ticket_folders)
+for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges,ticket_folders):
     ticket.datapath = datapath
 
     ticket.plane1_path = "{}/DH_plane2.tif".format(ticket.datapath)
