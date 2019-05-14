@@ -14,8 +14,9 @@ ticket.datapath = 'G:/DH_localization/Experiments_Phase2_afterSPIE/April2019_Bou
 ticket.plane1_path = "{}/DH_plane8.tif".format(ticket.datapath)
 ticket.plane2_path = "{}/DH_plane14.tif".format(ticket.datapath)
 ticket.psf_path = "{}/psf.tif".format(ticket.datapath)
-ticket.linbreg_alpha.maxit = 60000
+ticket.linbreg_alpha.maxit = 40000
 ticket.linbreg_alpha.save_obj_int = 200
 ticket.linbreg_alpha.debug = True
+ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -11
 with open("./Go_local.pris_ticket", "wb") as f:
     pickle.dump(ticket, f, pickle.HIGHEST_PROTOCOL)

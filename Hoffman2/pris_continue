@@ -1,4 +1,5 @@
 #!/u/home/a/alejandr/.conda/envs/PyPRIS_env/bin/python
+#!/u/home/x/xiyuyi/.conda/envs/PyPRIS_env/bin/python
 
 print("")
 print("")
@@ -98,7 +99,6 @@ if len(mxnames) is not 0:
     pypris.observe = observer.observe_biplane
     Iter = int(linbreg.PyPRIS_iter[4:])
     print("---------------- PRIS refinement #" + str(Iter) + " ------------------")
-    linbreg.maxit = 2000
     linbreg.go()
 else:
     print("PyPRIS Begin!")
@@ -168,7 +168,6 @@ else:
     print("---------------- PRIS refinement #0 ------------------")
     # recover
     linbreg.get_ready()
-    linbreg.maxit = 2000
     linbreg.go()
     Iter=0
 
@@ -197,7 +196,7 @@ for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
     linbreg.A = pypris.current_A
     linbreg.b = pypris.observation.ravel()
     linbreg.PyPRIS_iter = "pris"+ str(PRIS_iter)
-    linbreg.stopping_loghistpercdelres_thres -= PRIS_iter*2
+    #linbreg.stopping_loghistpercdelres_thres -= PRIS_iter
     linbreg.alpha = linbreg_ori.alpha/PRIS_iter
     print("---------------- PRIS refinement #" + str(PRIS_iter) + " ------------------")
     # recover

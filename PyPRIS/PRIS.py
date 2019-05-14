@@ -343,10 +343,10 @@ class LinBreg:
             self.save_obj(it_count, self.save_obj_int)
                 
     def save_obj(self, currit, step):
+        import sys
         if self.save is True:
             if currit % step == 1:
                 self.A = 0
-                import sys
                 setattr(sys.modules[__name__], 'Kick', self.Kick)
                 with open("{}/PyPRIS_{}_{}_{}.file".format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter, currit), "wb") as f:
                     pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
