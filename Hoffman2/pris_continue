@@ -190,18 +190,15 @@ for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
     c1 = np.min(c[0:-2])
     c2 = np.max(c[0:-2])
     bgv = c1 + (c2 - c1) * ticket.bg_scaling_coef
-    pypris.current_A[:, -1] = bgv / np.sum(
-        pypris.observation.ravel())  # the last column in A corresponds to the background component.
+    pypris.current_A[:, -1] = bgv / np.sum(pypris.observation.ravel())  # the last column in A corresponds to the background component.
     linbreg = copy.deepcopy(linbreg_ori)
     linbreg.candidate_coords = pypris.current_candidates
     linbreg.candidate_intervals = pypris.current_candidates_intervals
     linbreg.A = pypris.current_A
     linbreg.b = pypris.observation.ravel()
-
     linbreg.PyPRIS_iter = "pris"+ str(PRIS_iter)
     linbreg.stopping_loghistpercdelres_thres -= PRIS_iter*2
     linbreg.alpha = linbreg_ori.alpha/PRIS_iter
-
     print("---------------- PRIS refinement #" + str(PRIS_iter) + " ------------------")
     # recover
     linbreg.get_ready()
