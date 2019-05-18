@@ -7,4 +7,5 @@ print("")
 print("")
 print("")
 # stitch 4 field of views together.
+datapath_key_minimum=""
 p_fov1 = ""
