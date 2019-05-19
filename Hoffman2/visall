@@ -2,6 +2,7 @@
 import sys
 sys.path.append("/u/home/x/xiyuyi/bin")
 sys.path.append("G:/DH_localization/PyPRIS")
+sys.path.append("/Users/xiyuyi/Desktop/PyPRIS")
 from PyPRIS import *
 import os
 import matplotlib.pyplot as plt

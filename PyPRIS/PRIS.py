@@ -146,7 +146,7 @@ class LinBreg:
         self.path_0 = "../PyPRIS_Scratch"
         # solve for x from Ax = b.
         self.A = 0  # sensing matrix.
-        self.x = 0
+        self.x = np.ndarray(0)
         self.b = 0  # observation vector.
         self.flag_stop = False  # flag to stop optimization iteration.
         self.maxit = 2000  # maximum iteration steps.
@@ -159,6 +159,7 @@ class LinBreg:
         self.hist_percent_delta_res = list()
         self.stopping_moni_start = 1000
         self.it_count = 0
+        self.candidate_coords = list()
         # now initialize a threshold value for abs(log(abs(x)))*sign(x) with x=hist_delta_res; it suppose to be a negative value.
         self.stopping_loghistpercdelres_thres = -11; # iteration will stop with the value is below this value.
         self.stopping_loghistpercdelres = np.Inf;
@@ -170,7 +171,6 @@ class LinBreg:
         self.obs_dim1 = 0
         self.kick = self.Kick(self)
         self.A_dir = ''  # directory to store sensing matrix when saving
-
         
     class Kick:
         def __init__(self, LinBreg):
@@ -180,7 +180,9 @@ class LinBreg:
             self.reference = copy.deepcopy(self.parent.x)
             self.option = False
             self.thres = 1e-10
-            self.refnorm = np.max(self.parent.x)
+            tm = list(self.parent.x.ravel())
+            tm.append(-np.Inf)
+            self.refnorm = np.max(tm)
             self.hist_refnorm = list()
             self.hist_eval_counts = list()
 
