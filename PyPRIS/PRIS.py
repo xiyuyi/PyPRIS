@@ -403,7 +403,7 @@ class LinBreg:
         vis = np.zeros(dims)
         for coords, intensity in zip(self.candidate_coords, self.x[0:len(self.x) - 1]):
             vis[coords[0] - minimals[0] - 1, int((coords[1] - minimals[1]) // intervals[1]), int(
-                (coords[2] - minimals[2]) // intervals[2])] = intensity
+                (coords[2] - minimals[2]) // intervals[2])] += intensity
 
         return vis
     
