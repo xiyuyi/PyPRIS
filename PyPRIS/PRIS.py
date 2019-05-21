@@ -36,6 +36,7 @@ class PyPRIS:
         self.ifsave = True
         self.path_s = "./saved_objects"
         self.expansion = False
+
     def save(self):
         import os
         try:
@@ -402,8 +403,10 @@ class LinBreg:
 
         vis = np.zeros(dims)
         for coords, intensity in zip(self.candidate_coords, self.x[0:len(self.x) - 1]):
+            tp = vis[coords[0] - minimals[0] - 1, int((coords[1] - minimals[1]) // intervals[1]), int(
+                (coords[2] - minimals[2]) // intervals[2])]
             vis[coords[0] - minimals[0] - 1, int((coords[1] - minimals[1]) // intervals[1]), int(
-                (coords[2] - minimals[2]) // intervals[2])] += intensity
+                (coords[2] - minimals[2]) // intervals[2])] = np.max([intensity,tp])
 
         return vis
     
@@ -431,7 +434,6 @@ class LinBreg:
         new_x.append(self.x[-1])
         
         return np.array(new_x)
-
 
     def debug_output(self, it_count, appstr):
         # Generate intermediate output under debug mode.
