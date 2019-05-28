@@ -147,7 +147,7 @@ class LinBreg:
         self.path_0 = "../PyPRIS_Scratch"
         # solve for x from Ax = b.
         self.A = 0  # sensing matrix.
-        self.x = np.ndarray(0)
+        self.x = np.zeros(0)
         self.b = 0  # observation vector.
         self.flag_stop = False  # flag to stop optimization iteration.
         self.maxit = 2000  # maximum iteration steps.
@@ -178,7 +178,6 @@ class LinBreg:
             self.parent = LinBreg
             self.flag = False
             self.ints = 10  # number of iterations between kicking evaluation.
-            self.reference = copy.deepcopy(self.parent.x)
             self.option = False
             self.thres = 1e-10
             tm = list(self.parent.x.ravel())
@@ -186,6 +185,9 @@ class LinBreg:
             self.refnorm = np.max(tm)
             self.hist_refnorm = list()
             self.hist_eval_counts = list()
+
+        def set_reference(self):
+            self.reference = copy.deepcopy(self.parent.x)
 
         def evaluation(self, it_count):
             self.refnorm = np.linalg.norm(self.parent.x - self.reference)
@@ -228,7 +230,6 @@ class LinBreg:
         vis1 -= mask
         # Update masked result in CS Solver
         self.x = copy.deepcopy(self.candidate_vis_inv(vis1))
-        
 #         # Get the non_zero_coordinates from the existing cs_solver results.
 #         non_zero_inds = np.argwhere(cs_solver.x[0:len(cs_solver.x) - 1] > 0)
 #         non_zero_coordinates = [self.current_candidates[i] for i in list(non_zero_inds.ravel())]
@@ -249,6 +250,7 @@ class LinBreg:
         self.recb = np.zeros(self.b.shape)
         self.path_s = self.path_0 + "/saved_objects"
         self.path_d = self.path_0 + "/debug_output"
+        self.kick.set_reference() # set a kick reference
         print('stopping threshold is '+str(self.stopping_loghistpercdelres_thres))
         print('alpha is '+str(self.alpha))
         
@@ -317,21 +319,22 @@ class LinBreg:
             self.respj = np.dot(self.res, self.A)
             if self.deep_debug is True: self.debug_output(it_count, appstr='_b_respj_updated')
 
-            # check if kicking is needed 
+            # check if kicking is needed
             #
             # "Kicking" rescales the back projected residual (self.respj) with two different stepsizes
-            # we'll have stepsize > 1 for kicking area, and stepsize = 1 for non-kicking area. 
-            # kicking boosts the tip of the cumulated backprojected residuals towards the shrinkage 
+            # we'll have stepsize > 1 for kicking area, and stepsize = 1 for non-kicking area.
+            # kicking boosts the tip of the cumulated backprojected residuals towards the shrinkage
             # threshold.
-            # In this implementation, the effect of kicking is realized throught a modified. 
-            # distribution of stepsizes (self.stepsize). 
+            # In this implementation, the effect of kicking is realized throught a modified.
+            # distribution of stepsizes (self.stepsize).
             self.stepsize = np.ones(self.x.shape)  # [Note: this step involves some redundancy]
-            if np.remainder(it_count, self.kick.ints) == 0:
+            if np.remainder(it_count, self.kick.ints) == 1:
                 self.kick.evaluation(it_count)
                 if self.deep_debug is True: self.debug_output(it_count, appstr='_c1_kicking_evaluated')
                 # kick if we get a positive kicking ealuation.
                 if self.kick.flag is True:
                     self.kick.go()
+                    self.kick.set_reference() # update the kick reference
                 if self.deep_debug is True: self.debug_output(it_count, appstr='_c2_kicking_updated')
 
             # get the acumulation of the back projected residuals.

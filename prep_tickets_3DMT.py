@@ -13,8 +13,7 @@ ticket = SinglePlaneTicket()
 
 "where to find the data files, for both blur and observation"
 paths = []
-paths.append('G:/DH_localization/EPFL_datasets/Yiming_Li/Organized_data_micro_tubules_lite/corp_fov3_20k_binning')
-
+paths.append('G:\\DH_localization\\EPFL_datasets\\Yiming_Li\\Organized_data_micro_tubules\\corp_fov3_20k_binning')
 ax0_ranges = []
 ax0_ranges.append(list([-20, 50]))
 
