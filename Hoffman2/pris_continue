@@ -10,6 +10,7 @@ print("PyPRIS: [add some description]")
 print("Developers: Xiyu Yi, Xingjia Wang @ UCLA, 2019")
 print("PI: Shimon Weiss")
 print("[some more description]")
+print("[organize pris_continue]")
 
 import sys
 sys.path.append("/u/home/a/alejandr/bin")
