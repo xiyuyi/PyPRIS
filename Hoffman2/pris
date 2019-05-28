@@ -194,8 +194,12 @@ for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
     pypris.save()
     # put the configured observer to the pypris to perform the tasks of 'observe_biplane'
     # when a pypris object observes, it is through the observer and it is
-    # done with the observer's observe_biplane skill (skill = method).
-    pypris.observe = observer.observe_biplane
+    # done with the observer's observe_biplane skill (skill = method). or obsreve monoplane skill
+    if isinstance(ticket, SinglePlaneTicket):
+        pypris.observe = observer.observe_monoplane
+    if isinstance(ticket, BiplaneTicket):
+        pypris.observe = observer.observe_biplane
+
     pypris.generate_sensing_mx()
     # prepare the inner sparse recovery
     pypris.current_A = pypris.current_A / ticket.psf_norm_factor
