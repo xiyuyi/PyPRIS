@@ -15,7 +15,7 @@ ticket = SinglePlaneTicket()
 paths = []
 paths.append('G:\\DH_localization\\EPFL_datasets\\Yiming_Li\\Organized_data_micro_tubules\\corp_fov3_20k_binning')
 ax0_ranges = []
-ax0_ranges.append(list([-20, 50]))
+ax0_ranges.append(list([-20, 20]))
 
 ticket_folders = []
 ticket_folders.append('PyPRIS_MT3D_Astig_fov3_bin_20k')
@@ -28,17 +28,15 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.psf_norm_factor = 80
 
     "specification of the psf stack"
-    ticket.psfz0 = 106  # the count of the center plane, define it as z=0 in the psf coordinates system.
-    ticket.plane1_dz = np.int8(-12)
-    ticket.plane2_dz = np.int8(12)
+    ticket.psfz0 = 170  # the count of the center plane, define it as z=0 in the psf coordinates system.
     ticket.observer_edge_padding = True
 
     "configure the initial candidate pool of this pris ticket"
-    ticket.init_candidates_intervals = list([1, 4, 4])
+    ticket.init_candidates_intervals = list([1, 2, 2])
     ticket.init_ax0_range = ax0_range
 
-    ticket.init_ax1_range = list([1, 81])
-    ticket.init_ax2_range = list([11, 81])
+    ticket.init_ax1_range = list([1, 61])
+    ticket.init_ax2_range = list([1, 61])
 
     "debug configurations"
     ticket.observer_debugger = False
