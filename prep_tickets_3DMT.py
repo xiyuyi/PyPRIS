@@ -19,7 +19,7 @@ ax0_ranges = []
 ax0_ranges.append(list([-20, 50]))
 
 ticket_folders = []
-ticket_folders.append('MT3D_Astig_fov3_bin_20k')
+ticket_folders.append('PyPRIS_MT3D_Astig_fov3_bin_20k')
 
 for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders):
     ticket.datapath = datapath

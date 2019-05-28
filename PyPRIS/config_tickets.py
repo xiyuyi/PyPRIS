@@ -8,7 +8,7 @@ class BiplaneTicket:
         self.psf_path = None
         "the name of this pris ticket"
         self.name = 'Demo'
-
+        self.expansion = True
         "where to find the data files, for both blur and observation"
         self.datapath = './test_dataset_1'
         self.plane1_path = "{}/blur_plane1.tif".format(self.datapath)
@@ -64,7 +64,7 @@ class SinglePlaneTicket:
         self.psf_path = None
         "the name of this pris ticket"
         self.name = 'Demo'
-
+        self.expansion = True
         "where to find the data files, for both blur and observation"
         self.datapath = './test_dataset_2'
         self.plane1_path = "{}/im1.tif".format(self.datapath)
