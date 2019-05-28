@@ -138,7 +138,8 @@ class ObserveStation:
                              observer_debugger, observer_edge_padding):
         # prepare an observer for biplane observation
         # this method will only be executed once in the preparation before calculating the sensing matrix.
-        self.biplane_observer = self.SingleObs() # this is the parent class.
+        # this prep method provides an input window in the main pris script.
+        self.biplane_observer = self.SingleObs() # this is the child class.
         self.biplane_observer.psf = np.copy(psf)
         self.biplane_observer.psfz0 = psfz0
         self.biplane_observer.debug = observer_debugger
@@ -172,3 +173,25 @@ class ObserveStation:
         observation = np.concatenate([self.biplane_observer.observation1, self.biplane_observer.observation2]).ravel()
         return observation
 
+    def observe_monoplane_prep(self, psf, single_image_size, psfz0,\
+                             observer_debugger, observer_edge_padding):
+        # prepare an observer for one-plane observation
+        # this method will only be executed once in the preparation before calculating the sensing matrix.
+        # this prep method provides an input window in the main pris script.
+        self.monoplane_observer = self.SingleObs() # this is the child class.
+        self.monoplane_observer.psf = np.copy(psf)
+        self.monoplane_observer.psfz0 = psfz0
+        self.monoplane_observer.debug = observer_debugger
+        self.monoplane_observer.imsize = single_image_size  # this should be the image size of the single plane observation
+        self.monoplane_observer.edge_padding = observer_edge_padding  # yes we want edge padding.
+
+    def observe_monoplane(self, loc):
+        # take the single plane observation
+        # this method will be passed into the sensing matrix generator, and
+        # be executed iterative throughout the course of sensing matrix generation.
+        # get the depth positions of the two observation planes for the biplane_observer.
+        # the biplane_observer now observe the first plane.
+        self.monoplane_observer.location = loc  # focus at the position
+        self.monoplane_observer.single_obs()  # take the observation
+        self.monoplane_observer.observation = self.monoplane_observer.obs.ravel()  # record this single plane observation
+        return self.monoplane_observer.observation.ravel()
