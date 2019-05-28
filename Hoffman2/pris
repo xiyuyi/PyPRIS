@@ -108,7 +108,12 @@ if len(mxnames) is not 0:
     # put the configured observer to the pypris to perform the tasks of 'observe_biplane'
     # when a pypris object observes, it is through the observer and it is
     # done with the observer's observe_biplane skill (skill = method).
-    pypris.observe = observer.observe_biplane
+    if isinstance(ticket, SinglePlaneTicket):
+        pypris.observe = observer.observe_monoplane
+
+    if isinstance(ticket, BiplaneTicket):
+        pypris.observe = observer.observe_biplane
+
     Iter = int(linbreg.PyPRIS_iter[4:])
     print("---------------- PRIS refinement #" + str(Iter) + " ------------------")
     print("")
@@ -148,8 +153,12 @@ else:
     # put the configured observer to the pypris to perform the tasks of 'observe_biplane'
     # when a pypris object observes, it is through the observer and it is
     # done with the observer's observe_biplane skill (skill = method).
-    pypris.observe = observer.observe_biplane
-    # pypris.show_attributes()
+    if isinstance(ticket, SinglePlaneTicket):
+        pypris.observe = observer.observe_monoplane
+
+    if isinstance(ticket, BiplaneTicket):
+        pypris.observe = observer.observe_biplane
+
     # construct sensing matrix,
     pypris.generate_sensing_mx()
     # prepare the inner sparse recovery
@@ -175,11 +184,11 @@ else:
     linbreg.go()
     Iter=0
 
+# now continue the pris iterations
 # construct sensing matrix
 for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
     pypris.prep_for_new_refinement()
     pypris.expansion = ticket.expansion
-    #
     pypris.refine_candidates(linbreg)
     pypris.current_PRIS_ItN += 1
     pypris.save()
