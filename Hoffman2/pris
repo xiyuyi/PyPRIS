@@ -146,8 +146,9 @@ else:
         for i1 in range_ind1:
             for i2 in range_ind2:
                 pypris.current_candidates.append([i0, i1, i2])
-    #
+
     # set a check mark for pypris:
+    #
     pypris.set_check_mark()
     pypris.save()
     # put the configured observer to the pypris to perform the tasks of 'observe_biplane'
@@ -169,7 +170,7 @@ else:
     bgv = c1 + (c2 - c1) * ticket.bg_scaling_coef
     pypris.current_A[:, -1] = bgv / np.sum(
         pypris.observation.ravel())  # the last column in A corresponds to the background component.
-    #
+
     linbreg = copy.deepcopy(linbreg_ori)
     linbreg.candidate_coords = pypris.current_candidates
     linbreg.candidate_intervals = pypris.current_candidates_intervals

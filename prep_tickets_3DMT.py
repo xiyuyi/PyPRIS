@@ -50,13 +50,13 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
 
     # disable for hoffman2 tickets.
 
-    try:
-        import matplotlib.pyplot as plt
-        ticket.linbreg_alpha.debug = True
-        ticket.linbreg_alpha.deep_debug = False
-    except RuntimeError:
-        ticket.linbreg_alpha.debug = False
-        ticket.linbreg_alpha.deep_debug = False
+    # try:
+    #     import matplotlib.pyplot as plt
+    #     ticket.linbreg_alpha.debug = True
+    #     ticket.linbreg_alpha.deep_debug = True
+    # except RuntimeError:
+    #     ticket.linbreg_alpha.debug = False
+    #     ticket.linbreg_alpha.deep_debug = False
 
     ticket.linbreg_alpha.debug = True
     ticket.linbreg_alpha.deep_debug = False
@@ -66,9 +66,10 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.linbreg_alpha.maxit = 40000
     ticket.linbreg_alpha.it_check_rem = 1
     ticket.linbreg_alpha.debug_it_int = 100
-    ticket.linbreg_alpha.kick.ints = 10
+    ticket.linbreg_alpha.kick.ints = 1000
+    ticket.linbreg_alpha.kick.eval_ints = 10
     ticket.linbreg_alpha.kick.flag = True
-    ticket.linbreg_alpha.kick.thres = 1e-3
+    ticket.linbreg_alpha.kick.thres = 0.01
     ticket.linbreg_alpha.save_obj_int = 100
     ticket.linbreg_alpha.save = True
     ticket.expansion = True
@@ -76,7 +77,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     "ticket.linbreg_alpha.PyPRIS_name = ticket.name"  # moved to loop
     ticket.linbreg_alpha.path_0 = '.'
     "ticket.bg_scaling_coef = 1.5 "  # moved to loop
-    ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -11
+    ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -10
 
     "others"
     ticket.PRIS_iter_end = 6
@@ -87,8 +88,8 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
         pass
 
     for bgSCF in list([2]):
-        for mu in list([1e4]):
-            for alpha in list([1e-9]):
+        for mu in list([2e8]):
+            for alpha in list([1e-10]):
                 ticket_new = copy.deepcopy(ticket)
                 ticket_new.name = "bgSCF" + str(bgSCF) + "_mu" + str("%1.1e" % mu) + "_alpha" + str("%1.1e" % alpha)
                 ticket_new.bg_scaling_coef = copy.deepcopy(bgSCF)

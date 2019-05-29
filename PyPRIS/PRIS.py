@@ -111,6 +111,9 @@ class PyPRIS:
         self.set_check_mark()
 
     def generate_sensing_mx(self):
+        print("----------- Generate sensing matrix:")
+        print("            Matrix size:",str(len(self.observation)),' observation pixels ')
+        print("                        ",str(len(self.current_candidates)),' candidates ')
         self.current_A = np.ndarray([len(self.observation), len(self.current_candidates) + 1])
         for count, loc in enumerate(self.current_candidates):
             self.current_A[:, count] = self.observe(loc)
@@ -172,7 +175,7 @@ class LinBreg:
         self.obs_dim1 = 0
         self.kick = self.Kick(self)
         self.A_dir = ''  # directory to store sensing matrix when saving
-        
+        self.mu_reference = 0
     class Kick:
         def __init__(self, LinBreg):
             self.parent = LinBreg
@@ -193,11 +196,18 @@ class LinBreg:
             self.refnorm = np.linalg.norm(self.parent.x - self.reference)
             if self.refnorm < self.thres:
                 # flip the kicking flag to "True" with positive evaluation
+                print("----- kick evaluation:")
+                print("----- distance of x change from "+str(self.ints)+" steps before is:"+str(self.refnorm))
+                print("----- Threshold is:"+str(self.thres))
+                print("------------------------------- Kick!")
                 self.flag = True
             else:
                 # flip the kicking flag to "False" with negative evaluation.
+                print("----- kick evaluation:")
+                print("----- distance of x change from "+str(self.ints)+" steps before is:"+str(self.refnorm))
+                print("----- Threshold is:"+str(self.thres))
+                print("---------------- No kick.")
                 self.flag = False
-
             self.hist_refnorm.append(self.refnorm)
             self.hist_eval_counts.append([it_count, self.flag])
 
@@ -210,7 +220,8 @@ class LinBreg:
                 self.parent.x != 0)  # none zero entries in x. [x entries where there is a value, no need for kicking]
             si = (self.parent.mu * np.sign(self.parent.respj[i0]) - self.parent.cumres[i0]) / self.parent.respj[
                 i0]  # stepsie for entries that needs kicking
-            self.parent.stepsize[i0] = np.min(si)
+            if len(si) > 0:
+                self.parent.stepsize[i0] = np.min(si)
             self.parent.stepsize[i1] = 1
             # reset kick.flag to False and wait for the flip 
             # from the next positive kicking evaluation
@@ -253,7 +264,7 @@ class LinBreg:
         self.kick.set_reference() # set a kick reference
         print('stopping threshold is '+str(self.stopping_loghistpercdelres_thres))
         print('alpha is '+str(self.alpha))
-        
+        # calculate the initial back projected errors to determine mu
         # define the name of the directory to be created.
         import os
         try:
@@ -330,9 +341,11 @@ class LinBreg:
             self.stepsize = np.ones(self.x.shape)  # [Note: this step involves some redundancy]
             if np.remainder(it_count, self.kick.ints) == 1:
                 self.kick.evaluation(it_count)
+                self.kick.set_reference()
                 if self.deep_debug is True: self.debug_output(it_count, appstr='_c1_kicking_evaluated')
                 # kick if we get a positive kicking ealuation.
                 if self.kick.flag is True:
+                    print("Now kick.")
                     self.kick.go()
                     self.kick.set_reference() # update the kick reference
                 if self.deep_debug is True: self.debug_output(it_count, appstr='_c2_kicking_updated')
