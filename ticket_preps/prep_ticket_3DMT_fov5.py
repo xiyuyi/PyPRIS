@@ -62,7 +62,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
 
     "ticket.linbreg_alpha.mu = 1000000000"  # move to loop
     "ticket.linbreg_alpha.alpha = 1e-11"  # move to loop
-    ticket.linbreg_alpha.maxit = 40000
+    ticket.linbreg_alpha.maxit = 10000
     ticket.linbreg_alpha.it_check_rem = 1
     ticket.linbreg_alpha.debug_it_int = 500
     ticket.linbreg_alpha.kick.ints = 1000
@@ -71,7 +71,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.linbreg_alpha.kick.thres = 0.01
     ticket.linbreg_alpha.save_obj_int = 1000
     ticket.linbreg_alpha.save = True
-    ticket.expansion = True
+    ticket.expansion = False
     ticket.linbreg_alpha.PyPRIS_iter = 0
     "ticket.linbreg_alpha.PyPRIS_name = ticket.name"  # moved to loop
     ticket.linbreg_alpha.path_0 = '.'
@@ -88,7 +88,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
 
     for bgSCF in list([1]):
         for mu in list([2e8]):
-            for alpha in list([1e-10]):
+            for alpha in list([1e-9]):
                 ticket_new = copy.deepcopy(ticket)
                 ticket_new.name = "bgSCF" + str(bgSCF) + "_mu" + str("%1.1e" % mu) + "_alpha" + str("%1.1e" % alpha)
                 ticket_new.bg_scaling_coef = copy.deepcopy(bgSCF)
