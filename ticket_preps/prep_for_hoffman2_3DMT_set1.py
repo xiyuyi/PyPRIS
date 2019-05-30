@@ -1,11 +1,10 @@
+import sys
+sys.path.append("/u/home/x/xiyuyi/bin")
+sys.path.append("G:\\DH_localization\\PyPRIS")
 from PyPRIS import *
 import copy
 import os
-import sys
-
-sys.path.append("/u/home/x/xiyuyi/bin")
-sys.path.append("G:\\DH_localization\\PyPRIS")
-
+"set1: fov5, 100 bin. v1"
 ticket = SinglePlaneTicket()
 
 "the name of this pris ticket"
@@ -16,13 +15,14 @@ paths = []
 paths.append('/u/scratch/x/xiyuyi/PyPRIS_data/test_dataset_3')
 ax0_ranges = []
 ax0_ranges.append(list([-20, 20]))
+
 ticket_folders = []
-ticket_folders.append('PyPRIS_MT3D_Astig_fov3_bin_100')
+ticket_folders.append('PyPRIS_hfm2_MT3D_Astig_fov5_bin_100')
 
 for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders):
     ticket.datapath = datapath
     ticket.observation_channel_n = 'SinglePlane'
-    ticket.plane1_path = "{}/fov3.tif".format(ticket.datapath)
+    ticket.plane1_path = "{}/fov5.tif".format(ticket.datapath)
     ticket.psf_path = "{}/psf.tif".format(ticket.datapath)
     ticket.psf_norm_factor = 80
 
@@ -31,7 +31,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.observer_edge_padding = True
 
     "configure the initial candidate pool of this pris ticket"
-    ticket.init_candidates_intervals = list([1, 3, 3])
+    ticket.init_candidates_intervals = list([1, 4, 4])
     ticket.init_ax0_range = ax0_range
 
     ticket.init_ax1_range = list([1, 61])
@@ -57,12 +57,12 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     #     ticket.linbreg_alpha.debug = False
     #     ticket.linbreg_alpha.deep_debug = False
 
-    ticket.linbreg_alpha.debug = True
+    ticket.linbreg_alpha.debug = False
     ticket.linbreg_alpha.deep_debug = False
 
     "ticket.linbreg_alpha.mu = 1000000000"  # move to loop
     "ticket.linbreg_alpha.alpha = 1e-11"  # move to loop
-    ticket.linbreg_alpha.maxit = 40000
+    ticket.linbreg_alpha.maxit = 10000
     ticket.linbreg_alpha.it_check_rem = 1
     ticket.linbreg_alpha.debug_it_int = 100
     ticket.linbreg_alpha.kick.ints = 1000
@@ -71,24 +71,24 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.linbreg_alpha.kick.thres = 0.01
     ticket.linbreg_alpha.save_obj_int = 100
     ticket.linbreg_alpha.save = True
-    ticket.expansion = True
+    ticket.expansion = False
     ticket.linbreg_alpha.PyPRIS_iter = 0
     "ticket.linbreg_alpha.PyPRIS_name = ticket.name"  # moved to loop
     ticket.linbreg_alpha.path_0 = '.'
     "ticket.bg_scaling_coef = 1.5 "  # moved to loop
-    ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -10
+    ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -13
 
     "others"
-    ticket.PRIS_iter_end = 6
+    ticket.PRIS_iter_end = 8
     try:
         if not os.path.exists("../{}".format(ticket.ticket_folder)):
             os.mkdir("../{}".format(ticket.ticket_folder))
     except OSError:
         pass
 
-    for bgSCF in list([1, 2]):
+    for bgSCF in list([1]):
         for mu in list([2e8]):
-            for alpha in list([1e-10]):
+            for alpha in list([1e-9, 1e-10, 1e-11]):
                 ticket_new = copy.deepcopy(ticket)
                 ticket_new.name = "bgSCF" + str(bgSCF) + "_mu" + str("%1.1e" % mu) + "_alpha" + str("%1.1e" % alpha)
                 ticket_new.bg_scaling_coef = copy.deepcopy(bgSCF)
