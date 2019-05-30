@@ -1,10 +1,10 @@
+import sys
+sys.path.append("/u/home/x/xiyuyi/bin")
+sys.path.append("G:\\DH_localization\\PyPRIS")
+
 from PyPRIS import *
 import copy
 import os
-import sys
-
-sys.path.append("/u/home/x/xiyuyi/bin")
-sys.path.append("G:\\DH_localization\\PyPRIS")
 
 ticket = SinglePlaneTicket()
 
