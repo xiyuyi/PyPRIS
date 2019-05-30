@@ -72,12 +72,12 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.linbreg_alpha.kick.thres = 0.01
     ticket.linbreg_alpha.save_obj_int = 1000
     ticket.linbreg_alpha.save = True
-    ticket.expansion = True
+    ticket.expansion = False
     ticket.linbreg_alpha.PyPRIS_iter = 0
     "ticket.linbreg_alpha.PyPRIS_name = ticket.name"  # moved to loop
     ticket.linbreg_alpha.path_0 = '.'
     "ticket.bg_scaling_coef = 1.5 "  # moved to loop
-    ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -10
+    ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -13
 
     "others"
     ticket.PRIS_iter_end = 8
