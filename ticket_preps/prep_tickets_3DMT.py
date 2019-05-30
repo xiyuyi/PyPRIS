@@ -70,7 +70,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.linbreg_alpha.kick.eval_ints = 10
     ticket.linbreg_alpha.kick.flag = True
     ticket.linbreg_alpha.kick.thres = 0.01
-    ticket.linbreg_alpha.save_obj_int = 100
+    ticket.linbreg_alpha.save_obj_int = 1000
     ticket.linbreg_alpha.save = True
     ticket.expansion = True
     ticket.linbreg_alpha.PyPRIS_iter = 0
