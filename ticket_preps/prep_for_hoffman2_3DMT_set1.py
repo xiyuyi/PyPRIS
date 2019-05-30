@@ -14,10 +14,10 @@ ticket = SinglePlaneTicket()
 paths = []
 paths.append('/u/scratch/x/xiyuyi/PyPRIS_data/test_dataset_3')
 ax0_ranges = []
-ax0_ranges.append(list([-20, 20]))
+ax0_ranges.append(list([-60, 60]))
 
 ticket_folders = []
-ticket_folders.append('PyPRIS_hfm2_MT3D_Astig_fov5_bin_100')
+ticket_folders.append('PyPRIS_hfm2_MT3D_Astig_fov5_bin_100_v2')
 
 for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders):
     ticket.datapath = datapath
@@ -31,7 +31,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.observer_edge_padding = True
 
     "configure the initial candidate pool of this pris ticket"
-    ticket.init_candidates_intervals = list([1, 4, 4])
+    ticket.init_candidates_intervals = list([1, 6, 6])
     ticket.init_ax0_range = ax0_range
 
     ticket.init_ax1_range = list([1, 61])
@@ -62,7 +62,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
 
     "ticket.linbreg_alpha.mu = 1000000000"  # move to loop
     "ticket.linbreg_alpha.alpha = 1e-11"  # move to loop
-    ticket.linbreg_alpha.maxit = 10000
+    ticket.linbreg_alpha.maxit = 20000
     ticket.linbreg_alpha.it_check_rem = 1
     ticket.linbreg_alpha.debug_it_int = 100
     ticket.linbreg_alpha.kick.ints = 1000
