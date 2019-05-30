@@ -15,10 +15,10 @@ ticket = SinglePlaneTicket()
 paths = []
 paths.append('G:\\DH_localization\\EPFL_datasets\\Yiming_Li\\Organized_data_micro_tubules\\corp_fov3_20k_binning')
 ax0_ranges = []
-ax0_ranges.append(list([-20, 20]))
+ax0_ranges.append(list([-50, 50]))
 
 ticket_folders = []
-ticket_folders.append('PyPRIS_MT3D_Astig_fov3_bin_20k')
+ticket_folders.append('PyPRIS_MT3D_Astig_fov3_bin_20k_thick')
 
 for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders):
     ticket.datapath = datapath
@@ -32,7 +32,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.observer_edge_padding = True
 
     "configure the initial candidate pool of this pris ticket"
-    ticket.init_candidates_intervals = list([1, 2, 2])
+    ticket.init_candidates_intervals = list([1, 6, 6])
     ticket.init_ax0_range = ax0_range
 
     ticket.init_ax1_range = list([1, 61])
@@ -80,7 +80,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -10
 
     "others"
-    ticket.PRIS_iter_end = 6
+    ticket.PRIS_iter_end = 8
     try:
         if not os.path.exists("../{}".format(ticket.ticket_folder)):
             os.mkdir("../{}".format(ticket.ticket_folder))
