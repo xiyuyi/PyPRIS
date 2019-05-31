@@ -12,12 +12,12 @@ ticket = SinglePlaneTicket()
 
 "where to find the data files, for both blur and observation"
 paths = []
-paths.append('G:\\DH_localization\\PyPRIS\\test_dataset_3')
+paths.append('G:\\DH_localization\\PyPRIS\\test_dataset_2')
 ax0_ranges = []
-ax0_ranges.append(list([-20, 20]))
+ax0_ranges.append(list([-50, 50]))
 
 ticket_folders = []
-ticket_folders.append('PyPRIS_MT3D_Astig_fov5_bin_100')
+ticket_folders.append('PyPRIS_MT3D_Astig_fov5_bin_20k')
 
 for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders):
     ticket.datapath = datapath
@@ -31,7 +31,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.observer_edge_padding = True
 
     "configure the initial candidate pool of this pris ticket"
-    ticket.init_candidates_intervals = list([1, 4, 4])
+    ticket.init_candidates_intervals = list([1, 6, 6])
     ticket.init_ax0_range = ax0_range
 
     ticket.init_ax1_range = list([1, 61])
