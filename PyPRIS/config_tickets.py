@@ -106,8 +106,10 @@ class SinglePlaneTicket:
         self.linbreg_alpha.save = True
         self.linbreg_alpha.PyPRIS_iter = self.name
         self.linbreg_alpha.path_0 = self.output_path
-
         self.bg_scaling_coef = 1.5
 
         "others"
         self.PRIS_iter_end = 5
+
+class TwoChannelTicket:
+    def __init__(self):
