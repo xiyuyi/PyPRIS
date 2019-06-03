@@ -6,6 +6,11 @@ class ObserveStation:
     def __init__(self):
         self.biplane_observer = None
         self.monoplane_observer = None
+        # create position for 4 different channel observers.
+        self.channel_observer_1 = None
+        self.channel_observer_2 = None
+        self.channel_observer_3 = None
+        self.channel_observer_4 = None
 
     class SingleObs:
         
@@ -200,6 +205,23 @@ class ObserveStation:
         # prepare an observer for two channel observations
         # this method will only be executed once in the preparation before calculating the sensing matrix.
         # this prep method provides an input window in the main pris script.
+        # we need to assign two different channel observers.
+
+        # prepare the first channel observer
+        self.channel_observer_1 = self.SingleObs()  # this is the child class.
+        self.channel_observer_1.psf = np.copy(psf1)
+        self.channel_observer_1.imsize = size1  # this should be the image size of the single plane observation
+        self.channel_observer_1.psfz0 = psfz0
+        self.channel_observer_1.debug = observer_debugger
+        self.channel_observer_1.edge_padding = observer_edge_padding  # yes we want edge padding.
+
+        # prepare the second channel observer
+        self.channel_observer_2 = self.SingleObs()  # this is the child class.
+        self.channel_observer_2.psf = np.copy(psf2)
+        self.channel_observer_2.imsize = size2  # this should be the image size of the single plane observation
+        self.channel_observer_2.psfz0 = psfz0
+        self.channel_observer_2.debug = observer_debugger
+        self.channel_observer_2.edge_padding = observer_edge_padding  # yes we want edge padding.
 
     def observe_two_channel(self, loc):
         # take the simultaneous two channel observation
