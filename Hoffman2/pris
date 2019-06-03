@@ -240,7 +240,7 @@ for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
     if isinstance(ticket, TwoChannelTicket):
         "use the two-channel observation skill of the observer for pypris object"
         pypris.observe = observer.observe_two_channel
-        
+
     pypris.generate_sensing_mx()
     # prepare the inner sparse recovery
     pypris.current_A = pypris.current_A / ticket.psf_norm_factor
