@@ -206,7 +206,6 @@ class ObserveStation:
         # this method will only be executed once in the preparation before calculating the sensing matrix.
         # this prep method provides an input window in the main pris script.
         # we need to assign two different channel observers.
-
         # prepare the first channel observer
         self.channel_observer_1 = self.SingleObs()  # this is the child class.
         self.channel_observer_1.psf = np.copy(psf1)
@@ -227,8 +226,7 @@ class ObserveStation:
         # take the simultaneous two channel observation
         # this method will be passed into the sensing matrix generator, and
         # be executed iterative throughout the course of sensing matrix generation.
-
-        # observe the first channel (channel_observer_1 is configured to the first channel)
+        # observe the first channel. channel_observer_1 is configured to the first channel
         self.channel_observer_1.location = loc  # focus at the position
         self.channel_observer_1.single_obs()  # take the observation
         self.channel_observer_1.observation = self.channel_observer_1.obs.ravel()  # record this first observation
