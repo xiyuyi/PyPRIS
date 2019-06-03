@@ -23,7 +23,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
 
     "where to find the data files, for both blur and observation"
     # need to modify these default values with a prepared test dataset.
-    ticket.datapath = './test_dataset_4'
+    ticket.datapath = 'G:\\DH_localization\\PyPRIS\\test_dataset_4'
     ticket.blur_path_channel_1 = "{}/BP+250_binAll.tif".format(ticket.datapath)
     ticket.blur_path_channel_2 = "{}/BP-250_binAll.tif".format(ticket.datapath)
     ticket.psf_path_channel_1 = "{}/psf_BP+250.tif".format(ticket.datapath)
