@@ -29,10 +29,12 @@ ticket = get_ticket('./Go.pris_ticket')
 
 # prep the order according to the ticket [PSF, and overall blur]
 if isinstance(ticket, SinglePlaneTicket):
+    "load psf and blur for Single Plane Ticket"
     psf = io.imread(ticket.psf_path)
     blur = io.imread(ticket.plane1_path)
 
 if isinstance(ticket, BiplaneTicket):
+    "load psf and blur for sequential single channel biplane Ticket"
     psf = io.imread(ticket.psf_path)
     blur1 = io.imread(ticket.plane1_path)
     blur2 = io.imread(ticket.plane2_path)
