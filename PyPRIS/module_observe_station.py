@@ -5,6 +5,12 @@ class ObserveStation:
     
     def __init__(self):
         self.biplane_observer = None
+        self.monoplane_observer = None
+        # create position for 4 different channel observers.
+        self.channel_observer_1 = None
+        self.channel_observer_2 = None
+        self.channel_observer_3 = None
+        self.channel_observer_4 = None
 
     class SingleObs:
         
@@ -134,7 +140,7 @@ class ObserveStation:
                 self.obswbox[loc1sta: loc1end, loc2sta] = c
                 self.obswbox[loc1sta: loc1end, loc2end - 1] = c
 
-    def observe_biplane_prep(self, psf, single_image_size, deltaz_plane1, deltaz_plane2, psfz0,\
+    def observe_biplane_prep(self, psf, single_image_size, deltaz_plane1, deltaz_plane2, psfz0,
                              observer_debugger, observer_edge_padding):
         # prepare an observer for biplane observation
         # this method will only be executed once in the preparation before calculating the sensing matrix.
@@ -173,7 +179,7 @@ class ObserveStation:
         observation = np.concatenate([self.biplane_observer.observation1, self.biplane_observer.observation2]).ravel()
         return observation
 
-    def observe_monoplane_prep(self, psf, single_image_size, psfz0,\
+    def observe_monoplane_prep(self, psf, single_image_size, psfz0,
                              observer_debugger, observer_edge_padding):
         # prepare an observer for one-plane observation
         # this method will only be executed once in the preparation before calculating the sensing matrix.
@@ -189,9 +195,47 @@ class ObserveStation:
         # take the single plane observation
         # this method will be passed into the sensing matrix generator, and
         # be executed iterative throughout the course of sensing matrix generation.
-        # get the depth positions of the two observation planes for the biplane_observer.
-        # the biplane_observer now observe the first plane.
         self.monoplane_observer.location = loc  # focus at the position
         self.monoplane_observer.single_obs()  # take the observation
         self.monoplane_observer.observation = self.monoplane_observer.obs.ravel()  # record this single plane observation
         return self.monoplane_observer.observation.ravel()
+
+    def observe_two_channel_prep(self, psf1, size1, psf2, size2, psfz0,
+                                 observer_debugger, observer_edge_padding):
+        # prepare an observer for two channel observations
+        # this method will only be executed once in the preparation before calculating the sensing matrix.
+        # this prep method provides an input window in the main pris script.
+        # we need to assign two different channel observers.
+        # prepare the first channel observer
+        self.channel_observer_1 = self.SingleObs()  # this is the child class.
+        self.channel_observer_1.psf = np.copy(psf1)
+        self.channel_observer_1.imsize = size1  # this should be the image size of the single plane observation
+        self.channel_observer_1.psfz0 = psfz0
+        self.channel_observer_1.debug = observer_debugger
+        self.channel_observer_1.edge_padding = observer_edge_padding  # yes we want edge padding.
+
+        # prepare the second channel observer
+        self.channel_observer_2 = self.SingleObs()  # this is the child class.
+        self.channel_observer_2.psf = np.copy(psf2)
+        self.channel_observer_2.imsize = size2  # this should be the image size of the single plane observation
+        self.channel_observer_2.psfz0 = psfz0
+        self.channel_observer_2.debug = observer_debugger
+        self.channel_observer_2.edge_padding = observer_edge_padding  # yes we want edge padding.
+
+    def observe_two_channel(self, loc):
+        # take the simultaneous two channel observation
+        # this method will be passed into the sensing matrix generator, and
+        # be executed iterative throughout the course of sensing matrix generation.
+        # observe the first channel. channel_observer_1 is configured to the first channel
+        self.channel_observer_1.location = loc  # focus at the position
+        self.channel_observer_1.single_obs()  # take the observation
+        self.channel_observer_1.observation = self.channel_observer_1.obs.ravel()  # record this first observation
+
+        # observe the second channel (channel_observer_2 is configured to the second channel)
+        self.channel_observer_2.location = loc  # focus at the position
+        self.channel_observer_2.single_obs()  # take the observation
+        self.channel_observer_2.observation = self.channel_observer_2.obs.ravel()  # record this first observation
+
+        # Now returns the combined observations from two channels
+        observation = np.concatenate([self.channel_observer_1.observation, self.channel_observer_2.observation]).ravel()
+        return observation

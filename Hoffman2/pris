@@ -29,14 +29,24 @@ ticket = get_ticket('./Go.pris_ticket')
 
 # prep the order according to the ticket [PSF, and overall blur]
 if isinstance(ticket, SinglePlaneTicket):
+    "load psf and blur for Single Plane Ticket"
     psf = io.imread(ticket.psf_path)
     blur = io.imread(ticket.plane1_path)
 
 if isinstance(ticket, BiplaneTicket):
+    "load psf and blur for sequential single channel biplane Ticket"
     psf = io.imread(ticket.psf_path)
     blur1 = io.imread(ticket.plane1_path)
     blur2 = io.imread(ticket.plane2_path)
     blur = np.concatenate([blur1, blur2],axis=0)
+
+if isinstance(ticket, TwoChannelTicket):
+    "load psf and blur for simultaneous two channel observation."
+    psf_channel_1 = io.imread(ticket.psf_path_channel_1)
+    psf_channel_2 = io.imread(ticket.psf_path_channel_2)
+    blur_channel_1 = io.imread(ticket.blur_path_channel_1)
+    blur_channel_2 = io.imread(ticket.blur_path_channel_2)
+    blur = np.concatenate([blur_channel_1, blur_channel_2],axis = 0)
 
 # define linbreg_ori
 linbreg_ori = ticket.linbreg_alpha
@@ -62,6 +72,17 @@ if isinstance(ticket, BiplaneTicket):
                                psfz0 = ticket.psfz0,
                                observer_debugger = ticket.observer_debugger,
                                observer_edge_padding = ticket.observer_edge_padding)
+
+if isinstance(ticket, TwoChannelTicket):
+    "configure this observer with two channel observation specifics"
+    "simultaneous observation with two channels"
+    observer.observe_two_channel_prep(psf_channel_1,
+                                      image_size_channel_1=blur_channel_1.shape,
+                                      psf_channel_2,
+                                      image_size_channel_2=blur_channel_2.shape,
+                                      psfz0 = ticket.psfz0,
+                                      observer_debugger = ticket.observer_debugger,
+                                      observer_edge_padding = ticket.observer_edge_padding)
 
 # Get the latest saved linbreg filename
 # put in the file folder where you saved all the linbreg objects.
@@ -109,10 +130,16 @@ if len(mxnames) is not 0:
     # when a pypris object observes, it is through the observer and it is
     # done with the observer's observe_biplane skill (skill = method).
     if isinstance(ticket, SinglePlaneTicket):
+        "use the monoplane observation skill of the observer for pypris object"
         pypris.observe = observer.observe_monoplane
 
     if isinstance(ticket, BiplaneTicket):
+        "use the biplane observation skill of the observer for pypris object"
         pypris.observe = observer.observe_biplane
+
+    if isinstance(ticket, TwoChannelTicket):
+        "use the two-channel observation skill of the observer for pypris object"
+        pypris.observe = observer.observe_two_channel
 
     Iter = int(linbreg.PyPRIS_iter[4:])
     print("---------------- PRIS refinement #" + str(Iter) + " ------------------")
@@ -155,10 +182,16 @@ else:
     # when a pypris object observes, it is through the observer and it is
     # done with the observer's observe_biplane skill (skill = method).
     if isinstance(ticket, SinglePlaneTicket):
+        "use the monoplane observation skill of the observer for pypris object"
         pypris.observe = observer.observe_monoplane
 
     if isinstance(ticket, BiplaneTicket):
+        "use the biplane observation skill of the observer for pypris object"
         pypris.observe = observer.observe_biplane
+
+    if isinstance(ticket, TwoChannelTicket):
+        "use the two-channel observation skill of the observer for pypris object"
+        pypris.observe = observer.observe_two_channel
 
     # construct sensing matrix,
     pypris.generate_sensing_mx()
@@ -197,9 +230,16 @@ for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
     # when a pypris object observes, it is through the observer and it is
     # done with the observer's observe_biplane skill (skill = method). or obsreve monoplane skill
     if isinstance(ticket, SinglePlaneTicket):
+        "use the monoplane observation skill of the observer for pypris object"
         pypris.observe = observer.observe_monoplane
+
     if isinstance(ticket, BiplaneTicket):
+        "use the biplane observation skill of the observer for pypris object"
         pypris.observe = observer.observe_biplane
+
+    if isinstance(ticket, TwoChannelTicket):
+        "use the two-channel observation skill of the observer for pypris object"
+        pypris.observe = observer.observe_two_channel
 
     pypris.generate_sensing_mx()
     # prepare the inner sparse recovery
