@@ -40,6 +40,14 @@ if isinstance(ticket, BiplaneTicket):
     blur2 = io.imread(ticket.plane2_path)
     blur = np.concatenate([blur1, blur2],axis=0)
 
+if isinstance(ticket, TwoChannelTicket):
+    "load psf and blur for simultaneous two channel observation."
+    psf_channel_1 = io.imread(ticket.psf_path_channel_1)
+    psf_channel_2 = io.imread(ticket.psf_path_channel_2)
+    blur_channel_1 = io.imread(ticket.blur_path_channel_1)
+    blur_channel_2 = io.imread(ticket.blur_path_channel_2)
+    blur = np.concatenate([blur_channel_1, blur_channel_2],axis = 0)
+
 # define linbreg_ori
 linbreg_ori = ticket.linbreg_alpha
 linbreg_ori.obs_dim0 = blur.shape[0]
