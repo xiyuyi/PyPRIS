@@ -113,11 +113,6 @@ class SinglePlaneTicket:
 
 class TwoChannelTicket:
     def __init__(self):
-        self.psf_path_channel_1 = None
-        self.psf_path_channel_2 = None
-        self.blur_path_channel_1 = None
-        self.blur_path_channel_2 = None
-
         "the name of this pris ticket"
         self.name = 'Demo'
         self.expansion = True
@@ -150,7 +145,22 @@ class TwoChannelTicket:
         self.output_path = './PyPRIS_Scratch'
 
         "linbreg configurations"
-        "fill in when settled"
+        self.linbreg_alpha = LinBreg("Demo")
+        self.linbreg_alpha.debug = False
+        self.linbreg_alpha.deep_debug = False
+        self.linbreg_alpha.mu = 1000000000
+        self.linbreg_alpha.alpha = 1e-8
+        self.linbreg_alpha.maxit = 2000
+        self.linbreg_alpha.it_check_rem = 1
+        self.linbreg_alpha.debug_it_int = 100
+        self.linbreg_alpha.kick.ints = 10
+        self.linbreg_alpha.kick.flag = True
+        self.linbreg_alpha.kick.thres = 1e-3
+        self.linbreg_alpha.save_obj_int = 100
+        self.linbreg_alpha.save = True
+        self.linbreg_alpha.PyPRIS_iter = self.name
+        self.linbreg_alpha.path_0 = self.output_path
 
+        self.bg_scaling_coef = 1.5
         "others"
         self.PRIS_iter_end = 5
