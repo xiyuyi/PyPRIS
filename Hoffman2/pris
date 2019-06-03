@@ -130,9 +130,11 @@ if len(mxnames) is not 0:
     # when a pypris object observes, it is through the observer and it is
     # done with the observer's observe_biplane skill (skill = method).
     if isinstance(ticket, SinglePlaneTicket):
+        "assign a monoplane observer"
         pypris.observe = observer.observe_monoplane
 
     if isinstance(ticket, BiplaneTicket):
+        "assign a biplane observer to pypris object"
         pypris.observe = observer.observe_biplane
 
     Iter = int(linbreg.PyPRIS_iter[4:])
