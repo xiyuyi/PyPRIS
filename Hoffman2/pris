@@ -76,10 +76,10 @@ if isinstance(ticket, BiplaneTicket):
 if isinstance(ticket, TwoChannelTicket):
     "configure this observer with two channel observation specifics"
     "simultaneous observation with two channels"
-    observer.observe_two_channel_prep(psf_channel_1,
-                                      image_size_channel_1=blur_channel_1.shape,
-                                      psf_channel_2,
-                                      image_size_channel_2=blur_channel_2.shape,
+    observer.observe_two_channel_prep(psf1 = psf_channel_1,
+                                      size1 = blur_channel_1.shape,
+                                      psf2 = psf_channel_2,
+                                      size2 = blur_channel_2.shape,
                                       psfz0 = ticket.psfz0,
                                       observer_debugger = ticket.observer_debugger,
                                       observer_edge_padding = ticket.observer_edge_padding)
