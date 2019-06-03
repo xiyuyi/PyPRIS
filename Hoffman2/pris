@@ -182,10 +182,16 @@ else:
     # when a pypris object observes, it is through the observer and it is
     # done with the observer's observe_biplane skill (skill = method).
     if isinstance(ticket, SinglePlaneTicket):
+        "use the monoplane observation skill of the observer for pypris object"
         pypris.observe = observer.observe_monoplane
 
     if isinstance(ticket, BiplaneTicket):
+        "use the biplane observation skill of the observer for pypris object"
         pypris.observe = observer.observe_biplane
+
+    if isinstance(ticket, TwoChannelTicket):
+        "use the two-channel observation skill of the observer for pypris object"
+        pypris.observe = observer.observe_two_channel
 
     # construct sensing matrix,
     pypris.generate_sensing_mx()
