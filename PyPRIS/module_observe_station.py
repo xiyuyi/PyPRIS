@@ -227,3 +227,17 @@ class ObserveStation:
         # take the simultaneous two channel observation
         # this method will be passed into the sensing matrix generator, and
         # be executed iterative throughout the course of sensing matrix generation.
+
+        # observe the first channel (channel_observer_1 is configured to the first channel)
+        self.channel_observer_1.location = loc  # focus at the position
+        self.channel_observer_1.single_obs()  # take the observation
+        self.channel_observer_1.observation = self.channel_observer_1.obs.ravel()  # record this first observation
+
+        # observe the second channel (channel_observer_2 is configured to the second channel)
+        self.channel_observer_2.location = loc  # focus at the position
+        self.channel_observer_2.single_obs()  # take the observation
+        self.channel_observer_2.observation = self.channel_observer_2.obs.ravel()  # record this first observation
+
+        # Now returns the combined observations from two channels
+        observation = np.concatenate([self.channel_observer_1.observation, self.channel_observer_2.observation]).ravel()
+        return observation
