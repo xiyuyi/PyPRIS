@@ -5,6 +5,7 @@ class ObserveStation:
     
     def __init__(self):
         self.biplane_observer = None
+        self.monoplane_observer = None
 
     class SingleObs:
         
@@ -134,7 +135,7 @@ class ObserveStation:
                 self.obswbox[loc1sta: loc1end, loc2sta] = c
                 self.obswbox[loc1sta: loc1end, loc2end - 1] = c
 
-    def observe_biplane_prep(self, psf, single_image_size, deltaz_plane1, deltaz_plane2, psfz0,\
+    def observe_biplane_prep(self, psf, single_image_size, deltaz_plane1, deltaz_plane2, psfz0,
                              observer_debugger, observer_edge_padding):
         # prepare an observer for biplane observation
         # this method will only be executed once in the preparation before calculating the sensing matrix.
@@ -173,7 +174,7 @@ class ObserveStation:
         observation = np.concatenate([self.biplane_observer.observation1, self.biplane_observer.observation2]).ravel()
         return observation
 
-    def observe_monoplane_prep(self, psf, single_image_size, psfz0,\
+    def observe_monoplane_prep(self, psf, single_image_size, psfz0,
                              observer_debugger, observer_edge_padding):
         # prepare an observer for one-plane observation
         # this method will only be executed once in the preparation before calculating the sensing matrix.
@@ -189,9 +190,18 @@ class ObserveStation:
         # take the single plane observation
         # this method will be passed into the sensing matrix generator, and
         # be executed iterative throughout the course of sensing matrix generation.
-        # get the depth positions of the two observation planes for the biplane_observer.
-        # the biplane_observer now observe the first plane.
         self.monoplane_observer.location = loc  # focus at the position
         self.monoplane_observer.single_obs()  # take the observation
         self.monoplane_observer.observation = self.monoplane_observer.obs.ravel()  # record this single plane observation
         return self.monoplane_observer.observation.ravel()
+
+    def observe_two_channel_prep(self, psf1, size1, psf2, size2, psfz0,
+                                 observer_debugger, observer_edge_padding):
+        # prepare an observer for two channel observations
+        # this method will only be executed once in the preparation before calculating the sensing matrix.
+        # this prep method provides an input window in the main pris script.
+
+    def observe_two_channel(self, loc):
+        # take the simultaneous two channel observation
+        # this method will be passed into the sensing matrix generator, and
+        # be executed iterative throughout the course of sensing matrix generation.
