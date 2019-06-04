@@ -35,8 +35,8 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.observer_edge_padding = True
 
     "configure the initial candidate pool of this pris ticket"
-    ticket.init_candidates_intervals = list([1, 5, 5])
-    ticket.init_ax0_range = list([-60, 60])
+    ticket.init_candidates_intervals = list([1, 3, 3])
+    ticket.init_ax0_range = list([-75, 75])
     ticket.init_ax1_range = list([1, 64])
     ticket.init_ax2_range = list([1, 64])
 
@@ -55,7 +55,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     "ticket.linbreg_alpha.alpha = 1e-11"  # move to loop
     ticket.linbreg_alpha.maxit = 40000
     ticket.linbreg_alpha.it_check_rem = 1
-    ticket.linbreg_alpha.debug_it_int = 100
+    ticket.linbreg_alpha.debug_it_int = 500
     ticket.linbreg_alpha.kick.ints = 1000
     ticket.linbreg_alpha.kick.eval_ints = 10
     ticket.linbreg_alpha.kick.flag = True
@@ -78,9 +78,9 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     except OSError:
         pass
 
-    for bgSCF in list([2]):
-        for mu in list([2e8]):
-            for alpha in list([1e-10]):
+    for bgSCF in list([3]):
+        for mu in list([9e6]):
+            for alpha in list([1e-5]):
                 ticket_new = copy.deepcopy(ticket)
                 ticket_new.name = "bgSCF" + str(bgSCF) + "_mu" + str("%1.1e" % mu) + "_alpha" + str("%1.1e" % alpha)
                 ticket_new.bg_scaling_coef = copy.deepcopy(bgSCF)
