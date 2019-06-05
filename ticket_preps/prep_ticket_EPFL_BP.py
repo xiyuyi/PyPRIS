@@ -26,8 +26,8 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.datapath = 'G:\\DH_localization\\PyPRIS\\test_dataset_4'
     ticket.blur_path_channel_1 = "{}/BP+250_binAll.tif".format(ticket.datapath)
     ticket.blur_path_channel_2 = "{}/BP-250_binAll.tif".format(ticket.datapath)
-    ticket.psf_path_channel_1 = "{}/psf_BP+250.tif".format(ticket.datapath)
-    ticket.psf_path_channel_2 = "{}/psf_BP-250.tif".format(ticket.datapath)
+    ticket.psf_path_channel_1 = "{}/trimmed_psf_BP+250.tif".format(ticket.datapath)
+    ticket.psf_path_channel_2 = "{}/trimmed_psf_BP-250.tif".format(ticket.datapath)
     ticket.psf_norm_factor = 10000
 
     "specification of the psf stack"
@@ -79,7 +79,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
         pass
 
     for bgSCF in list([1]):
-        for mu in list([9e6]):
+        for mu in list([9e7]):
             for alpha in list([1e-5]):
                 ticket_new = copy.deepcopy(ticket)
                 ticket_new.name = "bgSCF" + str(bgSCF) + "_mu" + str("%1.1e" % mu) + "_alpha" + str("%1.1e" % alpha)
