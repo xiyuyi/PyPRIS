@@ -10,7 +10,7 @@ ticket = TwoChannelTicket()
 
 "where to find the data files, for both blur and observation"
 paths = []
-paths.append('/u/scratch/x/xiyuyi/EPFL_BP/test_data_4')
+paths.append('/u/scratch/x/xiyuyi/EPFL_BP/test_dataset_4')
 ax0_ranges = []
 ax0_ranges.append(list([-60, 60]))
 ticket_folders = []
@@ -23,6 +23,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
 
     "where to find the data files, for both blur and observation"
     # need to modify these default values with a prepared test dataset.
+    ticket.datapath = datapath
     ticket.blur_path_channel_1 = "{}/BP+250_binAll.tif".format(ticket.datapath)
     ticket.blur_path_channel_2 = "{}/BP-250_binAll.tif".format(ticket.datapath)
     ticket.psf_path_channel_1 = "{}/psf_BP+250.tif".format(ticket.datapath)
