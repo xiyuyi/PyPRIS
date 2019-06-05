@@ -78,7 +78,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     except OSError:
         pass
 
-    for bgSCF in list([3]):
+    for bgSCF in list([1]):
         for mu in list([9e6]):
             for alpha in list([1e-5]):
                 ticket_new = copy.deepcopy(ticket)
