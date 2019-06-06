@@ -113,11 +113,6 @@ class SinglePlaneTicket:
 
 class TwoChannelTicket:
     def __init__(self):
-        self.psf_path_channel_1 = None
-        self.psf_path_channel_2 = None
-        self.blur_path_channel_1 = None
-        self.blur_path_channel_2 = None
-
         "the name of this pris ticket"
         self.name = 'Demo'
         self.expansion = True
@@ -125,21 +120,21 @@ class TwoChannelTicket:
         "where to find the data files, for both blur and observation"
         # need to modify these default values with a prepared test dataset.
         self.datapath = './test_dataset_4'
-        self.blur_path_channel_1 = "{}/blur_channel_1.tif".format(self.datapath)
-        self.blur_path_channel_2 = "{}/blur_channel_2.tif".format(self.datapath)
-        self.psf_path_channel_1 = "{}/psf_channel_1.tif".format(self.datapath)
-        self.psf_path_channel_2 = "{}/psf_channel_2.tif".format(self.datapath)
-        self.psf_norm_factor = 80
+        self.blur_path_channel_1 = "{}/BP+250_binAll.tif".format(self.datapath)
+        self.blur_path_channel_2 = "{}/BP-250_binAll.tif".format(self.datapath)
+        self.psf_path_channel_1 = "{}/psf_BP+250.tif".format(self.datapath)
+        self.psf_path_channel_2 = "{}/psf_BP-250.tif".format(self.datapath)
+        self.psf_norm_factor = 10000
 
         "specification of the psf stack"
-        self.psfz0 = 106  # the count of the center plane, define it as z=0 in the psf coordinates system.
+        self.psfz0 = 76  # the count of the center plane, define it as z=0 in the psf coordinates system.
         self.observer_edge_padding = True
 
         "configure the initial candidate pool of this pris ticket"
         self.init_candidates_intervals = list([1, 5, 5])
-        self.init_ax0_range = list([-36, 36])
-        self.init_ax1_range = list([5, 66])
-        self.init_ax2_range = list([5, 66])
+        self.init_ax0_range = list([-60, 60])
+        self.init_ax1_range = list([1, 64])
+        self.init_ax2_range = list([1, 64])
 
         "debug configurations"
         self.observer_debugger = False
@@ -167,6 +162,5 @@ class TwoChannelTicket:
         self.linbreg_alpha.path_0 = self.output_path
 
         self.bg_scaling_coef = 1.5
-
         "others"
         self.PRIS_iter_end = 5
