@@ -14,7 +14,7 @@ paths.append('/u/scratch/x/xiyuyi/EPFL_BP/test_dataset_4')
 ax0_ranges = []
 ax0_ranges.append(list([-60, 60]))
 ticket_folders = []
-ticket_folders.append('PyPRIS_EPFL_BP_binAll_hoffman2')
+ticket_folders.append('PyPRIS_EPFL_BP_100Bin_hoffman2')
 
 for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders):
     "the name of this pris ticket"
@@ -23,8 +23,8 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     "where to find the data files, for both blur and observation"
     # need to modify these default values with a prepared test dataset.
     ticket.datapath = datapath
-    ticket.blur_path_channel_1 = "{}/BP+250_binAll.tif".format(ticket.datapath)
-    ticket.blur_path_channel_2 = "{}/BP-250_binAll.tif".format(ticket.datapath)
+    ticket.blur_path_channel_1 = "{}/BP+250_100Bin.tif".format(ticket.datapath)
+    ticket.blur_path_channel_2 = "{}/BP-250_100Bin.tif".format(ticket.datapath)
     ticket.psf_path_channel_1 = "{}/psf_BP+250.tif".format(ticket.datapath)
     ticket.psf_path_channel_2 = "{}/psf_BP-250.tif".format(ticket.datapath)
     ticket.psf_norm_factor = 10000
@@ -52,7 +52,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.linbreg_alpha.deep_debug = False
     "ticket.linbreg_alpha.mu = 1000000000"  # move to loop
     "ticket.linbreg_alpha.alpha = 1e-11"  # move to loop
-    ticket.linbreg_alpha.maxit = 40000
+    ticket.linbreg_alpha.maxit = 400000
     ticket.linbreg_alpha.it_check_rem = 1
     ticket.linbreg_alpha.debug_it_int = 500
     ticket.linbreg_alpha.kick.ints = 1000
