@@ -14,7 +14,7 @@ paths.append('G:\\DH_localization\\EPFL_datasets\\N2')
 ax0_ranges = []
 ax0_ranges.append(list([-60, 60]))
 ticket_folders = []
-ticket_folders.append('PyPRIS_EPFL_BP_binAll')
+ticket_folders.append('PyPRIS_EPFL_BP_100Bin')
 
 for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders):
     "the name of this pris ticket"
@@ -24,8 +24,8 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     "where to find the data files, for both blur and observation"
     # need to modify these default values with a prepared test dataset.
     ticket.datapath = 'G:\\DH_localization\\PyPRIS\\test_dataset_4'
-    ticket.blur_path_channel_1 = "{}/BP+250_binAll.tif".format(ticket.datapath)
-    ticket.blur_path_channel_2 = "{}/BP-250_binAll.tif".format(ticket.datapath)
+    ticket.blur_path_channel_1 = "{}/BP+250_100Bin.tif".format(ticket.datapath)
+    ticket.blur_path_channel_2 = "{}/BP-250_100Bin.tif".format(ticket.datapath)
     ticket.psf_path_channel_1 = "{}/psf_BP+250.tif".format(ticket.datapath)
     ticket.psf_path_channel_2 = "{}/psf_BP-250.tif".format(ticket.datapath)
     ticket.psf_norm_factor = 10000

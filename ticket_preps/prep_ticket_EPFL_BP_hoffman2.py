@@ -19,7 +19,6 @@ ticket_folders.append('PyPRIS_EPFL_BP_binAll_hoffman2')
 for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders):
     "the name of this pris ticket"
     ticket.name = 'Demo'
-    ticket.expansion = True
 
     "where to find the data files, for both blur and observation"
     # need to modify these default values with a prepared test dataset.
@@ -49,7 +48,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
 
     "linbreg configurations"
     ticket.linbreg_alpha = LinBreg("X")
-    ticket.linbreg_alpha.debug = True
+    ticket.linbreg_alpha.debug = False
     ticket.linbreg_alpha.deep_debug = False
     "ticket.linbreg_alpha.mu = 1000000000"  # move to loop
     "ticket.linbreg_alpha.alpha = 1e-11"  # move to loop
