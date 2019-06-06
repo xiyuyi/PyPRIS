@@ -4,6 +4,10 @@ import copy
 import pickle
 import joblib
 import matplotlib
+from collections import Counter
+import linecache
+import os
+import tracemalloc
 
 try:
     from matplotlib import pyplot as plt
@@ -36,6 +40,33 @@ class PyPRIS:
         self.ifsave = True
         self.path_s = "./saved_objects"
         self.expansion = False
+        self.memory_profiler = False
+        
+    def display_top(self, snapshot, key_type='lineno', limit=10):
+        with open("{}/PyPRIS_pris{}_mem.file \n".format(self.path_s, self.current_PRIS_ItN), "w") as f:
+            snapshot = snapshot.filter_traces((
+                tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
+                tracemalloc.Filter(False, "<unknown>"),
+            ))
+            top_stats = snapshot.statistics(key_type)
+
+            f.write("Top %s lines \n" % limit)
+            for index, stat in enumerate(top_stats[:limit], 1):
+                frame = stat.traceback[0]
+                # replace "/path/to/module/file.py" with "module/file.py"
+                filename = os.sep.join(frame.filename.split(os.sep)[-2:])
+                f.write("#%s: %s:%s: %.1f KiB \n"
+              % (index, filename, frame.lineno, stat.size / 1024))
+                line = linecache.getline(frame.filename, frame.lineno).strip()
+                if line:
+                    f.write('    %s \n' % line)
+
+            other = top_stats[limit:]
+            if other:
+                size = sum(stat.size for stat in other)
+                f.write("%s other: %.1f KiB \n" % (len(other), size / 1024))
+            total = sum(stat.size for stat in top_stats)
+            f.write("Total allocated size: %.1f KiB \n" % (total / 1024))
 
     def save(self):
         import os
