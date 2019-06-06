@@ -124,8 +124,16 @@ if len(mxnames) is not 0:
         linbreg.A = joblib.load(s)
     #
     pypris = loadPyPRIS(path, 'PyPRIS_pris{}'.format(linbreg.PyPRIS_iter[4:]))
+        
     # set a check mark for pypris:
     pypris.set_check_mark()
+    
+    # set if we want memory profiler to be on or off
+    pypris.memory_profiler = True
+    
+    if pypris.memory_profiler is True:
+        tracemalloc.start()
+    
     # put the configured observer to the pypris to perform the tasks of 'observe_biplane'
     # when a pypris object observes, it is through the observer and it is
     # done with the observer's observe_biplane skill (skill = method).
@@ -145,6 +153,9 @@ if len(mxnames) is not 0:
     print("---------------- PRIS refinement #" + str(Iter) + " ------------------")
     print("")
     linbreg.go()
+    if pypris.memory_profiler is True:
+        snapshot = tracemalloc.take_snapshot()
+        pypris.display_top(snapshot)
 else:
     print("PyPRIS Begin!")
     print("")
@@ -158,6 +169,13 @@ else:
     #
     # get a PyPRIS object:
     pypris = PyPRIS()
+    
+    # set if we want memory profiler to be on or off
+    pypris.memory_profiler = True
+    
+    if pypris.memory_profiler is True:
+        tracemalloc.start()
+        
     pypris.observation = blur.ravel()
     pypris.current_candidates_intervals = ticket.init_candidates_intervals  # initialize the first intervals of neighboring candidate voxels.
     #
@@ -217,6 +235,11 @@ else:
     linbreg.get_ready()
     linbreg.go()
     Iter=0
+    
+    # Saves top 10 memory snapshots at current PyPRIS iteration into saved_objects folder 
+    if pypris.memory_profiler is True:
+        snapshot = tracemalloc.take_snapshot()
+        pypris.display_top(snapshot)
 
 # now continue the pris iterations
 # construct sensing matrix
@@ -263,3 +286,7 @@ for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
     # recover
     linbreg.get_ready()
     linbreg.go()
+    
+    if pypris.memory_profiler is True:
+        snapshot = tracemalloc.take_snapshot()
+        pypris.display_top(snapshot)
