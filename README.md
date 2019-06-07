@@ -58,7 +58,7 @@ Examples include *prep_for_hoffman2_Feature2.py* and *prep_for_hoffman2_feature3
   * Turn on or off **memory profiling options** in *pris* file 
       * Line 133: if a previously saved PyPRIS object already exists 
       * Line 178: for new calculations
-      * Top 10 memory usages by line for each PyPRIS iteration will be saved in the saved_objects folder under the name *PyPRIS_*_mem.file*
+      * Top 10 memory usages by line for each PyPRIS iteration will be saved in the saved_objects folder under the name *PyPRIS_*_mem.file*. To see a sample output, please check *sample_memprof_output.file*.
   * To ensure the *pris* file, the ticket files and the associated file folders are readable, writable and executable, use `chmod -R u+rwx * `
   * **Perform single job test!** This is extremley important. Test with a single job first, as if you fail a big batch of jobs, your priority will be reduced in the queue.
       * If any error arises, open an interactive session to debug on the server by activating an interactive Python session. To initiate such session from the terminal on Hoffman2 (recommended to use PuTTY), type `Python`
