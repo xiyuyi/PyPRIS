@@ -128,8 +128,11 @@ if len(mxnames) is not 0:
     # set a check mark for pypris:
     pypris.set_check_mark()
     
-    # set if we want memory profiler to be on or off
+    # ----------- **** Memory Profiler Setting for Existing PRIS *** ------------
+    
     pypris.memory_profiler = True
+    
+    # ---------------------------------------------------------------------------
     
     if pypris.memory_profiler is True:
         tracemalloc.start()
@@ -170,8 +173,11 @@ else:
     # get a PyPRIS object:
     pypris = PyPRIS()
     
-    # set if we want memory profiler to be on or off
+    # ----------- **** Memory Profiler Setting for New PRIS *** ------------
+    
     pypris.memory_profiler = True
+    
+    # ----------------------------------------------------------------------
     
     if pypris.memory_profiler is True:
         tracemalloc.start()
