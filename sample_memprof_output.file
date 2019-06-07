@@ -1,0 +1,23 @@
+Top 10 lines 
+#1: joblib/numpy_pickle.py:141: 10236774.6 KiB 
+    array = unpickler.np.empty(count, dtype=self.dtype) 
+#2: PyPRIS/PRIS.py:616: 2217.1 KiB 
+    self.bg.append(self.x[self.x.size - 1]) 
+#3: PyPRIS/PRIS.py:613: 2217.1 KiB 
+    /self.hist_res[it_count - 1] \ 
+#4: PyPRIS/PRIS.py:610: 2217.1 KiB 
+    self.hist_delta_res.append((self.hist_res[it_count] - self.hist_res[it_count - 1])) 
+#5: PyPRIS/PRIS.py:341: 1585.9 KiB 
+    self.it_count += 1 
+#6: linalg/linalg.py:2360: 1495.3 KiB 
+    ret = sqrt(sqnorm) 
+#7: PyPRIS/PRIS.py:377: 1015.9 KiB 
+    self.x = self.alpha * self.shrink(self.x) 
+#8: PyPRIS/PRIS.py:350: 1015.4 KiB 
+    self.respj = np.dot(self.res, self.A) 
+#9: core/numeric.py:203: 1015.4 KiB 
+    a = empty(shape, dtype, order) 
+#10: PyPRIS/PRIS.py:609: 858.2 KiB 
+    self.hist_res.append(np.linalg.norm(res)) 
+44 other: 1827.4 KiB 
+Total allocated size: 10252239.4 KiB 
