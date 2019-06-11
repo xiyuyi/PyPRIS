@@ -9,12 +9,20 @@ import os
 ticket = TwoChannelTicket()
 
 "where to find the data files, for both blur and observation"
+
 paths = []
 paths.append('/u/scratch/x/xiyuyi/EPFL_BP/test_dataset_4')
+paths.append('/u/scratch/x/xiyuyi/EPFL_BP/test_dataset_4')
+paths.append('/u/scratch/x/xiyuyi/EPFL_BP/test_dataset_4')
+paths.append('/u/scratch/x/xiyuyi/EPFL_BP/test_dataset_4')
+paths.append('/u/scratch/x/xiyuyi/EPFL_BP/test_dataset_4')
+
 ax0_ranges = []
-ax0_ranges.append(list([-60, 55]))
+ax0_ranges.append(list([-60, 60]))
+
+
 ticket_folders = []
-ticket_folders.append('PyPRIS_EPFL_BP_binall_hoffman2_set2_precise')
+ticket_folders.append('PyPRIS_EPFL_BP_binall_hoffman2_set4')
 
 for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders):
     "the name of this pris ticket"
@@ -25,8 +33,8 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.datapath = datapath
     ticket.blur_path_channel_1 = "{}/BP+250_binAll.tif".format(ticket.datapath)
     ticket.blur_path_channel_2 = "{}/BP-250_binAll.tif".format(ticket.datapath)
-    ticket.psf_path_channel_1 = "{}/psf_BP+250.tif".format(ticket.datapath)
-    ticket.psf_path_channel_2 = "{}/psf_BP-250.tif".format(ticket.datapath)
+    ticket.psf_path_channel_1 = "{}/trimmed_psf_BP+250.tif".format(ticket.datapath)
+    ticket.psf_path_channel_2 = "{}/trimmed_psf_BP-250.tif".format(ticket.datapath)
     ticket.psf_norm_factor = 10000
 
     "specification of the psf stack"
@@ -34,7 +42,8 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.observer_edge_padding = True
 
     "configure the initial candidate pool of this pris ticket"
-    ticket.init_candidates_intervals = list([1, 3, 3])
+    ticket.init_candidates_intervals = list([1, 4, 4])
+    ticket.init_ax0_range = ax0_range
     ticket.init_ax1_range = list([1, 64])
     ticket.init_ax2_range = list([1, 64])
 
@@ -51,7 +60,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.linbreg_alpha.deep_debug = False
     "ticket.linbreg_alpha.mu = 1000000000"  # move to loop
     "ticket.linbreg_alpha.alpha = 1e-11"  # move to loop
-    ticket.linbreg_alpha.maxit = 400000
+    ticket.linbreg_alpha.maxit = 50000
     ticket.linbreg_alpha.it_check_rem = 1
     ticket.linbreg_alpha.debug_it_int = 500
     ticket.linbreg_alpha.kick.ints = 1000
@@ -65,7 +74,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     "ticket.linbreg_alpha.PyPRIS_name = ticket.name"  # moved to loop
     ticket.linbreg_alpha.path_0 = '.'
     "ticket.bg_scaling_coef = 1.5 "  # moved to loop
-    ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -13
+    ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -11
 
     "others"
     ticket.PRIS_iter_end = 8
@@ -80,7 +89,9 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
         for mu in list([1e8]):
             for alpha in list([1e-5]):
                 ticket_new = copy.deepcopy(ticket)
-                ticket_new.name = "bgSCF" + str(bgSCF) + "_mu" + str("%1.1e" % mu) + "_alpha" + str("%1.1e" % alpha)
+                ticket_new.name = "bgSCF" + str(bgSCF) + "_mu" + str("%1.1e" % mu) + "_alpha" + str("%1.1e" % alpha) + "_thres" + \
+                                  str(ticket.linbreg_alpha.stopping_loghistpercdelres_thres) + "zrange" + str(ticket.init_ax0_range[0])\
+                                  +"to"+str(ticket.init_ax0_range[1])
                 ticket_new.bg_scaling_coef = copy.deepcopy(bgSCF)
                 ticket_new.linbreg_alpha.PyPRIS_name = ticket_new.name
                 ticket_new.linbreg_alpha.mu = mu
