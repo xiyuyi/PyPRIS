@@ -12,17 +12,13 @@ ticket = TwoChannelTicket()
 
 paths = []
 paths.append('/u/scratch/x/xiyuyi/EPFL_BP/test_dataset_4')
-paths.append('/u/scratch/x/xiyuyi/EPFL_BP/test_dataset_4')
-paths.append('/u/scratch/x/xiyuyi/EPFL_BP/test_dataset_4')
-paths.append('/u/scratch/x/xiyuyi/EPFL_BP/test_dataset_4')
-paths.append('/u/scratch/x/xiyuyi/EPFL_BP/test_dataset_4')
 
 ax0_ranges = []
 ax0_ranges.append(list([-60, 60]))
 
 
 ticket_folders = []
-ticket_folders.append('PyPRIS_EPFL_BP_binall_hoffman2_set4')
+ticket_folders.append('PyPRIS_EPFL_BP_binall_hoffman2_set7')
 
 for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders):
     "the name of this pris ticket"
@@ -33,8 +29,8 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.datapath = datapath
     ticket.blur_path_channel_1 = "{}/BP+250_binAll.tif".format(ticket.datapath)
     ticket.blur_path_channel_2 = "{}/BP-250_binAll.tif".format(ticket.datapath)
-    ticket.psf_path_channel_1 = "{}/trimmed_psf_BP+250.tif".format(ticket.datapath)
-    ticket.psf_path_channel_2 = "{}/trimmed_psf_BP-250.tif".format(ticket.datapath)
+    ticket.psf_path_channel_1 = "{}/trimmed2_psf_BP+250.tif".format(ticket.datapath)
+    ticket.psf_path_channel_2 = "{}/trimmed2_psf_BP-250.tif".format(ticket.datapath)
     ticket.psf_norm_factor = 10000
 
     "specification of the psf stack"
@@ -86,8 +82,8 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
         pass
 
     for bgSCF in list([2]):
-        for mu in list([1e8]):
-            for alpha in list([1e-5]):
+        for mu in list([1e7]):
+            for alpha in list([1e-7]):
                 ticket_new = copy.deepcopy(ticket)
                 ticket_new.name = "bgSCF" + str(bgSCF) + "_mu" + str("%1.1e" % mu) + "_alpha" + str("%1.1e" % alpha) + "_thres" + \
                                   str(ticket.linbreg_alpha.stopping_loghistpercdelres_thres) + "zrange" + str(ticket.init_ax0_range[0])\

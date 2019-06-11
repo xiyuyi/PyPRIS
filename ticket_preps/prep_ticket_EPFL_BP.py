@@ -35,7 +35,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.observer_edge_padding = True
 
     "configure the initial candidate pool of this pris ticket"
-    ticket.init_candidates_intervals = list([1, 3, 3])
+    ticket.init_candidates_intervals = list([1, 4, 4])
     ticket.init_ax0_range = list([-60, 60])
     ticket.init_ax1_range = list([1, 64])
     ticket.init_ax2_range = list([1, 64])
@@ -55,12 +55,12 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     "ticket.linbreg_alpha.alpha = 1e-11"  # move to loop
     ticket.linbreg_alpha.maxit = 50000
     ticket.linbreg_alpha.it_check_rem = 1
-    ticket.linbreg_alpha.debug_it_int = 500
+    ticket.linbreg_alpha.debug_it_int = 100
     ticket.linbreg_alpha.kick.ints = 1000
     ticket.linbreg_alpha.kick.eval_ints = 10
     ticket.linbreg_alpha.kick.flag = True
     ticket.linbreg_alpha.kick.thres = 0.01
-    ticket.linbreg_alpha.save_obj_int = 1000
+    ticket.linbreg_alpha.save_obj_int = 3000
     ticket.linbreg_alpha.save = True
     ticket.expansion = False
     ticket.linbreg_alpha.PyPRIS_iter = 0
