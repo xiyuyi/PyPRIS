@@ -12,9 +12,9 @@ ticket = TwoChannelTicket()
 paths = []
 paths.append('/u/scratch/x/xiyuyi/EPFL_BP/test_dataset_4')
 ax0_ranges = []
-ax0_ranges.append(list([-60, 60]))
+ax0_ranges.append(list([-60, 55]))
 ticket_folders = []
-ticket_folders.append('PyPRIS_EPFL_BP_100Bin_hoffman2')
+ticket_folders.append('PyPRIS_EPFL_BP_binall_hoffman2_set2_precise')
 
 for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders):
     "the name of this pris ticket"
@@ -23,8 +23,8 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     "where to find the data files, for both blur and observation"
     # need to modify these default values with a prepared test dataset.
     ticket.datapath = datapath
-    ticket.blur_path_channel_1 = "{}/BP+250_100Bin.tif".format(ticket.datapath)
-    ticket.blur_path_channel_2 = "{}/BP-250_100Bin.tif".format(ticket.datapath)
+    ticket.blur_path_channel_1 = "{}/BP+250_binAll.tif".format(ticket.datapath)
+    ticket.blur_path_channel_2 = "{}/BP-250_binAll.tif".format(ticket.datapath)
     ticket.psf_path_channel_1 = "{}/psf_BP+250.tif".format(ticket.datapath)
     ticket.psf_path_channel_2 = "{}/psf_BP-250.tif".format(ticket.datapath)
     ticket.psf_norm_factor = 10000
@@ -35,7 +35,6 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
 
     "configure the initial candidate pool of this pris ticket"
     ticket.init_candidates_intervals = list([1, 3, 3])
-    ticket.init_ax0_range = list([-75, 75])
     ticket.init_ax1_range = list([1, 64])
     ticket.init_ax2_range = list([1, 64])
 
@@ -77,9 +76,9 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     except OSError:
         pass
 
-    for bgSCF in list([2, 5]):
-        for mu in list([5e6, 1e7, 5e7, 1e8]):
-            for alpha in list([1e-4, 1e-5, 1e-6]):
+    for bgSCF in list([2]):
+        for mu in list([1e8]):
+            for alpha in list([1e-5]):
                 ticket_new = copy.deepcopy(ticket)
                 ticket_new.name = "bgSCF" + str(bgSCF) + "_mu" + str("%1.1e" % mu) + "_alpha" + str("%1.1e" % alpha)
                 ticket_new.bg_scaling_coef = copy.deepcopy(bgSCF)
