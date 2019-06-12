@@ -14,7 +14,7 @@ paths.append('G:\\DH_localization\\EPFL_datasets\\N2')
 ax0_ranges = []
 ax0_ranges.append(list([-60, 60]))
 ticket_folders = []
-ticket_folders.append('PyPRIS_EPFL_BP_binAll_set6')
+ticket_folders.append('PyPRIS_EPFL_BP_binAll_set8')
 
 for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders):
     "the name of this pris ticket"
@@ -60,14 +60,14 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.linbreg_alpha.kick.eval_ints = 10
     ticket.linbreg_alpha.kick.flag = True
     ticket.linbreg_alpha.kick.thres = 0.01
-    ticket.linbreg_alpha.save_obj_int = 3000
+    ticket.linbreg_alpha.save_obj_int = 100
     ticket.linbreg_alpha.save = True
     ticket.expansion = False
     ticket.linbreg_alpha.PyPRIS_iter = 0
     "ticket.linbreg_alpha.PyPRIS_name = ticket.name"  # moved to loop
     ticket.linbreg_alpha.path_0 = '.'
     "ticket.bg_scaling_coef = 1.5 "  # moved to loop
-    ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -12
+    ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -11
 
     "others"
     ticket.PRIS_iter_end = 8
@@ -79,8 +79,8 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
         pass
 
     for bgSCF in list([2]):
-        for mu in list([5e6]):
-            for alpha in list([1e-7]):
+        for mu in list([5e7]):
+            for alpha in list([5e-8]):
                 ticket_new = copy.deepcopy(ticket)
                 ticket_new.name = "bgSCF" + str(bgSCF) + "_mu" + str("%1.1e" % mu) + "_alpha" + str("%1.1e" % alpha) + "_thres" + \
                                   str(ticket.linbreg_alpha.stopping_loghistpercdelres_thres) + "zrange" + str(ticket.init_ax0_range[0])\

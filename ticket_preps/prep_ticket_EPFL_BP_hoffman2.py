@@ -29,8 +29,8 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.datapath = datapath
     ticket.blur_path_channel_1 = "{}/BP+250_binAll.tif".format(ticket.datapath)
     ticket.blur_path_channel_2 = "{}/BP-250_binAll.tif".format(ticket.datapath)
-    ticket.psf_path_channel_1 = "{}/trimmed2_psf_BP+250.tif".format(ticket.datapath)
-    ticket.psf_path_channel_2 = "{}/trimmed2_psf_BP-250.tif".format(ticket.datapath)
+    ticket.psf_path_channel_1 = "{}/rmbg_psf_BP+250.tif".format(ticket.datapath)
+    ticket.psf_path_channel_2 = "{}/rmbg_psf_BP-250.tif".format(ticket.datapath)
     ticket.psf_norm_factor = 10000
 
     "specification of the psf stack"
@@ -56,7 +56,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.linbreg_alpha.deep_debug = False
     "ticket.linbreg_alpha.mu = 1000000000"  # move to loop
     "ticket.linbreg_alpha.alpha = 1e-11"  # move to loop
-    ticket.linbreg_alpha.maxit = 50000
+    ticket.linbreg_alpha.maxit = 20000
     ticket.linbreg_alpha.it_check_rem = 1
     ticket.linbreg_alpha.debug_it_int = 500
     ticket.linbreg_alpha.kick.ints = 1000
@@ -82,8 +82,8 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
         pass
 
     for bgSCF in list([2]):
-        for mu in list([1e7]):
-            for alpha in list([1e-7]):
+        for mu in list([5e7]):
+            for alpha in list([1e-9, 5e-9, 1e-8, 5e-8,1e-7]):
                 ticket_new = copy.deepcopy(ticket)
                 ticket_new.name = "bgSCF" + str(bgSCF) + "_mu" + str("%1.1e" % mu) + "_alpha" + str("%1.1e" % alpha) + "_thres" + \
                                   str(ticket.linbreg_alpha.stopping_loghistpercdelres_thres) + "zrange" + str(ticket.init_ax0_range[0])\
