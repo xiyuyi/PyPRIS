@@ -1,3 +1,5 @@
+from cmath import nan
+
 import numpy as np
 from scipy import interpolate
 
@@ -238,4 +240,25 @@ class ObserveStation:
 
         # Now returns the combined observations from two channels
         observation = np.concatenate([self.channel_observer_1.observation, self.channel_observer_2.observation]).ravel()
+        return observation
+
+    def observe_with_CL_prep(self, psf, single_iamge_size,
+                        x_dist_amplitd, x_dist_shift,
+                        y_dist_amplitd, y_dist_shift,
+                        observer_debugger, observer_edge_padding):
+        return nan
+
+    def observe_with_CL(self, loc):
+        return observation
+        return observation
+
+    def observe_with_grating_prep(self, psf, single_iamge_size,
+                        x_dist_shift, y_dist_shift,
+                        observer_debugger, observer_edge_padding):
+        # the grating doesn't cause field distortion, but causes translation based on the alignment
+        # and the cropping of the image from the raw data.
+        # such translation movement needs to be characterized from the experimental data and fed into this observer.
+        self.grating_observer.debug = observer_debugger
+
+    def observe_with_grating(self, loc):
         return observation
