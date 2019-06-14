@@ -18,7 +18,7 @@ ax0_ranges.append(list([-60, 60]))
 
 
 ticket_folders = []
-ticket_folders.append('PyPRIS_EPFL_BP_binall_hoffman2_set7')
+ticket_folders.append('PyPRIS_EPFL_BP_binall_hoffman2_set8')
 
 for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders):
     "the name of this pris ticket"
@@ -82,8 +82,8 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
         pass
 
     for bgSCF in list([2]):
-        for mu in list([5e7]):
-            for alpha in list([1e-9, 5e-9, 1e-8, 5e-8,1e-7]):
+        for mu in list([1e8]):
+            for alpha in list([1e-5, 5e-6, 1e-6]):
                 ticket_new = copy.deepcopy(ticket)
                 ticket_new.name = "bgSCF" + str(bgSCF) + "_mu" + str("%1.1e" % mu) + "_alpha" + str("%1.1e" % alpha) + "_thres" + \
                                   str(ticket.linbreg_alpha.stopping_loghistpercdelres_thres) + "zrange" + str(ticket.init_ax0_range[0])\
