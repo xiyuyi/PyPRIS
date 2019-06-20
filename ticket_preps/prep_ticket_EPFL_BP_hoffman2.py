@@ -18,7 +18,7 @@ ax0_ranges.append(list([-60, 60]))
 
 
 ticket_folders = []
-ticket_folders.append('PyPRIS_EPFL_BP_binall_hoffman2_set8')
+ticket_folders.append('PyPRIS_EPFL_BP_binall_hoffman2_set9')
 
 for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders):
     "the name of this pris ticket"
@@ -29,8 +29,8 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.datapath = datapath
     ticket.blur_path_channel_1 = "{}/BP+250_binAll.tif".format(ticket.datapath)
     ticket.blur_path_channel_2 = "{}/BP-250_binAll.tif".format(ticket.datapath)
-    ticket.psf_path_channel_1 = "{}/rmbg_psf_BP+250.tif".format(ticket.datapath)
-    ticket.psf_path_channel_2 = "{}/rmbg_psf_BP-250.tif".format(ticket.datapath)
+    ticket.psf_path_channel_1 = "{}/psf_BP+250.tif".format(ticket.datapath)
+    ticket.psf_path_channel_2 = "{}/psf_BP-250.tif".format(ticket.datapath)
     ticket.psf_norm_factor = 10000
 
     "specification of the psf stack"
@@ -56,7 +56,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.linbreg_alpha.deep_debug = False
     "ticket.linbreg_alpha.mu = 1000000000"  # move to loop
     "ticket.linbreg_alpha.alpha = 1e-11"  # move to loop
-    ticket.linbreg_alpha.maxit = 20000
+    ticket.linbreg_alpha.maxit = 40000
     ticket.linbreg_alpha.it_check_rem = 1
     ticket.linbreg_alpha.debug_it_int = 500
     ticket.linbreg_alpha.kick.ints = 1000
@@ -70,7 +70,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     "ticket.linbreg_alpha.PyPRIS_name = ticket.name"  # moved to loop
     ticket.linbreg_alpha.path_0 = '.'
     "ticket.bg_scaling_coef = 1.5 "  # moved to loop
-    ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -11
+    ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -15
 
     "others"
     ticket.PRIS_iter_end = 8
@@ -81,9 +81,9 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     except OSError:
         pass
 
-    for bgSCF in list([2]):
-        for mu in list([1e8]):
-            for alpha in list([1e-5, 5e-6, 1e-6]):
+    for bgSCF in list([6]):
+        for mu in list([1e8, 1e7, 1e6]):
+            for alpha in list([1e-5, 5e-6, 1e-6, 5e-7, 1e-7]):
                 ticket_new = copy.deepcopy(ticket)
                 ticket_new.name = "bgSCF" + str(bgSCF) + "_mu" + str("%1.1e" % mu) + "_alpha" + str("%1.1e" % alpha) + "_thres" + \
                                   str(ticket.linbreg_alpha.stopping_loghistpercdelres_thres) + "zrange" + str(ticket.init_ax0_range[0])\

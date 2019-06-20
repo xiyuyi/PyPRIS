@@ -243,8 +243,8 @@ class ObserveStation:
         return observation
 
     def observe_with_CL_prep(self, psf, single_iamge_size,
-                        x_dist_amplitd, x_dist_shift,
-                        y_dist_amplitd, y_dist_shift,
+                        dist_x_amplitd, dist_x_shift,
+                        dist_y_amplitd, dist_y_shift,
                         observer_debugger, observer_edge_padding):
         return nan
 
@@ -253,7 +253,7 @@ class ObserveStation:
         return observation
 
     def observe_with_grating_prep(self, psf, single_iamge_size,
-                        x_dist_shift, y_dist_shift,
+                        x_shift, y_shift,
                         observer_debugger, observer_edge_padding):
         # the grating doesn't cause field distortion, but causes translation based on the alignment
         # and the cropping of the image from the raw data.

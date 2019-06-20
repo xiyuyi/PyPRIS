@@ -14,7 +14,7 @@ paths.append('G:\\DH_localization\\EPFL_datasets\\N2')
 ax0_ranges = []
 ax0_ranges.append(list([-60, 60]))
 ticket_folders = []
-ticket_folders.append('PyPRIS_EPFL_BP_binAll_set8')
+ticket_folders.append('PyPRIS_EPFL_BP_binAll_set9')
 
 for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders):
     "the name of this pris ticket"
@@ -26,9 +26,9 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.datapath = 'G:\\DH_localization\\PyPRIS\\test_dataset_4'
     ticket.blur_path_channel_1 = "{}/BP+250_binAll.tif".format(ticket.datapath)
     ticket.blur_path_channel_2 = "{}/BP-250_binAll.tif".format(ticket.datapath)
-    ticket.psf_path_channel_1 = "{}/rmbg_psf_BP+250.tif".format(ticket.datapath)
-    ticket.psf_path_channel_2 = "{}/rmbg_psf_BP-250.tif".format(ticket.datapath)
-    ticket.psf_norm_factor = 100
+    ticket.psf_path_channel_1 = "{}/psf_BP+250.tif".format(ticket.datapath)
+    ticket.psf_path_channel_2 = "{}/psf_BP-250.tif".format(ticket.datapath)
+    ticket.psf_norm_factor = 10000
 
     "specification of the psf stack"
     ticket.psfz0 = 76  # the count of the center plane, define it as z=0 in the psf coordinates system.
@@ -53,21 +53,21 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.linbreg_alpha.deep_debug = False
     "ticket.linbreg_alpha.mu = 1000000000"  # move to loop
     "ticket.linbreg_alpha.alpha = 1e-11"  # move to loop
-    ticket.linbreg_alpha.maxit = 50000
+    ticket.linbreg_alpha.maxit = 80000
     ticket.linbreg_alpha.it_check_rem = 1
     ticket.linbreg_alpha.debug_it_int = 100
     ticket.linbreg_alpha.kick.ints = 1000
     ticket.linbreg_alpha.kick.eval_ints = 10
     ticket.linbreg_alpha.kick.flag = True
     ticket.linbreg_alpha.kick.thres = 0.01
-    ticket.linbreg_alpha.save_obj_int = 100
+    ticket.linbreg_alpha.save_obj_int = 1000
     ticket.linbreg_alpha.save = True
     ticket.expansion = False
     ticket.linbreg_alpha.PyPRIS_iter = 0
     "ticket.linbreg_alpha.PyPRIS_name = ticket.name"  # moved to loop
     ticket.linbreg_alpha.path_0 = '.'
     "ticket.bg_scaling_coef = 1.5 "  # moved to loop
-    ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -11
+    ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -15
 
     "others"
     ticket.PRIS_iter_end = 8
@@ -78,7 +78,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     except OSError:
         pass
 
-    for bgSCF in list([2]):
+    for bgSCF in list([12]):
         for mu in list([1e8]):
             for alpha in list([1e-5]):
                 ticket_new = copy.deepcopy(ticket)
