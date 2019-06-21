@@ -13,6 +13,7 @@ class ObserveStation:
         self.channel_observer_2 = None
         self.channel_observer_3 = None
         self.channel_observer_4 = None
+        self.dist = None
 
     class SingleObs:
         
@@ -242,15 +243,33 @@ class ObserveStation:
         observation = np.concatenate([self.channel_observer_1.observation, self.channel_observer_2.observation]).ravel()
         return observation
 
-    def observe_with_CL_prep(self, psf, single_iamge_size,
-                        dist_x_amplitd, dist_x_shift,
-                        dist_y_amplitd, dist_y_shift,
+    def observe_with_CL_prep(self, psf, single_iamge_size, psfz0,
+                        dist_1_amplitd, dist_1_shift,
+                        dist_2_amplitd, dist_2_shift,
                         observer_debugger, observer_edge_padding):
+        self.observer_with_CL = self.SingleObs()  # this is the child class.
+        self.observer_with_CL.psf = np.copy(psf)
+        self.observer_with_CL.imsize = single_iamge_size  # this should be the image size of the single plane observation
+        self.observer_with_CL.psfz0 = psfz0
+        self.observer_with_CL.debug = observer_debugger
+        self.observer_with_CL.edge_padding = observer_edge_padding
+        self.dist.A1 = dist_1_amplitd
+        self.dist.S1 = dist_1_shift
+        self.dist.A2 = dist_2_amplitd
+        self.dist.S2 = dist_2_shift
         return nan
 
     def observe_with_CL(self, loc):
-        return observation
-        return observation
+        # update loc to incorporate field distortion and alignment
+        # get an observer to observe with updated location coordiantes
+        # self.channel_observer_2 = self.SingleObs()
+        loc_shifted = copy.deepcopy(loc)
+        loc_shifted[1] = loc[1]*self.dist.A1 + self.dist.S1# update location based on field distortion parameters.
+        loc_shifted[2] = loc[2]*self.dist.A2 + self.dist.S2# update location based on field distortion parameters.
+        self.observer_with_CL.location = loc_shifted  # focus at the position
+        self.observer_with_CL.single_obs()  # take the observation
+        self.observer_with_CL.observation = self.observer_with_CL.obs.ravel()  # record this first observation
+        return self.observer_with_CL.observation
 
     def observe_with_grating_prep(self, psf, single_iamge_size,
                         x_shift, y_shift,
