@@ -1,5 +1,5 @@
 from cmath import nan
-
+import copy
 import numpy as np
 from scipy import interpolate
 
@@ -255,10 +255,10 @@ class ObserveStation:
         self.observer_with_CL.psfz0 = psfz0
         self.observer_with_CL.debug = observer_debugger
         self.observer_with_CL.edge_padding = observer_edge_padding
-        self.dist.CL_A1 = dist_1_amplitd
-        self.dist.CL_S1 = dist_1_shift
-        self.dist.CL_A2 = dist_2_amplitd
-        self.dist.CL_S2 = dist_2_shift
+        self.CL_A1 = dist_1_amplitd
+        self.CL_S1 = dist_1_shift
+        self.CL_A2 = dist_2_amplitd
+        self.CL_S2 = dist_2_shift
         return nan
 
     def observe_with_CL(self, loc):
@@ -266,8 +266,8 @@ class ObserveStation:
         # get an observer to observe with updated location coordiantes
         # self.channel_observer_2 = self.SingleObs()
         loc_shifted = copy.deepcopy(loc)
-        loc_shifted[1] = loc[1]*self.dist.CL_A1 + self.dist.CL_S1# update location based on field distortion parameters.
-        loc_shifted[2] = loc[2]*self.dist.CL_A2 + self.dist.CL_S2# update location based on field distortion parameters.
+        loc_shifted[1] = loc[1]*self.CL_A1 + self.CL_S1# update location based on field distortion parameters.
+        loc_shifted[2] = loc[2]*self.CL_A2 + self.CL_S2# update location based on field distortion parameters.
         self.observer_with_CL.location = loc_shifted  # focus at the position
         self.observer_with_CL.single_obs()  # take the observation
         self.observer_with_CL.observation = self.observer_with_CL.obs.ravel()  # record this first observation

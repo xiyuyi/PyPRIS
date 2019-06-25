@@ -6,12 +6,12 @@ from PyPRIS import *
 import copy
 import os
 
-ticket = SinglePlaneTicket()
+ticket = SingleCLTicket()
 # put field distortion parameters here. caused by CL:
 # fitted parameters from pre-processing steps using pinhole array
 ticket.distortion_1_amp = 1
 ticket.distortion_1_shift = 0.922
-ticket.distortion_2_amp = 0.813 
+ticket.distortion_2_amp = 0.813
 ticket.distortion_2_shift = 9.459
 
 "where to find the data files, for both blur and observation"
