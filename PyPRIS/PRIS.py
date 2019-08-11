@@ -32,7 +32,6 @@ class PyPRIS:
         self.hist_candidates_intervals = list()  # keep a record of the full history.
         self.hist_PRIS_ItN = list()
         self.hist_check_mark_id = list()  # checkmark ID. ascending each time after you make a check_mark
-        self.observator = None  # this should be a function that needs to be defined.
         
         self.ifsave = True
         self.path_s = "./saved_objects"
