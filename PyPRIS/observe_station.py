@@ -285,17 +285,17 @@ class ObserveStation:
         self.observer_with_shift.psfz0 = psfz0
         self.observer_with_shift.debug = observer_debugger
         self.observer_with_shift.edge_padding = observer_edge_padding
-        self.dist.shift_1 = shift_1
-        self.dist.shift_2 = shift_2
+        self.shift_1 = shift_1
+        self.shift_2 = shift_2
         self.observer_with_shift.debug = observer_debugger
 
     def observe_with_shift(self, loc):
         loc_shifted = copy.deepcopy(loc)
-        loc_shifted[1] = loc[1] + self.dist.shift_1 # update location based on field translation parameters.
-        loc_shifted[2] = loc[2] + self.dist.shift_2 # update location based on field translation parameters.
+        loc_shifted[1] = copy.deepcopy(loc[1] + self.shift_1) # update location based on field translation parameters.
+        loc_shifted[2] = copy.deepcopy(loc[2] + self.shift_2) # update location based on field translation parameters.
         self.observer_with_shift.location = loc_shifted  # focus at the position
-        self.observer_with_shift.single_obs()  # take the observation
-        self.observer_with_shift.observation = self.observer_with_shift.obs.ravel()  # record this first observation
+        self.observer_with_shift.single_obs()  # take the observation, this will generate the obs attribute used below.
+        self.observer_with_shift.observation = self.observer_with_shift.obs.ravel()  # record this observation
         return self.observer_with_shift.observation
 
     def observe_with_CL_and_grating_prep(self,  psf_CL, imsize_CL, psfz0_CL,
