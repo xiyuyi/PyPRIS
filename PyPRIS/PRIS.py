@@ -109,7 +109,18 @@ class PyPRIS:
 
         # set a check mark for tracking purposes.
         self.set_check_mark()
-
+        
+    def candidate_pop(self, thres=0, cs_solver)
+        """
+        pop out candidates with amplitudes below or equal to the threshold.
+        """
+        # Note: 
+        # maitain the separation of pypris from the cs_solver type. 
+        # don't modify cs_solver in pypris methods. 
+        survival_inds = np.argwhere(cs_solver.x[0:len(cs_solver.x) - 1] > thres)
+        survival_coordinates = [self.current_candidates[i] for i in list(survival_inds.ravel())]
+        self.current_candidates = copy.deepcopy(survival_coordinates)
+        
     def generate_sensing_mx(self):
         print("----------- Generate sensing matrix:")
         print("            Matrix size:",str(len(self.observation)),' observation pixels ')
