@@ -110,7 +110,7 @@ class PyPRIS:
         # set a check mark for tracking purposes.
         self.set_check_mark()
         
-    def candidate_pop(self, thres=0, cs_solver)
+    def candidate_pop(self, thres=0, cs_solver):
         """
         pop out candidates with amplitudes below or equal to the threshold.
         """
