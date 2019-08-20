@@ -4,6 +4,7 @@ import copy
 import pickle
 import joblib
 import matplotlib
+from PyPRIS.candidate_screening import *
 
 try:
     from matplotlib import pyplot as plt
@@ -31,7 +32,6 @@ class PyPRIS:
         self.hist_candidates_intervals = list()  # keep a record of the full history.
         self.hist_PRIS_ItN = list()
         self.hist_check_mark_id = list()  # checkmark ID. ascending each time after you make a check_mark
-        self.observator = None  # this should be a function that needs to be defined.
         
         self.ifsave = True
         self.path_s = "./saved_objects"
@@ -109,6 +109,19 @@ class PyPRIS:
 
         # set a check mark for tracking purposes.
         self.set_check_mark()
+        
+    def candidate_pop(self, cs_solver, thres=0):
+        """
+        pop out candidates with amplitudes below or equal to the threshold.
+        """
+        # Note: 
+        # maitain the separation of pypris from the cs_solver type. 
+        # don't modify cs_solver in pypris methods. 
+        survival_inds = np.argwhere(cs_solver.x[0:len(cs_solver.x) - 1] > thres)
+        if len(survival_inds)>0:
+            survival_coordinates = [self.current_candidates[i] for i in list(survival_inds.ravel())]
+            self.current_candidates = copy.deepcopy(survival_coordinates)
+            self.survival_inds = survival_inds
 
     def generate_sensing_mx(self):
         print("----------- Generate sensing matrix:")
@@ -233,23 +246,44 @@ class LinBreg:
     # this will take the current candidates and the result in the compressive sensing solver object,
     # and generate  pool of candidates.        
         vis1 = self.candidate_vis()
-        # Apply the mask to current recovery result
-        vis1 += mask
-        # Get rid of extra signals
-        vis1[np.where(vis1<1)] = 0
-        # Remove mask
-        vis1 -= mask
-        # Update masked result in CS Solver
+
+        # when the mask value is 1, don't change the value. when the mask value is 0, set it to 0.
+        vis1 = mask * vis1
         self.x = copy.deepcopy(self.candidate_vis_inv(vis1))
-#         # Get the non_zero_coordinates from the existing cs_solver results.
-#         non_zero_inds = np.argwhere(cs_solver.x[0:len(cs_solver.x) - 1] > 0)
-#         non_zero_coordinates = [self.current_candidates[i] for i in list(non_zero_inds.ravel())]
 
-#         self.current_candidates = copy.deepcopy(non_zero_coordinates)
+    def match_popped_candidates(self, survival_inds):
+        xtemp = np.ndarray(len(survival_inds) + 1)
+        for i, iv in enumerate(survival_inds):
+            xtemp[i] = self.x[iv]
+        xtemp[-1] = self.x[-1]
+        self.x = xtemp
 
-#         # set a check mark for tracking purposes.
-#         self.set_check_mark()
-            
+    def candidate_pool_thinning(self, opts):
+        if isinstance(opts, ProjFilter2D_Opts):
+            v = self.candidate_vis()
+            prj = copy.deepcopy(np.mean(v, axis=0))
+            ub = np.max(prj.ravel())
+            lb = np.min(prj.ravel())
+            thres = lb + opts.relative_lower_bound_2Dproj*(ub - lb)
+            prj[np.where(prj < thres)] = 0
+            prj[np.where(prj >= thres)] = 1
+            for i in np.arange(0,v.shape[0]):
+                v[i,:,:] = copy.deepcopy(prj)
+            mask = v
+            self.mask_2D = prj
+
+        if isinstance(opts, RelativeValueFilter_Opts):
+            v = self.candidate_vis()
+            ub = np.max(prj.ravel())
+            lb = np.min(prj.ravel())
+            thres = lb + opts.relative_lower_bound_FullPool * (ub - lb)
+            v[np.where(v < thres)] = 0
+            v[np.where(v >= thres)] = 1
+            mask = v
+
+        return mask
+
+
     def get_ready(self):
         import os
         self.it_count = -1
@@ -427,7 +461,6 @@ class LinBreg:
         return vis
     
     def candidate_vis_inv(self, vis):
-                
         intervals = self.candidate_intervals
         locs = list(zip(*self.candidate_coords))
         dims = list()
@@ -442,7 +475,6 @@ class LinBreg:
             maximums.append(maximum)
         
         new_x = []
-        
         for coords, intensity in zip(self.candidate_coords, self.x[0:len(self.x) - 1]):
             new_x.append(vis[coords[0] - minimals[0] - 1, int((coords[1] - minimals[1]) // intervals[1]), int(
                 (coords[2] - minimals[2]) // intervals[2])] )

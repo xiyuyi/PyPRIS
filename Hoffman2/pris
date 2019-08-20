@@ -48,6 +48,19 @@ if isinstance(ticket, TwoChannelTicket):
     blur_channel_2 = io.imread(ticket.blur_path_channel_2)
     blur = np.concatenate([blur_channel_1, blur_channel_2],axis = 0)
 
+if isinstance(ticket, SingleCLTicket):
+    "load psf and blur for Single Plane Ticket"
+    psf = io.imread(ticket.psf_path)
+    blur = io.imread(ticket.blur_path)
+    
+if isinstance(ticket, CLnShiftTicket):
+    "load psf and blur for ticket of CL channel and shift channel"
+    psf_CL_in = io.imread(ticket.psf_path_CL)
+    blur_CL_in = io.imread(ticket.blur_path_CL)
+    psf_shift_in = io.imread(ticket.psf_path_shift)
+    blur_shift_in = io.imread(ticket.blur_path_shift)
+    blur = np.concatenate([blur_CL, blur_shift], axis = 0)
+
 # define linbreg_ori
 linbreg_ori = ticket.linbreg_alpha
 linbreg_ori.obs_dim0 = blur.shape[0]
@@ -83,6 +96,36 @@ if isinstance(ticket, TwoChannelTicket):
                                       psfz0 = ticket.psfz0,
                                       observer_debugger = ticket.observer_debugger,
                                       observer_edge_padding = ticket.observer_edge_padding)
+
+if isinstance(ticket, SingleCLTicket):
+    "configure this observer with single observation that has a cylindrical lens"
+    observer.observe_with_CL_prep(psf,
+                                  single_iamge_size = blur.shape,
+                                  psfz0 = ticket.psfz0,
+                                  dist_1_amplitd=ticket.distortion_1_amp,
+                                  dist_1_shift=ticket.distortion_1_shift,
+                                  dist_2_amplitd=ticket.distortion_2_amp,
+                                  dist_2_shift=ticket.distortion_2_shift,
+                                  observer_debugger=ticket.observer_debugger,
+                                  observer_edge_padding=ticket.observer_edge_padding)
+
+if isinstance(ticket, CLnShiftTicket):
+    "configure this observer with both CL and shift channels"
+    observer.observe_with_CL_and_grating_prep(psf_CL = psf_CL_in, 
+                                                imsize_CL = blur_CL_in.shape, 
+                                                psfz0_CL = ticket.psfz0_CL,
+                                                dist_1_amplitd=ticket.distortion_1_amp,
+                                                dist_1_shift=ticket.distortion_1_shift,
+                                                dist_2_amplitd=ticket.distortion_2_amp,
+                                                dist_2_shift=ticket.distortion_2_shift,
+                                                psf_shift = psf_shift_in, 
+                                                imsize_shift = blur_shift_in.shape, 
+                                                psfz0_shift = ticket.psfz0_shift,
+                                                shift_1 = ticket.shift_channel_shift1, 
+                                                shift_2 = ticket.shift_channel_shift2,
+                                                observer_debugger=ticket.observer_debugger,
+                                                observer_edge_padding=ticket.observer_edge_padding)
+        
 
 # Get the latest saved linbreg filename
 # put in the file folder where you saved all the linbreg objects.
@@ -141,6 +184,14 @@ if len(mxnames) is not 0:
         "use the two-channel observation skill of the observer for pypris object"
         pypris.observe = observer.observe_two_channel
 
+    if isinstance(ticket, SingleCLTicket):
+        "use the observe with single cylindrical lens observation skill of the observer for pypris object"
+        pypris.observe = observer.observe_with_CL
+        
+    if isinstance(ticket, CLnShiftTicket):
+        "use the observe with the combination of cylindrical lens channel observation skill and the shift channel for pypris object"
+        pypris.observe = observer.observe_with_CL_and_grating
+
     Iter = int(linbreg.PyPRIS_iter[4:])
     print("---------------- PRIS refinement #" + str(Iter) + " ------------------")
     print("")
@@ -193,6 +244,14 @@ else:
         "use the two-channel observation skill of the observer for pypris object"
         pypris.observe = observer.observe_two_channel
 
+    if isinstance(ticket, SingleCLTicket):
+        "use the observe with single cylindrical lens observation skill of the observer for pypris object"
+        pypris.observe = observer.observe_with_CL
+        
+    if isinstance(ticket, CLnShiftTicket):
+        "use the observe with the combination of cylindrical lens channel observation skill and the shift channel for pypris object"
+        pypris.observe = observer.observe_with_CL_and_grating
+        
     # construct sensing matrix,
     pypris.generate_sensing_mx()
     # prepare the inner sparse recovery
@@ -241,6 +300,14 @@ for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
         "use the two-channel observation skill of the observer for pypris object"
         pypris.observe = observer.observe_two_channel
 
+    if isinstance(ticket, SingleCLTicket):
+        "use the observe with single cylindrical lens observation skill of the observer for pypris object"
+        pypris.observe = observer.observe_with_CL
+        
+    if isinstance(ticket, CLnShiftTicket):
+        "use the observe with the combination of cylindrical lens channel observation skill and the shift channel for pypris object"
+        pypris.observe = observer.observe_with_CL_and_grating
+        
     pypris.generate_sensing_mx()
     # prepare the inner sparse recovery
     pypris.current_A = pypris.current_A / ticket.psf_norm_factor
@@ -257,9 +324,9 @@ for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
     linbreg.PyPRIS_iter = "pris"+ str(PRIS_iter)
     linbreg.stopping_loghistpercdelres_thres -= PRIS_iter
     linbreg.alpha = linbreg_ori.alpha/PRIS_iter
-    print("")
-    print("---------------- PRIS refinement #" + str(PRIS_iter) + " ------------------")
-    print("")
+    print(" ")
+    print(" ---------------- PRIS refinement # " + str(PRIS_iter) + " ------------------ ")
+    print(" ")
     # recover
     linbreg.get_ready()
     linbreg.go()

@@ -1,3 +1,5 @@
+from cmath import nan
+import copy
 import numpy as np
 from scipy import interpolate
 
@@ -11,6 +13,9 @@ class ObserveStation:
         self.channel_observer_2 = None
         self.channel_observer_3 = None
         self.channel_observer_4 = None
+        self.observer_with_shift = None
+        self.observer_with_CL = None
+        self.dist = None
 
     class SingleObs:
         
@@ -238,4 +243,80 @@ class ObserveStation:
 
         # Now returns the combined observations from two channels
         observation = np.concatenate([self.channel_observer_1.observation, self.channel_observer_2.observation]).ravel()
+        return observation
+
+    def observe_with_CL_prep(self, psf, single_iamge_size, psfz0,
+                        dist_1_amplitd, dist_1_shift,
+                        dist_2_amplitd, dist_2_shift,
+                        observer_debugger, observer_edge_padding):
+        self.observer_with_CL = self.SingleObs()  # this is the child class.
+        self.observer_with_CL.psf = np.copy(psf)
+        self.observer_with_CL.imsize = single_iamge_size  # this should be the image size of the single plane observation
+        self.observer_with_CL.psfz0 = psfz0
+        self.observer_with_CL.debug = observer_debugger
+        self.observer_with_CL.edge_padding = observer_edge_padding
+        self.CL_A1 = dist_1_amplitd
+        self.CL_S1 = dist_1_shift
+        self.CL_A2 = dist_2_amplitd
+        self.CL_S2 = dist_2_shift
+        return nan
+
+    def observe_with_CL(self, loc):
+        # update loc to incorporate field distortion and alignment
+        # get an observer to observe with updated location coordiantes
+        # self.channel_observer_2 = self.SingleObs()
+        loc_shifted = copy.deepcopy(loc)
+        loc_shifted[1] = loc[1]*self.CL_A1 + self.CL_S1# update location based on field distortion parameters.
+        loc_shifted[2] = loc[2]*self.CL_A2 + self.CL_S2# update location based on field distortion parameters.
+        self.observer_with_CL.location = loc_shifted  # focus at the position
+        self.observer_with_CL.single_obs()  # take the observation
+        self.observer_with_CL.observation = self.observer_with_CL.obs.ravel()  # record this first observation
+        return self.observer_with_CL.observation
+
+    def observe_with_shift_prep(self, psf, single_image_size, psfz0,
+                                      shift_1, shift_2,
+                                      observer_debugger, observer_edge_padding):
+        # the grating doesn't cause field distortion, but causes translation based on the alignment
+        # and the cropping of the image from the raw data.
+        # such translation movement needs to be characterized from the experimental data and fed into this observer.
+        self.observer_with_shift = self.SingleObs()  # this is the child class.
+        self.observer_with_shift.psf = np.copy(psf)
+        self.observer_with_shift.imsize = single_image_size  # this should be the image size of the single plane observation
+        self.observer_with_shift.psfz0 = psfz0
+        self.observer_with_shift.debug = observer_debugger
+        self.observer_with_shift.edge_padding = observer_edge_padding
+        self.shift_1 = shift_1
+        self.shift_2 = shift_2
+        self.observer_with_shift.debug = observer_debugger
+
+    def observe_with_shift(self, loc):
+        loc_shifted = copy.deepcopy(loc)
+        loc_shifted[1] = copy.deepcopy(loc[1] + self.shift_1) # update location based on field translation parameters.
+        loc_shifted[2] = copy.deepcopy(loc[2] + self.shift_2) # update location based on field translation parameters.
+        self.observer_with_shift.location = loc_shifted  # focus at the position
+        self.observer_with_shift.single_obs()  # take the observation, this will generate the obs attribute used below.
+        self.observer_with_shift.observation = self.observer_with_shift.obs.ravel()  # record this observation
+        return self.observer_with_shift.observation
+
+    def observe_with_CL_and_grating_prep(self,  psf_CL, imsize_CL, psfz0_CL,
+                                                dist_1_amplitd, dist_1_shift,
+                                                dist_2_amplitd, dist_2_shift,
+                                                psf_shift, imsize_shift, psfz0_shift,
+                                                shift_1, shift_2,
+                                                observer_debugger, observer_edge_padding):
+
+        # wrap the observation with the combination of CL and grating channels.
+        self.observe_with_CL_prep(psf_CL, imsize_CL, psfz0_CL,
+                        dist_1_amplitd, dist_1_shift,
+                        dist_2_amplitd, dist_2_shift,
+                        observer_debugger, observer_edge_padding)
+
+        self.observe_with_shift_prep(psf_shift, imsize_shift, psfz0_shift,
+                                      shift_1, shift_2,
+                                      observer_debugger, observer_edge_padding)
+
+    def observe_with_CL_and_grating(self, loc):
+        obs_with_CL = self.observe_with_CL(loc)
+        obs_with_shift = self.observe_with_shift(loc)
+        observation = np.concatenate([obs_with_CL, obs_with_shift]).ravel()
         return observation
