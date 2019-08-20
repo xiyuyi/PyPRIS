@@ -52,6 +52,14 @@ if isinstance(ticket, SingleCLTicket):
     "load psf and blur for Single Plane Ticket"
     psf = io.imread(ticket.psf_path)
     blur = io.imread(ticket.blur_path)
+    
+if isinstance(ticket, CLnShiftTicket):
+    "load psf and blur for ticket of CL channel and shift channel"
+    psf_CL = io.imread(ticket.psf_path_CL)
+    blur_CL = io.imread(ticket.blur_path_CL)
+    psf_shift = io.imread(ticket.psf_path_shift)
+    blur_shift = io.imread(ticket.blur_path_shift)
+    blur = np.concatenate([blur_CL, blur_shift], axis = 0)
 
 # define linbreg_ori
 linbreg_ori = ticket.linbreg_alpha
