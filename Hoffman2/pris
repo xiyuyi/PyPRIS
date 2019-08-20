@@ -55,10 +55,10 @@ if isinstance(ticket, SingleCLTicket):
     
 if isinstance(ticket, CLnShiftTicket):
     "load psf and blur for ticket of CL channel and shift channel"
-    psf_CL = io.imread(ticket.psf_path_CL)
-    blur_CL = io.imread(ticket.blur_path_CL)
-    psf_shift = io.imread(ticket.psf_path_shift)
-    blur_shift = io.imread(ticket.blur_path_shift)
+    psf_CL_in = io.imread(ticket.psf_path_CL)
+    blur_CL_in = io.imread(ticket.blur_path_CL)
+    psf_shift_in = io.imread(ticket.psf_path_shift)
+    blur_shift_in = io.imread(ticket.blur_path_shift)
     blur = np.concatenate([blur_CL, blur_shift], axis = 0)
 
 # define linbreg_ori
@@ -109,6 +109,23 @@ if isinstance(ticket, SingleCLTicket):
                                   observer_debugger=ticket.observer_debugger,
                                   observer_edge_padding=ticket.observer_edge_padding)
 
+if isinstance(ticket, CLnShiftTicket):
+    "configure this observer with both CL and shift channels"
+    observer.observe_with_CL_and_grating_prep(psf_CL = psf_CL_in, 
+                                                imsize_CL = blur_CL_in.shape, 
+                                                psfz0_CL = ticket.psfz0_CL,
+                                                dist_1_amplitd=ticket.distortion_1_amp,
+                                                dist_1_shift=ticket.distortion_1_shift,
+                                                dist_2_amplitd=ticket.distortion_2_amp,
+                                                dist_2_shift=ticket.distortion_2_shift,
+                                                psf_shift = psf_shift_in, 
+                                                imsize_shift = blur_shift_in.shape, 
+                                                psfz0_shift = ticket.psfz0_shift,
+                                                shift_1 = ticket.shift_channel_shift1, 
+                                                shift_2 = ticket.shift_channel_shift2,
+                                                observer_debugger=ticket.observer_debugger,
+                                                observer_edge_padding=ticket.observer_edge_padding)
+        
 
 # Get the latest saved linbreg filename
 # put in the file folder where you saved all the linbreg objects.
