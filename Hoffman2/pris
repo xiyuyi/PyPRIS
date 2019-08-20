@@ -187,6 +187,10 @@ if len(mxnames) is not 0:
     if isinstance(ticket, SingleCLTicket):
         "use the observe with single cylindrical lens observation skill of the observer for pypris object"
         pypris.observe = observer.observe_with_CL
+        
+    if isinstance(ticket, CLnShiftTicket):
+        "use the observe with the combination of cylindrical lens channel observation skill and the shift channel for pypris object"
+        pypris.observe = observer.observe_with_CL_and_grating
 
     Iter = int(linbreg.PyPRIS_iter[4:])
     print("---------------- PRIS refinement #" + str(Iter) + " ------------------")
@@ -243,7 +247,11 @@ else:
     if isinstance(ticket, SingleCLTicket):
         "use the observe with single cylindrical lens observation skill of the observer for pypris object"
         pypris.observe = observer.observe_with_CL
-
+        
+    if isinstance(ticket, CLnShiftTicket):
+        "use the observe with the combination of cylindrical lens channel observation skill and the shift channel for pypris object"
+        pypris.observe = observer.observe_with_CL_and_grating
+        
     # construct sensing matrix,
     pypris.generate_sensing_mx()
     # prepare the inner sparse recovery
@@ -295,7 +303,11 @@ for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
     if isinstance(ticket, SingleCLTicket):
         "use the observe with single cylindrical lens observation skill of the observer for pypris object"
         pypris.observe = observer.observe_with_CL
-
+        
+    if isinstance(ticket, CLnShiftTicket):
+        "use the observe with the combination of cylindrical lens channel observation skill and the shift channel for pypris object"
+        pypris.observe = observer.observe_with_CL_and_grating
+        
     pypris.generate_sensing_mx()
     # prepare the inner sparse recovery
     pypris.current_A = pypris.current_A / ticket.psf_norm_factor
