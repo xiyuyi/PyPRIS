@@ -223,7 +223,7 @@ class SingleCLTicket:
         "others"
         self.PRIS_iter_end = 5
         
-class CLnShiftTicket
+class CLnShiftTicket:
     def __init__(self):
         "the name of this pris ticket"
         self.name = 'Demo'
