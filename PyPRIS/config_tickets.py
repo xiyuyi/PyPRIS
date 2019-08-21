@@ -231,7 +231,7 @@ class CLnShiftTicket:
 
         "where to find the data files, for both blur and observation"
         # need to modify these default values with a prepared test dataset.
-        self.datapath = './test_dataset_5'
+        self.datapath = 'G:/DH_localization/PyPRIS/test_dataset_5'
         self.blur_path_CL = "{}/Combined_0th.tif".format(self.datapath)
         self.psf_path_CL = "{}/psf_cropped_0th.tif".format(self.datapath)
         self.blur_path_shift = "{}/combined_1st.tif".format(self.datapath)
@@ -246,8 +246,8 @@ class CLnShiftTicket:
         self.distortion_2_shift = -0.922
         self.distortion_1_amp = 0.813 # this is the y dimension (vertical). CL causes field compression
         self.distortion_1_shift = 9.459
-        self.shift_channel_shift1 = 0
-        self.shift_channel_shift2 = 0
+        self.shift_channel_shift1 = -2.81
+        self.shift_channel_shift2 = -2
 
         "configure the initial candidate pool of this pris ticket"
         self.init_candidates_intervals = list([1, 4, 4])
