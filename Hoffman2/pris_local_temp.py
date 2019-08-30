@@ -68,7 +68,7 @@ linbreg_ori = ticket.linbreg_alpha
 linbreg_ori.obs_dim0 = blur.shape[0]
 linbreg_ori.obs_dim1 = blur.shape[1]
 linbreg_ori.PyPRIS_name = ticket.name
-linbreg_ori.stopping_loghistpercdelres_thres = -20
+linbreg_ori.stopping_loghistpercdelres_thres = -28
 linbreg_ori.maxit = 140000
 linbreg_ori.debug_it_int = 1000
 # prepare a observer for pypris. [from one candidate, to one observation]
@@ -197,7 +197,7 @@ if len(mxnames) is not 0:
     Iter = int(linbreg.PyPRIS_iter[4:])
     print("---------------- PRIS refinement #" + str(Iter) + " ------------------")
     print("")
-    linbreg.stopping_loghistpercdelres_thres = -20
+    linbreg.stopping_loghistpercdelres_thres = -28
     linbreg.maxit = 140000
     linbreg.debug_it_int = 1000
     linbreg.go()
