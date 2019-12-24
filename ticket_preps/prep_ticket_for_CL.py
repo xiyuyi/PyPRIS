@@ -1,7 +1,9 @@
 import sys
 sys.path.append("/u/home/x/xiyuyi/bin")
 sys.path.append("G:\\DH_localization\\PyPRIS")
-
+sys.path.append("../PyPRIS")
+pypris_path = 'C:\\Users\\china\\Desktop\\Research\\PyPRIS'
+sys.path.append(pypris_path)
 from PyPRIS import *
 import copy
 import os
@@ -9,16 +11,16 @@ import os
 ticket = SingleCLTicket()
 # put field distortion parameters here. caused by CL:
 # fitted parameters from pre-processing steps using pinhole array
-ticket.distortion_1_amp = 1
-ticket.distortion_1_shift = 0.922
-ticket.distortion_2_amp = 0.813
-ticket.distortion_2_shift = 9.459
+ticket.distortion_2_amp = 1
+ticket.distortion_2_shift = 0.922
+ticket.distortion_1_amp = 0.813
+ticket.distortion_1_shift = 9.459
 
 "where to find the data files, for both blur and observation"
 paths = []
 paths.append('G:\\DH_localization\\EPFL_datasets\\N2')
 ax0_ranges = []
-ax0_ranges.append(list([-20, 20]))
+ax0_ranges.append(list([-20, 21]))
 ticket_folders = []
 ticket_folders.append('PyPRIS_CL_set1')
 
@@ -29,7 +31,8 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
 
     "where to find the data files, for both blur and observation"
     # need to modify these default values with a prepared test dataset.
-    ticket.datapath = 'G:\\DH_localization\\PyPRIS\\test_dataset_5'
+    ticket.datapath = pypris_path+'\\test_dataset_5'
+    #ticket.datapath = ''
     ticket.blur_path = "{}/combined_0th.tif".format(ticket.datapath)
     ticket.psf_path = "{}/psf_cropped_0th.tif".format(ticket.datapath)
     ticket.psf_norm_factor = 10000
@@ -40,9 +43,9 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
 
     "configure the initial candidate pool of this pris ticket"
     ticket.init_candidates_intervals = list([1, 4, 4])
-    ticket.init_ax0_range = list([-20, 20])
-    ticket.init_ax1_range = list([1, 100])
-    ticket.init_ax2_range = list([1, 140])
+    ticket.init_ax0_range = list([-19, 19])
+    ticket.init_ax1_range = list([1, 150])
+    ticket.init_ax2_range = list([1, 100])
 
     "debug configurations"
     ticket.observer_debugger = False
@@ -57,6 +60,9 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     ticket.linbreg_alpha.deep_debug = False
     "ticket.linbreg_alpha.mu = 1000000000"  # move to loop
     "ticket.linbreg_alpha.alpha = 1e-11"  # move to loop
+
+
+
     ticket.linbreg_alpha.maxit = 80000
     ticket.linbreg_alpha.it_check_rem = 1
     ticket.linbreg_alpha.debug_it_int = 100
@@ -71,7 +77,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     "ticket.linbreg_alpha.PyPRIS_name = ticket.name"  # moved to loop
     ticket.linbreg_alpha.path_0 = '.'
     "ticket.bg_scaling_coef = 1.5 "  # moved to loop
-    ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -15
+    ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -17
 
     "others"
     ticket.PRIS_iter_end = 8
