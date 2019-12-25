@@ -325,20 +325,20 @@ class ObserveStation:
                                             psf_CL_color1, imsize_CL_color1, psfz0_CL_color1,
                                             dist_1_amplitd_color1, dist_1_shift_color1,
                                             dist_2_amplitd_color1, dist_2_shift_color1,
-                                            psf_shift_color1, imsize_shift_color1, psfz0_shift_color1,
+                                            psf_dif1_color1, imsize_shift_color1, psfz0_shift_color1,
                                             shift_1_color1, shift_2_color1,
                                            # set of parameters for Cl and grating, for color 2:
                                             psf_CL_color2, imsize_CL_color2, psfz0_CL_color2,
                                             dist_1_amplitd_color2, dist_1_shift_color2,
                                             dist_2_amplitd_color2, dist_2_shift_color2,
-                                            psf_shift_color2, imsize_shift_color2, psfz0_shift_color2,
+                                            psf_dif1_color2, imsize_shift_color2, psfz0_shift_color2,
                                             shift_1_color2, shift_2_color2,
                                            # common recovery parameters
                                             observer_debugger, observer_edge_padding):
 
         # from observe with shift prep, for color1
         self.observer_dif1_color1 = self.SingleObs()  # this is the child class.
-        self.observer_dif1_color1.psf = np.copy(psf_shift_color1)
+        self.observer_dif1_color1.psf = np.copy(psf_dif1_color1)
         self.observer_dif1_color1.imsize = imsize_shift_color1  # this should be the image size of the single plane
         self.observer_dif1_color1.psfz0 = psfz0_shift_color1
         self.observer_dif1_color1.debug = observer_debugger
@@ -349,7 +349,7 @@ class ObserveStation:
 
         # from observe with shift prep, for color2
         self.observer_dif1_color2 = self.SingleObs()  # this is the child class.
-        self.observer_dif1_color2.psf = np.copy(psf_shift_color2)
+        self.observer_dif1_color2.psf = np.copy(psf_dif1_color2)
         self.observer_dif1_color2.imsize = imsize_shift_color2  # this should be the image size of the single plane
         self.observer_dif1_color2.psfz0 = psfz0_shift_color2
         self.observer_dif1_color2.debug = observer_debugger
