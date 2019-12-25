@@ -320,7 +320,7 @@ class ObserveStation:
         observation = np.concatenate([obs_with_CL, obs_with_shift]).ravel()
         return observation
 
-    def observe_2color_cl_and_grating_prep(self,
+    def observe_2color_CL_and_grating_prep(self,
                                            # set of parameters for Cl and grating, for color 1:
                                             psf_CL_color1, imsize_CL_color1, psfz0_CL_color1,
                                             dist_1_amplitd_color1, dist_1_shift_color1,
@@ -384,7 +384,7 @@ class ObserveStation:
 
         return nan
 
-    def observe_2color_cl_and_grating(self, loc):
+    def observe_2color_CL_and_grating(self, loc):
         # get observation for diff1 for color1
         loc_shifted = copy.deepcopy(loc)
         loc_shifted[1] = loc[1] + self.diff1_shift_1_color1  # update location based on field translation parameters.
