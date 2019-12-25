@@ -54,6 +54,15 @@ if isinstance(ticket, SingleCLTicket):
     psf = io.imread(ticket.psf_path)
     blur = io.imread(ticket.blur_path)
 
+if isinstance(ticket, TwoColor_CL_and_grating_Ticket):
+    "load psf and blur for dual channel CL and 2 color ticket"
+    psf_CL_Crimson = io.imread(ticket.psf_path_CL_Crimson)
+    psf_CL_Darkred = io.imread(ticket.psf_path_CL_Darkred)
+    psf_D1_Crimson = io.imread(ticket.psf_path_diff1_Crimson)
+    psf_D1_Darkred = io.imread(ticket.psf_path_diff1_Darkred)
+    blur_CL = io.imread(ticket.blur_path_CL)
+    blur_D1 = io.imread(ticket.blur_path_diff1)
+
 # define linbreg_ori
 linbreg_ori = ticket.linbreg_alpha
 linbreg_ori.obs_dim0 = blur.shape[0]
@@ -102,6 +111,38 @@ if isinstance(ticket, SingleCLTicket):
                                   observer_debugger=ticket.observer_debugger,
                                   observer_edge_padding=ticket.observer_edge_padding)
 
+if isinstance(ticket, TwoColor_CL_and_grating_Ticket):
+    "configure the observer to match with 2color 2 channel observation " \
+    "(0th order diffraction channel +CL, and 1st order diffraction channel)"
+    observer.observe_2color_CL_and_grating_prep(# set of parameters for Cl and grating, for color 2:
+                                                psf_CL_color1 = psf_CL_Crimson,
+                                                imsize_CL_color1 = blur_CL.shape,
+                                                psfz0_CL_color1 = ticket.psfz0_Crimson,
+                                                dist_1_amplitd_color1 = ticket.distortion_Crimson_1_amp,
+                                                dist_1_shift_color1 = ticket.distortion_Crimson_1_shift,
+                                                dist_2_amplitd_color1 = ticket.distortion_Crimson_2_amp,
+                                                dist_2_shift_color1 = ticket.distortion_Crimson_2_shift,
+                                                psf_dif1_color1 = psf_D1_Crimson,
+                                                imsize_shift_color1 = psf_D1_Crimson.shape,
+                                                psfz0_shift_color1 = ticket.psfz0_Crimson,
+                                                shift_1_color1 = ticket.shift_Crimson_1,
+                                                shift_2_color1 = ticket.shift_Crimson_2,
+                                                # set of parameters for Cl and grating, for color 2:
+                                                psf_CL_color2 = psf_CL_Darkred,
+                                                imsize_CL_color2 = blur_CL.shape,
+                                                psfz0_CL_color2 = ticket.psfz0_Darkred,
+                                                dist_1_amplitd_color2 = ticket.distortion_Darkred_1_amp,
+                                                dist_1_shift_color2 = ticket.distortion_Darkred_1_shift,
+                                                dist_2_amplitd_color2 = ticket.distortion_Darkred_2_amp,
+                                                dist_2_shift_color2 = ticket.distortion_Darkred_2_shift,
+                                                psf_dif1_color2 = psf_D1_Darkred,
+                                                imsize_shift_color2 = psf_D1_Darkred.shape,
+                                                psfz0_shift_color2 = ticket.psfz0_Darkred,
+                                                shift_1_color2 = ticket.shift_Darkred_1,
+                                                shift_2_color2 = ticket.shift_Darkred_2,
+                                                # common recovery parameters
+                                                observer_debugger=ticket.observer_debugger,
+                                                observer_edge_padding=ticket.observer_edge_padding)
 
 # Get the latest saved linbreg filename
 # put in the file folder where you saved all the linbreg objects.
@@ -164,6 +205,11 @@ if len(mxnames) is not 0:
         "use the observe with single cylindrical lens observation skill of the observer for pypris object"
         pypris.observe = observer.observe_with_CL
 
+    if isinstance(ticket, TwoColor_CL_and_grating_Ticket):
+        "use the observe with 2 color and 2 channles: dif0CL and dif1"
+        pypris.observe = observer.observe_2color_CL_and_grating
+
+
     Iter = int(linbreg.PyPRIS_iter[4:])
     print("---------------- PRIS refinement #" + str(Iter) + " ------------------")
     print("")
@@ -220,6 +266,10 @@ else:
         "use the observe with single cylindrical lens observation skill of the observer for pypris object"
         pypris.observe = observer.observe_with_CL
 
+    if isinstance(ticket, TwoColor_CL_and_grating_Ticket):
+        "use the observe with 2 color and 2 channles: dif0CL and dif1"
+        pypris.observe = observer.observe_2color_CL_and_grating
+
     # construct sensing matrix,
     pypris.generate_sensing_mx()
     # prepare the inner sparse recovery
@@ -271,6 +321,10 @@ for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
     if isinstance(ticket, SingleCLTicket):
         "use the observe with single cylindrical lens observation skill of the observer for pypris object"
         pypris.observe = observer.observe_with_CL
+
+    if isinstance(ticket, TwoColor_CL_and_grating_Ticket):
+        "use the observe with 2 color and 2 channles: dif0CL and dif1"
+        pypris.observe = observer.observe_2color_CL_and_grating
 
     pypris.generate_sensing_mx()
     # prepare the inner sparse recovery
