@@ -228,7 +228,7 @@ class SingleCLTicket:
         "others"
         self.PRIS_iter_end = 5
 
-class DualChannel_CL_and_grating_Ticket:
+class TwoColor_CL_and_grating_Ticket:
     def __init__(self):
         "the name of this pris ticket"
         self.name = 'Demo'
