@@ -384,40 +384,45 @@ class ObserveStation:
 
         return nan
 
-    def observe_2color_CL_and_grating(self, loc):
-        # get observation for diff1 for color1
-        loc_shifted = copy.deepcopy(loc)
-        loc_shifted[1] = loc[1] + self.diff1_shift_1_color1  # update location based on field translation parameters.
-        loc_shifted[2] = loc[2] + self.diff1_shift_2_color1  # update location based on field translation parameters.
-        self.observer_dif1_color1.location = loc_shifted  # focus at the position
-        self.observer_dif1_color1.single_obs()  # take the observation
-        obs_dif1_color1 = self.observer_dif1_color1.obs.ravel()  # record this first observation
+    def observe_2color_CL_and_grating(self, loc, ctag):
+        if ctag == 1:
+            # get observation for diff1 for color1
+            loc_shifted = copy.deepcopy(loc)
+            loc_shifted[1] = loc[1] + self.diff1_shift_1_color1  # update location based on field translation parameters.
+            loc_shifted[2] = loc[2] + self.diff1_shift_2_color1  # update location based on field translation parameters.
+            self.observer_dif1_color1.location = loc_shifted  # focus at the position
+            self.observer_dif1_color1.single_obs()  # take the observation
+            obs_dif1_color1 = self.observer_dif1_color1.obs.ravel()  # record this first observation
 
-        # get observation for diff1 for color2
-        loc_shifted = copy.deepcopy(loc)
-        loc_shifted[1] = loc[1] + self.diff1_shift_1_color2  # update location based on field translation parameters.
-        loc_shifted[2] = loc[2] + self.diff1_shift_2_color2  # update location based on field translation parameters.
-        self.observer_dif1_color2.location = loc_shifted  # focus at the position
-        self.observer_dif1_color2.single_obs()  # take the observation
-        obs_dif1_color2 = self.observer_dif1_color2.obs.ravel()  # record this first observation
+            # get observation for diff0 + CL, for color1
+            loc_shifted = copy.deepcopy(loc)
+            loc_shifted[1] = loc[1]*self.CL_A1_color1 + self.CL_S1_color1  # update location based on field distortion.
+            loc_shifted[2] = loc[2]*self.CL_A2_color1 + self.CL_S2_color1  # update location based on field distortion.
+            self.observer_dif0CL_color1.location = loc_shifted  # focus at the position
+            self.observer_dif0CL_color1.single_obs()  # take the observation
+            self.observer_dif0CL_color1.observation = self.observer_dif0CL_color1.obs.ravel()  # record first observation
+            obs_dif0CL_color1 = self.observer_dif0CL_color1.observation
 
-        # get observation for diff0 + CL, for color1
-        loc_shifted = copy.deepcopy(loc)
-        loc_shifted[1] = loc[1]*self.CL_A1_color1 + self.CL_S1_color1  # update location based on field distortion.
-        loc_shifted[2] = loc[2]*self.CL_A2_color1 + self.CL_S2_color1  # update location based on field distortion.
-        self.observer_dif0CL_color1.location = loc_shifted  # focus at the position
-        self.observer_dif0CL_color1.single_obs()  # take the observation
-        self.observer_dif0CL_color1.observation = self.observer_dif0CL_color1.obs.ravel()  # record first observation
-        obs_dif0CL_color1 = self.observer_dif0CL_color1.observation
+            obs = np.concatenate([obs_dif0CL_color1, obs_dif1_color1])
 
-        # get observation for diff0 + CL, for color2
-        loc_shifted = copy.deepcopy(loc)
-        loc_shifted[1] = loc[1]*self.CL_A1_color2 + self.CL_S1_color2  # update location based on field distortion.
-        loc_shifted[2] = loc[2]*self.CL_A2_color2 + self.CL_S2_color2  # update location based on field distortion.
-        self.observer_dif0CL_color2.location = loc_shifted  # focus at the position
-        self.observer_dif0CL_color2.single_obs()  # take the observation
-        self.observer_dif0CL_color2.observation = self.observer_dif0CL_color2.obs.ravel()  # record first observation
-        obs_dif0CL_color2 = self.observer_dif0CL_color2.observation
+        if ctag == 2:
+            # get observation for diff1 for color2
+            loc_shifted = copy.deepcopy(loc)
+            loc_shifted[1] = loc[1] + self.diff1_shift_1_color2  # update location based on field translation parameters.
+            loc_shifted[2] = loc[2] + self.diff1_shift_2_color2  # update location based on field translation parameters.
+            self.observer_dif1_color2.location = loc_shifted  # focus at the position
+            self.observer_dif1_color2.single_obs()  # take the observation
+            obs_dif1_color2 = self.observer_dif1_color2.obs.ravel()  # record this first observation
 
-        observation = np.concatenate([obs_dif0CL_color1+obs_dif0CL_color2, obs_dif1_color1+obs_dif0CL_color2]).ravel()
-        return observation
+            # get observation for diff0 + CL, for color2
+            loc_shifted = copy.deepcopy(loc)
+            loc_shifted[1] = loc[1]*self.CL_A1_color2 + self.CL_S1_color2  # update location based on field distortion.
+            loc_shifted[2] = loc[2]*self.CL_A2_color2 + self.CL_S2_color2  # update location based on field distortion.
+            self.observer_dif0CL_color2.location = loc_shifted  # focus at the position
+            self.observer_dif0CL_color2.single_obs()  # take the observation
+            self.observer_dif0CL_color2.observation = self.observer_dif0CL_color2.obs.ravel()  # record first observation
+            obs_dif0CL_color2 = self.observer_dif0CL_color2.observation
+
+            obs = np.concatenate([obs_dif0CL_color2, obs_dif1_color2])
+
+        return obs

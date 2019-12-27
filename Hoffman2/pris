@@ -17,6 +17,7 @@ sys.path.append("/u/home/a/alejandr/bin")
 sys.path.append("/u/home/x/xiyuyi/bin")
 sys.path.append("G:\\DH_localization\\PyPRIS")
 sys.path.append("C:\\Users\\china\\Desktop\\Research\\PyPRIS")
+sys.path.append("/Users/xiyuyi/Desktop/PyPRIS")
 from PyPRIS import *
 import os
 print("")
@@ -71,9 +72,10 @@ linbreg_ori.PyPRIS_name = ticket.name
 
 # prepare a observer for pypris. [from one candidate, to one observation]
 # summon an observer from the ObserveStation (ObserveStation class) (Cheers~)
-observer = ObserveStation()
+
 if isinstance(ticket, SinglePlaneTicket):
     "configure this observer with single plane (monoplane) observation specifics"
+    observer = ObserveStation()
     observer.observe_monoplane_prep(psf, single_image_size = blur.shape,
                                psfz0 = ticket.psfz0,
                                observer_debugger = ticket.observer_debugger,
@@ -81,6 +83,7 @@ if isinstance(ticket, SinglePlaneTicket):
 
 if isinstance(ticket, BiplaneTicket):
     "configure this observer with biplane observation specifics"
+    observer = ObserveStation()
     observer.observe_biplane_prep(psf, single_image_size = blur1.shape,
                                deltaz_plane1 = ticket.plane1_dz,
                                deltaz_plane2 = ticket.plane2_dz,
@@ -91,6 +94,7 @@ if isinstance(ticket, BiplaneTicket):
 if isinstance(ticket, TwoChannelTicket):
     "configure this observer with two channel observation specifics"
     "simultaneous observation with two channels"
+    observer = ObserveStation()
     observer.observe_two_channel_prep(psf1 = psf_channel_1,
                                       size1 = blur_channel_1.shape,
                                       psf2 = psf_channel_2,
@@ -101,6 +105,7 @@ if isinstance(ticket, TwoChannelTicket):
 
 if isinstance(ticket, SingleCLTicket):
     "configure this observer with single observation that has a cylindrical lens"
+    observer = ObserveStation()
     observer.observe_with_CL_prep(psf,
                                   single_iamge_size = blur.shape,
                                   psfz0 = ticket.psfz0,
@@ -114,6 +119,7 @@ if isinstance(ticket, SingleCLTicket):
 if isinstance(ticket, TwoColor_CL_and_grating_Ticket):
     "configure the observer to match with 2color 2 channel observation " \
     "(0th order diffraction channel +CL, and 1st order diffraction channel)"
+    observer = ObserveStation()
     observer.observe_2color_CL_and_grating_prep(# set of parameters for Cl and grating, for color 2:
                                                 psf_CL_color1 = psf_CL_Crimson,
                                                 imsize_CL_color1 = blur_CL.shape,
@@ -228,25 +234,6 @@ else:
     # get a PyPRIS object:
     pypris = PyPRIS()
     pypris.observation = blur.ravel()
-    pypris.current_candidates_intervals = ticket.init_candidates_intervals  # initialize the first intervals of neighboring candidate voxels.
-    #
-    # decide candidates for the first PRIS iteration. PRIS #0:
-    range_ind0 = np.arange(ticket.init_ax0_range[0], ticket.init_ax0_range[1], pypris.current_candidates_intervals[
-        0])  # seems like for DH psf, use finnest intervals for the thickness dimension is better.
-    range_ind1 = np.arange(ticket.init_ax1_range[0], ticket.init_ax1_range[1], pypris.current_candidates_intervals[1])
-    range_ind2 = np.arange(ticket.init_ax2_range[0], ticket.init_ax2_range[1], pypris.current_candidates_intervals[2])
-    #
-    # initialize the first pool of candidates with the current candidate intervals.
-    pypris.current_candidates = list()  # current pool of candidates.
-    for i0 in range_ind0:
-        for i1 in range_ind1:
-            for i2 in range_ind2:
-                pypris.current_candidates.append([i0, i1, i2])
-
-    # set a check mark for pypris:
-    #
-    pypris.set_check_mark()
-    pypris.save()
     # put the configured observer to the pypris to perform the tasks of 'observe_biplane'
     # when a pypris object observes, it is through the observer and it is
     # done with the observer's observe_biplane skill (skill = method).
@@ -268,7 +255,40 @@ else:
 
     if isinstance(ticket, TwoColor_CL_and_grating_Ticket):
         "use the observe with 2 color and 2 channles: dif0CL and dif1"
+        pypris.species_n = 2
         pypris.observe = observer.observe_2color_CL_and_grating
+
+    pypris.current_candidates_intervals = ticket.init_candidates_intervals  # initialize the first intervals of neighboring candidate voxels.
+    #
+    # decide candidates for the first PRIS iteration. PRIS #0:
+    range_ind0 = np.arange(ticket.init_ax0_range[0], ticket.init_ax0_range[1], pypris.current_candidates_intervals[
+        0])  # seems like for DH psf, use finnest intervals for the thickness dimension is better.
+    range_ind1 = np.arange(ticket.init_ax1_range[0], ticket.init_ax1_range[1], pypris.current_candidates_intervals[1])
+    range_ind2 = np.arange(ticket.init_ax2_range[0], ticket.init_ax2_range[1], pypris.current_candidates_intervals[2])
+    #
+    # initialize the first pool of candidates with the current candidate intervals.
+    pypris.current_candidates = list()  # current pool of candidates.
+    if pypris.species_n == 1:
+        for i0 in range_ind0:
+            for i1 in range_ind1:
+                for i2 in range_ind2:
+                    pypris.current_candidates.append([i0, i1, i2])
+    else:
+        for i0 in range_ind0:
+            for i1 in range_ind1:
+                for i2 in range_ind2:
+                    pypris.current_candidates.append([i0, i1, i2, 1])
+
+        for i0 in range_ind0:
+            for i1 in range_ind1:
+                for i2 in range_ind2:
+                    pypris.current_candidates.append([i0, i1, i2, 2])
+
+    # set a check mark for pypris:
+    #
+    pypris.set_check_mark()
+    pypris.save()
+
 
     # construct sensing matrix,
     pypris.generate_sensing_mx()
@@ -324,6 +344,7 @@ for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
 
     if isinstance(ticket, TwoColor_CL_and_grating_Ticket):
         "use the observe with 2 color and 2 channles: dif0CL and dif1"
+        pypris.species_n = 2
         pypris.observe = observer.observe_2color_CL_and_grating
 
     pypris.generate_sensing_mx()

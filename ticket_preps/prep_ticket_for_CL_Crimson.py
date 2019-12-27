@@ -1,8 +1,7 @@
 import sys
 sys.path.append("/u/home/x/xiyuyi/bin")
-sys.path.append("G:\\DH_localization\\PyPRIS")
 sys.path.append("../PyPRIS")
-pypris_path = 'C:\\Users\\china\\Desktop\\Research\\PyPRIS'
+pypris_path = '/Users/xiyuyi/Desktop/PyPRIS'
 sys.path.append(pypris_path)
 from PyPRIS import *
 import copy
@@ -18,7 +17,7 @@ ticket.distortion_1_shift = 9.459
 
 "where to find the data files, for both blur and observation"
 paths = []
-paths.append('G:\\DH_localization\\EPFL_datasets\\N2')
+paths.append('../test_dataset_6')
 ax0_ranges = []
 ax0_ranges.append(list([-20, 21]))
 ticket_folders = []
@@ -31,14 +30,14 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
 
     "where to find the data files, for both blur and observation"
     # need to modify these default values with a prepared test dataset.
-    ticket.datapath = pypris_path+'\\test_dataset_5'
+    ticket.datapath = pypris_path+'/test_dataset_6'
     #ticket.datapath = ''
-    ticket.blur_path = "{}/combined_0th.tif".format(ticket.datapath)
-    ticket.psf_path = "{}/psf_cropped_0th.tif".format(ticket.datapath)
+    ticket.blur_path = "{}/Cali_3D_Crimson (3) single slice_dif0CL.tif".format(ticket.datapath)
+    ticket.psf_path = "{}/PSF_Crimson_Order0.tif".format(ticket.datapath)
     ticket.psf_norm_factor = 10000
 
     "specification of the psf stack"
-    ticket.psfz0 = 44  # the count of the center plane, define it as z=0 in the psf coordinates system.
+    ticket.psfz0 = 101  # the count of the center plane, define it as z=0 in the psf coordinates system.
     ticket.observer_edge_padding = True
 
     "configure the initial candidate pool of this pris ticket"

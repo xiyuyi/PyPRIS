@@ -20,7 +20,8 @@ class PyPRIS:
         self.name = 'PyPRIS object'
         self.positivity = True  # positivity constraint.
         self.observation = np.ndarray(0)  # this should be the observation vector
-        self.current_relReF = list([1, 2, 2])    # current relative refinement factor. This is the relative refinement to be or have been performed
+        self.current_relReF = list([1, 2, 2])    # current relative refinement factor. This is the relative refinement
+        #                               to be or have been performed
         #                               for this round of pris as compared to the last round of pris.
         self.current_PRIS_ItN = 0  # current PRIS iteration count, starting from 0.
         self.current_A = np.ndarray(0)  # current sensing matrix.
@@ -37,6 +38,7 @@ class PyPRIS:
         self.ifsave = True
         self.path_s = "./saved_objects"
         self.expansion = False
+        self.species_n = 1
 
     def save(self):
         import os
@@ -117,7 +119,10 @@ class PyPRIS:
         print("                        ",str(len(self.current_candidates)),' candidates ')
         self.current_A = np.ndarray([len(self.observation), len(self.current_candidates) + 1])
         for count, loc in enumerate(self.current_candidates):
-            self.current_A[:, count] = self.observe(loc)
+            if self.species_n == 2:
+                self.current_A[:, count] = self.observe(loc[0:3],loc[3])
+            else:
+                self.current_A[:, count] = self.observe(loc)
         self.current_A[:, len(self.current_candidates)] = 1
 
     def set_check_mark(self):

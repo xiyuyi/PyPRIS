@@ -178,7 +178,7 @@ class SingleCLTicket:
         self.name = 'Demo'
         self.expansion = True
         "where to find the data files, for both blur and observation"
-        self.datapath = './test_dataset_5'-
+        self.datapath = './test_dataset_5'
 
         self.blur_path = "{}/im1.tif".format(self.datapath)
         self.psf_path = "{}/psf.tif".format(self.datapath)
@@ -217,7 +217,7 @@ class SingleCLTicket:
         self.linbreg_alpha.it_check_rem = 1
         self.linbreg_alpha.debug_it_int = 100
         self.linbreg_alpha.kick.ints = 10
-        self.linbreg_alpha.kick.flag = True+
+        self.linbreg_alpha.kick.flag = True
         self.linbreg_alpha.kick.thres = 1e-3
         self.linbreg_alpha.save_obj_int = 100
         self.linbreg_alpha.save = True
