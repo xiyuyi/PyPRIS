@@ -39,6 +39,8 @@ class PyPRIS:
         self.path_s = "./saved_objects"
         self.expansion = False
         self.species_n = 1
+        self.top_candidates = False
+        self.top_candidates_N = 500
 
     def save(self):
         import os
@@ -69,6 +71,11 @@ class PyPRIS:
 
         # Get the non_zero_coordinates from the existing cs_solver results.
         non_zero_inds = np.argwhere(cs_solver.x[0:len(cs_solver.x) - 1] > 0)
+        if self.top_candidates is True:
+            print("refine candidates with only top candidates")
+            maxN = np.min([self.top_candidates_N, len(non_zero_inds)])
+            non_zero_inds = cs_solver.x.argsort()[-maxN:][::-1]
+
         non_zero_coordinates = [self.current_candidates[i] for i in list(non_zero_inds.ravel())]
         self.current_candidates_intervals = copy.deepcopy(
             [pre / ref for pre, ref in zip(self.current_candidates_intervals, self.current_relReF)]
@@ -79,30 +86,57 @@ class PyPRIS:
         print('expansion is ' + str(self.expansion))
         for i in non_zero_coordinates:
             if self.expansion is False:
-                extra_coords = [[i[0], i[1] - current_interval[1] / 2, i[2] - current_interval[2] / 2], \
-                                [i[0], i[1] - current_interval[1] / 2, i[2] + current_interval[2] / 2], \
-                                [i[0], i[1] + current_interval[1] / 2, i[2] - current_interval[2] / 2], \
-                                [i[0], i[1] + current_interval[1] / 2, i[2] + current_interval[2] / 2]]
+                if self.species_n == 2:
+                    extra_coords = [[i[0], i[1] - current_interval[1] / 2, i[2] - current_interval[2] / 2, i[3]], \
+                                    [i[0], i[1] - current_interval[1] / 2, i[2] + current_interval[2] / 2, i[3]], \
+                                    [i[0], i[1] + current_interval[1] / 2, i[2] - current_interval[2] / 2, i[3]], \
+                                    [i[0], i[1] + current_interval[1] / 2, i[2] + current_interval[2] / 2, i[3]]]
+                else:
+                    extra_coords = [[i[0], i[1] - current_interval[1] / 2, i[2] - current_interval[2] / 2], \
+                                    [i[0], i[1] - current_interval[1] / 2, i[2] + current_interval[2] / 2], \
+                                    [i[0], i[1] + current_interval[1] / 2, i[2] - current_interval[2] / 2], \
+                                    [i[0], i[1] + current_interval[1] / 2, i[2] + current_interval[2] / 2]]
             else:
-                extra_coords = [[i[0], i[1] -     current_interval[1] / 2, i[2] -     current_interval[2] / 2], \
-                                [i[0], i[1] - 3 * current_interval[1] / 2, i[2] -     current_interval[2] / 2], \
-                                [i[0], i[1] -     current_interval[1] / 2, i[2] - 3 * current_interval[2] / 2], \
-                                [i[0], i[1] - 3 * current_interval[1] / 2, i[2] - 3 * current_interval[2] / 2], \
-                                \
-                                [i[0], i[1] -     current_interval[1] / 2, i[2] +     current_interval[2] / 2], \
-                                [i[0], i[1] - 3 * current_interval[1] / 2, i[2] +     current_interval[2] / 2], \
-                                [i[0], i[1] -     current_interval[1] / 2, i[2] + 3 * current_interval[2] / 2], \
-                                [i[0], i[1] - 3 * current_interval[1] / 2, i[2] + 3 * current_interval[2] / 2], \
-                                \
-                                [i[0], i[1] +     current_interval[1] / 2, i[2] -     current_interval[2] / 2], \
-                                [i[0], i[1] + 3 * current_interval[1] / 2, i[2] -     current_interval[2] / 2], \
-                                [i[0], i[1] +     current_interval[1] / 2, i[2] - 3 * current_interval[2] / 2], \
-                                [i[0], i[1] + 3 * current_interval[1] / 2, i[2] - 3 * current_interval[2] / 2], \
-                                \
-                                [i[0], i[1] +     current_interval[1] / 2, i[2] +     current_interval[2] / 2], \
-                                [i[0], i[1] + 3 * current_interval[1] / 2, i[2] +     current_interval[2] / 2], \
-                                [i[0], i[1] +     current_interval[1] / 2, i[2] + 3 * current_interval[2] / 2], \
-                                [i[0], i[1] + 3 * current_interval[1] / 2, i[2] + 3 * current_interval[2] / 2]]
+                if self.species_n == 2:
+                    extra_coords = [[i[0], i[1] -     current_interval[1] / 2, i[2] -     current_interval[2] / 2, i[3]], \
+                                    [i[0], i[1] - 3 * current_interval[1] / 2, i[2] -     current_interval[2] / 2, i[3]], \
+                                    [i[0], i[1] -     current_interval[1] / 2, i[2] - 3 * current_interval[2] / 2, i[3]], \
+                                    [i[0], i[1] - 3 * current_interval[1] / 2, i[2] - 3 * current_interval[2] / 2, i[3]], \
+                                    \
+                                    [i[0], i[1] -     current_interval[1] / 2, i[2] +     current_interval[2] / 2, i[3]], \
+                                    [i[0], i[1] - 3 * current_interval[1] / 2, i[2] +     current_interval[2] / 2, i[3]], \
+                                    [i[0], i[1] -     current_interval[1] / 2, i[2] + 3 * current_interval[2] / 2, i[3]], \
+                                    [i[0], i[1] - 3 * current_interval[1] / 2, i[2] + 3 * current_interval[2] / 2, i[3]], \
+                                    \
+                                    [i[0], i[1] +     current_interval[1] / 2, i[2] -     current_interval[2] / 2, i[3]], \
+                                    [i[0], i[1] + 3 * current_interval[1] / 2, i[2] -     current_interval[2] / 2, i[3]], \
+                                    [i[0], i[1] +     current_interval[1] / 2, i[2] - 3 * current_interval[2] / 2, i[3]], \
+                                    [i[0], i[1] + 3 * current_interval[1] / 2, i[2] - 3 * current_interval[2] / 2, i[3]], \
+                                    \
+                                    [i[0], i[1] +     current_interval[1] / 2, i[2] +     current_interval[2] / 2, i[3]], \
+                                    [i[0], i[1] + 3 * current_interval[1] / 2, i[2] +     current_interval[2] / 2, i[3]], \
+                                    [i[0], i[1] +     current_interval[1] / 2, i[2] + 3 * current_interval[2] / 2, i[3]], \
+                                    [i[0], i[1] + 3 * current_interval[1] / 2, i[2] + 3 * current_interval[2] / 2, i[3]]]
+                else:
+                    extra_coords = [[i[0], i[1] -     current_interval[1] / 2, i[2] -     current_interval[2] / 2], \
+                                    [i[0], i[1] - 3 * current_interval[1] / 2, i[2] -     current_interval[2] / 2], \
+                                    [i[0], i[1] -     current_interval[1] / 2, i[2] - 3 * current_interval[2] / 2], \
+                                    [i[0], i[1] - 3 * current_interval[1] / 2, i[2] - 3 * current_interval[2] / 2], \
+                                    \
+                                    [i[0], i[1] -     current_interval[1] / 2, i[2] +     current_interval[2] / 2], \
+                                    [i[0], i[1] - 3 * current_interval[1] / 2, i[2] +     current_interval[2] / 2], \
+                                    [i[0], i[1] -     current_interval[1] / 2, i[2] + 3 * current_interval[2] / 2], \
+                                    [i[0], i[1] - 3 * current_interval[1] / 2, i[2] + 3 * current_interval[2] / 2], \
+                                    \
+                                    [i[0], i[1] +     current_interval[1] / 2, i[2] -     current_interval[2] / 2], \
+                                    [i[0], i[1] + 3 * current_interval[1] / 2, i[2] -     current_interval[2] / 2], \
+                                    [i[0], i[1] +     current_interval[1] / 2, i[2] - 3 * current_interval[2] / 2], \
+                                    [i[0], i[1] + 3 * current_interval[1] / 2, i[2] - 3 * current_interval[2] / 2], \
+                                    \
+                                    [i[0], i[1] +     current_interval[1] / 2, i[2] +     current_interval[2] / 2], \
+                                    [i[0], i[1] + 3 * current_interval[1] / 2, i[2] +     current_interval[2] / 2], \
+                                    [i[0], i[1] +     current_interval[1] / 2, i[2] + 3 * current_interval[2] / 2], \
+                                    [i[0], i[1] + 3 * current_interval[1] / 2, i[2] + 3 * current_interval[2] / 2]]
 
             for i1 in extra_coords:
                 if i1 not in new_coords:

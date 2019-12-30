@@ -10,18 +10,19 @@ import os
 ticket = SingleCLTicket()
 # put field distortion parameters here. caused by CL:
 # fitted parameters from pre-processing steps using pinhole array
-ticket.distortion_2_amp = 1
-ticket.distortion_2_shift = 0.922
-ticket.distortion_1_amp = 0.813
-ticket.distortion_1_shift = 9.459
-
+ticket.distortion_1_amp = 1
+ticket.distortion_1_shift = -0.421
+ticket.distortion_2_amp = 0.844
+ticket.distortion_2_shift = 17.484
+ticket.top_candidates = True
+ticket.top_candidates_N = 50
 "where to find the data files, for both blur and observation"
 paths = []
 paths.append('../test_dataset_6')
 ax0_ranges = []
 ax0_ranges.append(list([-20, 21]))
 ticket_folders = []
-ticket_folders.append('PyPRIS_CL_set1')
+ticket_folders.append('PyPRIS_CL_Crimson_top50')
 
 for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders):
     "the name of this pris ticket"
@@ -34,17 +35,17 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     #ticket.datapath = ''
     ticket.blur_path = "{}/Cali_3D_Crimson (3) single slice_dif0CL.tif".format(ticket.datapath)
     ticket.psf_path = "{}/PSF_Crimson_Order0.tif".format(ticket.datapath)
-    ticket.psf_norm_factor = 10000
+    ticket.psf_norm_factor = 100
 
     "specification of the psf stack"
     ticket.psfz0 = 101  # the count of the center plane, define it as z=0 in the psf coordinates system.
     ticket.observer_edge_padding = True
 
     "configure the initial candidate pool of this pris ticket"
-    ticket.init_candidates_intervals = list([1, 4, 4])
-    ticket.init_ax0_range = list([-19, 19])
-    ticket.init_ax1_range = list([1, 150])
-    ticket.init_ax2_range = list([1, 100])
+    ticket.init_candidates_intervals = list([1, 6, 6])
+    ticket.init_ax0_range = list([-5, 5])
+    ticket.init_ax1_range = list([1, 140])
+    ticket.init_ax2_range = list([1, 212])
 
     "debug configurations"
     ticket.observer_debugger = False
@@ -62,9 +63,9 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
 
 
 
-    ticket.linbreg_alpha.maxit = 80000
+    ticket.linbreg_alpha.maxit = 10000
     ticket.linbreg_alpha.it_check_rem = 1
-    ticket.linbreg_alpha.debug_it_int = 100
+    ticket.linbreg_alpha.debug_it_int = 1000
     ticket.linbreg_alpha.kick.ints = 1000
     ticket.linbreg_alpha.kick.eval_ints = 10
     ticket.linbreg_alpha.kick.flag = True
@@ -76,7 +77,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     "ticket.linbreg_alpha.PyPRIS_name = ticket.name"  # moved to loop
     ticket.linbreg_alpha.path_0 = '.'
     "ticket.bg_scaling_coef = 1.5 "  # moved to loop
-    ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -17
+    ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -11
 
     "others"
     ticket.PRIS_iter_end = 8
@@ -87,9 +88,9 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     except OSError:
         pass
 
-    for bgSCF in list([12]):
-        for mu in list([1e8]):
-            for alpha in list([1e-5]):
+    for bgSCF in list([8]):
+        for mu in list([1e2]):
+            for alpha in list([1e-9]):
                 ticket_new = copy.deepcopy(ticket)
                 ticket_new.name = "bgSCF" + str(bgSCF) + "_mu" + str("%1.1e" % mu) + "_alpha" + str("%1.1e" % alpha) + "_thres" + \
                                   str(ticket.linbreg_alpha.stopping_loghistpercdelres_thres) + "zrange" + str(ticket.init_ax0_range[0])\

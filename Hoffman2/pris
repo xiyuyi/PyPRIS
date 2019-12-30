@@ -75,6 +75,7 @@ linbreg_ori.PyPRIS_name = ticket.name
 
 if isinstance(ticket, SinglePlaneTicket):
     "configure this observer with single plane (monoplane) observation specifics"
+    print("set observer for SinglePlaneTicket")
     observer = ObserveStation()
     observer.observe_monoplane_prep(psf, single_image_size = blur.shape,
                                psfz0 = ticket.psfz0,
@@ -83,6 +84,7 @@ if isinstance(ticket, SinglePlaneTicket):
 
 if isinstance(ticket, BiplaneTicket):
     "configure this observer with biplane observation specifics"
+    print("set observer for BiplaneTicket")
     observer = ObserveStation()
     observer.observe_biplane_prep(psf, single_image_size = blur1.shape,
                                deltaz_plane1 = ticket.plane1_dz,
@@ -94,6 +96,7 @@ if isinstance(ticket, BiplaneTicket):
 if isinstance(ticket, TwoChannelTicket):
     "configure this observer with two channel observation specifics"
     "simultaneous observation with two channels"
+    print("set observer for TwoChannelTicket")
     observer = ObserveStation()
     observer.observe_two_channel_prep(psf1 = psf_channel_1,
                                       size1 = blur_channel_1.shape,
@@ -105,9 +108,10 @@ if isinstance(ticket, TwoChannelTicket):
 
 if isinstance(ticket, SingleCLTicket):
     "configure this observer with single observation that has a cylindrical lens"
+    print("set observer for SingleCLTicket")
     observer = ObserveStation()
     observer.observe_with_CL_prep(psf,
-                                  single_iamge_size = blur.shape,
+                                  single_image_size = blur.shape,
                                   psfz0 = ticket.psfz0,
                                   dist_1_amplitd=ticket.distortion_1_amp,
                                   dist_1_shift=ticket.distortion_1_shift,
@@ -119,6 +123,7 @@ if isinstance(ticket, SingleCLTicket):
 if isinstance(ticket, TwoColor_CL_and_grating_Ticket):
     "configure the observer to match with 2color 2 channel observation " \
     "(0th order diffraction channel +CL, and 1st order diffraction channel)"
+    print("set observer for TwoColor_CL_and_grating_Ticket")
     observer = ObserveStation()
     observer.observe_2color_CL_and_grating_prep(# set of parameters for Cl and grating, for color 2:
                                                 psf_CL_color1 = psf_CL_Crimson,
@@ -234,6 +239,9 @@ else:
     # get a PyPRIS object:
     pypris = PyPRIS()
     pypris.observation = blur.ravel()
+    pypris.top_candidates = ticket.top_candidates
+    pypris.top_candidate_N = ticket.top_candidates_N
+
     # put the configured observer to the pypris to perform the tasks of 'observe_biplane'
     # when a pypris object observes, it is through the observer and it is
     # done with the observer's observe_biplane skill (skill = method).

@@ -10,18 +10,19 @@ import os
 ticket = SingleCLTicket()
 # put field distortion parameters here. caused by CL:
 # fitted parameters from pre-processing steps using pinhole array
-ticket.distortion_2_amp = 1
-ticket.distortion_2_shift = -0.421
-ticket.distortion_1_amp = 0.844
-ticket.distortion_1_shift = 17.484
-
+ticket.distortion_1_amp = 1
+ticket.distortion_1_shift = -0.421
+ticket.distortion_2_amp = 0.844
+ticket.distortion_2_shift = 17.484
+ticket.top_candidates = True
+ticket.top_candidates_N = 50
 "where to find the data files, for both blur and observation"
 paths = []
 paths.append('../test_dataset_6')
 ax0_ranges = []
 ax0_ranges.append(list([-20, 21]))
 ticket_folders = []
-ticket_folders.append('PyPRIS_CL_set1')
+ticket_folders.append('PyPRIS_CL_Darkred_top50')
 
 for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders):
     "the name of this pris ticket"
@@ -32,8 +33,8 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     # need to modify these default values with a prepared test dataset.
     ticket.datapath = pypris_path+'/test_dataset_6'
     #ticket.datapath = ''
-    ticket.blur_path = "{}/Cali_3D_Crimson (3) single slice_dif0CL.tif".format(ticket.datapath)
-    ticket.psf_path = "{}/PSF_Crimson_Order0.tif".format(ticket.datapath)
+    ticket.blur_path = "{}/Cali_3D_Darkred  (5) single slice_dif0CL.tif".format(ticket.datapath)
+    ticket.psf_path = "{}/PSF_Darkred_Order0.tif".format(ticket.datapath)
     ticket.psf_norm_factor = 100
 
     "specification of the psf stack"
@@ -62,7 +63,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
 
 
 
-    ticket.linbreg_alpha.maxit = 4000
+    ticket.linbreg_alpha.maxit = 10000
     ticket.linbreg_alpha.it_check_rem = 1
     ticket.linbreg_alpha.debug_it_int = 1000
     ticket.linbreg_alpha.kick.ints = 1000
@@ -76,7 +77,7 @@ for datapath, ax0_range, ticket_folder in zip(paths, ax0_ranges, ticket_folders)
     "ticket.linbreg_alpha.PyPRIS_name = ticket.name"  # moved to loop
     ticket.linbreg_alpha.path_0 = '.'
     "ticket.bg_scaling_coef = 1.5 "  # moved to loop
-    ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -17
+    ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -11
 
     "others"
     ticket.PRIS_iter_end = 8
