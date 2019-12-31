@@ -65,6 +65,7 @@ class SinglePlaneTicket:
         "the name of this pris ticket"
         self.name = 'Demo'
         self.expansion = True
+        self.species_n = 1
         "where to find the data files, for both blur and observation"
         self.datapath = './test_dataset_2'
         self.plane1_path = "{}/im1.tif".format(self.datapath)
@@ -116,6 +117,7 @@ class TwoChannelTicket:
         "the name of this pris ticket"
         self.name = 'Demo'
         self.expansion = True
+        self.species_n = 1
         self.kernel_1_type = 'conv kernel' # cylindrical lens
         self.kernel_2_type = 'conv kernel' # when convolution assumption is applicable
         # Other options so far:
@@ -177,6 +179,7 @@ class SingleCLTicket:
         "the name of this pris ticket"
         self.name = 'Demo'
         self.expansion = True
+        self.species_n = 1
         "where to find the data files, for both blur and observation"
         self.datapath = './test_dataset_5'
 
@@ -233,6 +236,7 @@ class TwoColor_CL_and_grating_Ticket:
         "the name of this pris ticket"
         self.name = 'Demo'
         self.expansion = True
+        self.species_n = 2
         "where to find the data files, for both blur and observation"
         self.datapath = './test_dataset_6'
         self.blur_path_CL = "{}/view4_frame328_dif0CL.tif".format(self.datapath)

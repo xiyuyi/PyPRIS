@@ -68,13 +68,12 @@ class PyPRIS:
     # and generate refined pool of candidates.
         # create a check mark.
         self.set_check_mark()
-
         # Get the non_zero_coordinates from the existing cs_solver results.
-        non_zero_inds = np.argwhere(cs_solver.x[0:len(cs_solver.x) - 1] > 0)
+        non_zero_inds = np.argwhere(cs_solver.x[0:-1] > 0)
         if self.top_candidates is True:
             print("refine candidates with only top candidates")
             maxN = np.min([self.top_candidates_N, len(non_zero_inds)])
-            non_zero_inds = cs_solver.x.argsort()[-maxN:][::-1]
+            non_zero_inds = cs_solver.x[0:-1].argsort()[-maxN:][::-1]
 
         non_zero_coordinates = [self.current_candidates[i] for i in list(non_zero_inds.ravel())]
         self.current_candidates_intervals = copy.deepcopy(
@@ -307,6 +306,7 @@ class LinBreg:
 
     def get_ready(self):
         import os
+        print("linbreg getready:")
         self.it_count = -1
         self.x = np.zeros(self.A.shape[1])
         self.stepsize = np.ones(self.x.shape)  # stepsize.
@@ -317,8 +317,8 @@ class LinBreg:
         self.path_s = self.path_0 + "/saved_objects"
         self.path_d = self.path_0 + "/debug_output"
         self.kick.set_reference() # set a kick reference
-        print('stopping threshold is '+str(self.stopping_loghistpercdelres_thres))
-        print('alpha is '+str(self.alpha))
+        print('stopping threshold: '+str(self.stopping_loghistpercdelres_thres))
+        print('alpha: '+str(self.alpha))
         # calculate the initial back projected errors to determine mu
         # define the name of the directory to be created.
         import os
@@ -342,6 +342,13 @@ class LinBreg:
                     print ("Failed to write sensing matrix to directory %s " % self.path_s)
                 else: 
                     print ("Successfully wrote sensing matrix to directory %s " % self.path_s)
+
+                self.A = 0 # remove sensing matrix because it is too big for pickle
+                with open("{}/PyPRIS_{}_{}_{}.file".format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter, 0), "wb") as f:
+                    pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
+                    print ("Successfully saved Linbreg ID {} at iteration {} to directory.".format(self.PyPRIS_iter, 0))
+                with open('{}/PyPRIS_{}_{}_SensingMx.file'.format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter), "rb") as s:
+                    self.A = joblib.load(s)  # load sensing matrix back
 
             except OSError:
                 print ("Creation of the directory %s failed" % self.path_s)
@@ -432,10 +439,8 @@ class LinBreg:
             if self.stopping_loghistpercdelres < self.stopping_loghistpercdelres_thres and it_count > self.stopping_moni_start: 
                 self.flag_stop = True
                 print('stopping criteria fulfilled')
-                
             # check intermediate outputs. (Valid under debug mode).
             self.debug_output(it_count, appstr='_h_track_status_updated')
-
             # save object into separate file every assigned step
             self.save_obj(it_count, self.save_obj_int)
                 
@@ -443,20 +448,21 @@ class LinBreg:
         import sys
         if self.save is True:
             if currit % step == 1:
-                self.A = 0
+                print("now start saving objs")
+                self.A = 0 # remove sensing matrix because it is too big.
                 setattr(sys.modules[__name__], 'Kick', self.Kick)
                 with open("{}/PyPRIS_{}_{}_{}.file".format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter, currit), "wb") as f:
                     pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
                     print ("Successfully saved Linbreg ID {} at iteration {} to directory.".format(self.PyPRIS_iter, currit))
                 with open('{}/PyPRIS_{}_{}_SensingMx.file'.format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter), "rb") as s:
-                    self.A = joblib.load(s)
+                    self.A = joblib.load(s) # load sensing matrix back
             elif self.flag_stop is True:
-                self.A = 0
+                self.A = 0 # remove sensing matrix because it is too big
                 with open("{}/PyPRIS_{}_{}_{}.file".format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter, currit), "wb") as f:
                     pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
                     print ("Successfully saved Linbreg ID {} at iteration {} to directory.".format(self.PyPRIS_iter, currit))
                 with open('{}/PyPRIS_{}_{}_SensingMx.file'.format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter), "rb") as s:
-                    self.A = joblib.load(s)
+                    self.A = joblib.load(s) # load sensing matrix back
 
     def candidate_vis(self):
         intervals = self.candidate_intervals
@@ -474,10 +480,10 @@ class LinBreg:
 
         vis = np.zeros(dims)
         for coords, intensity in zip(self.candidate_coords, self.x[0:len(self.x) - 1]):
-            tp = vis[coords[0] - minimals[0] - 1, int((coords[1] - minimals[1]) // intervals[1]), int(
+            tp = vis[int((coords[0] - minimals[0] - 1) // intervals[0]), int((coords[1] - minimals[1]) // intervals[1]), int(
                 (coords[2] - minimals[2]) // intervals[2])]
-            vis[coords[0] - minimals[0] - 1, int((coords[1] - minimals[1]) // intervals[1]), int(
-                (coords[2] - minimals[2]) // intervals[2])] = np.max([intensity,tp])
+            vis[int((coords[0] - minimals[0] - 1) // intervals[0]), int((coords[1] - minimals[1]) // intervals[1]), int(
+                (coords[2] - minimals[2]) // intervals[2])] = np.max([intensity, tp])
 
         return vis
     

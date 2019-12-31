@@ -117,6 +117,7 @@ class ObserveStation:
 
                 self.obs = np.ones(self.imsize) * edge_value
                 self.obs[loc1sta:loc1end, loc2sta:loc2end] = self.stamp
+
             else:
                 self.obs = np.zeros(self.imsize)
                 self.obs[loc1sta:loc1end, loc2sta:loc2end] = self.stamp
@@ -345,7 +346,6 @@ class ObserveStation:
         self.observer_dif1_color1.edge_padding = observer_edge_padding
         self.diff1_shift_1_color1 = shift_1_color2
         self.diff1_shift_2_color1 = shift_2_color2
-        self.observer_with_shift.debug = observer_debugger
 
         # from observe with shift prep, for color2
         self.observer_dif1_color2 = self.SingleObs()  # this is the child class.
@@ -356,7 +356,6 @@ class ObserveStation:
         self.observer_dif1_color2.edge_padding = observer_edge_padding
         self.diff1_shift_1_color2 = shift_1_color2
         self.diff1_shift_2_color2 = shift_2_color2
-        self.observer_with_shift.debug = observer_debugger
 
         # from observe with CL prep, for color1
         self.observer_dif0CL_color1 = self.SingleObs()  # this is the child class.
