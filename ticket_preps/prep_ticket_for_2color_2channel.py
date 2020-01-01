@@ -46,10 +46,12 @@ ticket.plane1_dz = np.int8(0)
 ticket.observer_edge_padding = True
 
 "configure the initial candidate pool of this pris ticket"
-ticket.init_candidates_intervals = list([4, 5, 5])
-ticket.init_ax0_range = list([-40, 40])
-ticket.init_ax1_range = list([1, 100])  # full range is 140
-ticket.init_ax2_range = list([1, 60])  # full range is 212
+ticket.init_candidates_intervals = list([2, 4, 4])
+ticket.init_ax0_range = list([-100, 100])
+
+#ticket.init_ax1_range = list([1, 40])  # full range is 140  move to loop
+#ticket.init_ax2_range = list([1, 40])  # full range is 212  move to loop
+
 
 "debug configurations"
 ticket.observer_debugger = False
@@ -64,7 +66,7 @@ ticket.top_candidates_N = 100
 "where to find the data files, for both blur and observation"
 
 ticket_folders = []
-ticket_folders.append('PyPRIS_dif0CL_dif1_CS_DR_top100')
+ticket_folders.append('PyPRIS_dif0CL_dif1_CS_DR_top100_tiles')
 ticket.ticket_folder = ticket_folders[0]
 
 
@@ -91,10 +93,10 @@ ticket.linbreg_alpha.PyPRIS_iter = 0
 "ticket.linbreg_alpha.PyPRIS_name = ticket.name"  # moved to loop
 ticket.linbreg_alpha.path_0 = '.'
 "ticket.bg_scaling_coef = 1.5 "  # moved to loop
-ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -11
+ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -15
 
 "others"
-ticket.PRIS_iter_end = 8
+ticket.PRIS_iter_end = 7
 
 try:
     if not os.path.exists("../{}".format(ticket.ticket_folder)):
@@ -102,21 +104,32 @@ try:
 except OSError:
     pass
 
-for bgSCF in list([8]):
-    for mu in list([1e2]):
-        for alpha in list([1e-9]):
-            ticket_new = copy.deepcopy(ticket)
-            ticket_new.name = "bgSCF" + str(bgSCF) + "_mu" + str("%1.1e" % mu) + "_alpha" + str("%1.1e" % alpha) + "_thres" + \
-                              str(ticket.linbreg_alpha.stopping_loghistpercdelres_thres) + "zrange" + str(ticket.init_ax0_range[0])\
-                              +"to"+str(ticket.init_ax0_range[1])
-            ticket_new.bg_scaling_coef = copy.deepcopy(bgSCF)
-            ticket_new.linbreg_alpha.PyPRIS_name = ticket_new.name
-            ticket_new.linbreg_alpha.mu = mu
-            ticket_new.linbreg_alpha.alpha = alpha
-            try:
-                if not os.path.exists("../{}/{}".format(ticket_new.ticket_folder, ticket_new.name)):
-                    os.mkdir("../{}/{}".format(ticket_new.ticket_folder, ticket_new.name))
-            except OSError:
-                pass
-            with open("../{}/{}/Go.pris_ticket".format(ticket_new.ticket_folder, ticket_new.name), "wb") as f:
-                pickle.dump(ticket_new, f, pickle.HIGHEST_PROTOCOL)
+ax1_ranges = [[1,45], [35,80], [70,115], [105,140]]
+ax2_ranges = [[1,45], [35,80], [70,110], [105,140], [130,175], [165,212]]
+
+#ticket.init_ax1_range = list([1, 40])  # full range is 140  move to loop
+#ticket.init_ax2_range = list([1, 40])  # full range is 212  move to loop
+count = 0
+for ticket.init_ax1_range in ax1_ranges:
+    for ticket.init_ax2_range in ax2_ranges:
+        for bgSCF in list([8]):
+            for mu in list([1e2]):
+                for alpha in list([1e-9]):
+                    count += 1
+                    ticket_new = copy.deepcopy(ticket)
+                    ticket_new.name = "bgSCF" + str(bgSCF) + "_mu" + str("%1.1e" % mu) + "_alpha" + str("%1.1e" % alpha) + "_thres" + \
+                                      str(ticket.linbreg_alpha.stopping_loghistpercdelres_thres) + "_c" + str(count).zfill(2) + \
+                                      "_zrange" + str(ticket.init_ax0_range[0])+"to"+str(ticket.init_ax0_range[1]) + \
+                                      "_yrange" + str(ticket.init_ax1_range[0]) + "to" + str(ticket.init_ax1_range[1]) + \
+                                      "_xrange" + str(ticket.init_ax2_range[0]) + "to" + str(ticket.init_ax2_range[1])
+                    ticket_new.bg_scaling_coef = copy.deepcopy(bgSCF)
+                    ticket_new.linbreg_alpha.PyPRIS_name = ticket_new.name
+                    ticket_new.linbreg_alpha.mu = mu
+                    ticket_new.linbreg_alpha.alpha = alpha
+                    try:
+                        if not os.path.exists("../{}/{}".format(ticket_new.ticket_folder, ticket_new.name)):
+                            os.mkdir("../{}/{}".format(ticket_new.ticket_folder, ticket_new.name))
+                    except OSError:
+                        pass
+                    with open("../{}/{}/Go.pris_ticket".format(ticket_new.ticket_folder, ticket_new.name), "wb") as f:
+                        pickle.dump(ticket_new, f, pickle.HIGHEST_PROTOCOL)

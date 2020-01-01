@@ -381,6 +381,7 @@ class LinBreg:
         while self.flag_stop is False:
             # incrementation of the iteration number.
             self.it_count += 1
+            print("current iteration " + str(self.it_count))
             it_count = self.it_count
 
             # calculate distance (residuals)
