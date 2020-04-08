@@ -15,7 +15,6 @@ class ObserveStation:
         self.channel_observer_4 = None
         self.observer_with_shift = None
         self.observer_with_CL = None
-        self.dist = None
 
     class SingleObs:
         
@@ -118,6 +117,7 @@ class ObserveStation:
 
                 self.obs = np.ones(self.imsize) * edge_value
                 self.obs[loc1sta:loc1end, loc2sta:loc2end] = self.stamp
+
             else:
                 self.obs = np.zeros(self.imsize)
                 self.obs[loc1sta:loc1end, loc2sta:loc2end] = self.stamp
@@ -245,13 +245,13 @@ class ObserveStation:
         observation = np.concatenate([self.channel_observer_1.observation, self.channel_observer_2.observation]).ravel()
         return observation
 
-    def observe_with_CL_prep(self, psf, single_iamge_size, psfz0,
+    def observe_with_CL_prep(self, psf, single_image_size, psfz0,
                         dist_1_amplitd, dist_1_shift,
                         dist_2_amplitd, dist_2_shift,
                         observer_debugger, observer_edge_padding):
         self.observer_with_CL = self.SingleObs()  # this is the child class.
         self.observer_with_CL.psf = np.copy(psf)
-        self.observer_with_CL.imsize = single_iamge_size  # this should be the image size of the single plane observation
+        self.observer_with_CL.imsize = single_image_size  # this should be the image size of the single plane observation
         self.observer_with_CL.psfz0 = psfz0
         self.observer_with_CL.debug = observer_debugger
         self.observer_with_CL.edge_padding = observer_edge_padding
@@ -291,8 +291,9 @@ class ObserveStation:
 
     def observe_with_shift(self, loc):
         loc_shifted = copy.deepcopy(loc)
-        loc_shifted[1] = copy.deepcopy(loc[1] + self.shift_1) # update location based on field translation parameters.
-        loc_shifted[2] = copy.deepcopy(loc[2] + self.shift_2) # update location based on field translation parameters.
+        loc_shifted[1] = loc[1] + self.shift_1 # update location based on field translation parameters.
+        loc_shifted[2] = loc[2] + self.shift_2 # update location based on field translation parameters.
+
         self.observer_with_shift.location = loc_shifted  # focus at the position
         self.observer_with_shift.single_obs()  # take the observation, this will generate the obs attribute used below.
         self.observer_with_shift.observation = self.observer_with_shift.obs.ravel()  # record this observation
@@ -320,3 +321,109 @@ class ObserveStation:
         obs_with_shift = self.observe_with_shift(loc)
         observation = np.concatenate([obs_with_CL, obs_with_shift]).ravel()
         return observation
+
+    def observe_2color_CL_and_grating_prep(self,
+                                           # set of parameters for Cl and grating, for color 1:
+                                            psf_CL_color1, imsize_CL_color1, psfz0_CL_color1,
+                                            dist_1_amplitd_color1, dist_1_shift_color1,
+                                            dist_2_amplitd_color1, dist_2_shift_color1,
+                                            psf_dif1_color1, imsize_shift_color1, psfz0_shift_color1,
+                                            shift_1_color1, shift_2_color1,
+                                           # set of parameters for Cl and grating, for color 2:
+                                            psf_CL_color2, imsize_CL_color2, psfz0_CL_color2,
+                                            dist_1_amplitd_color2, dist_1_shift_color2,
+                                            dist_2_amplitd_color2, dist_2_shift_color2,
+                                            psf_dif1_color2, imsize_shift_color2, psfz0_shift_color2,
+                                            shift_1_color2, shift_2_color2,
+                                           # common recovery parameters
+                                            observer_debugger, observer_edge_padding):
+
+        # from observe with shift prep, for color1
+        self.observer_dif1_color1 = self.SingleObs()  # this is the child class.
+        self.observer_dif1_color1.psf = np.copy(psf_dif1_color1)
+        self.observer_dif1_color1.imsize = imsize_shift_color1  # this should be the image size of the single plane
+        self.observer_dif1_color1.psfz0 = psfz0_shift_color1
+        self.observer_dif1_color1.debug = observer_debugger
+        self.observer_dif1_color1.edge_padding = observer_edge_padding
+        self.diff1_shift_1_color1 = shift_1_color2
+        self.diff1_shift_2_color1 = shift_2_color2
+
+        # from observe with shift prep, for color2
+        self.observer_dif1_color2 = self.SingleObs()  # this is the child class.
+        self.observer_dif1_color2.psf = np.copy(psf_dif1_color2)
+        self.observer_dif1_color2.imsize = imsize_shift_color2  # this should be the image size of the single plane
+        self.observer_dif1_color2.psfz0 = psfz0_shift_color2
+        self.observer_dif1_color2.debug = observer_debugger
+        self.observer_dif1_color2.edge_padding = observer_edge_padding
+        self.diff1_shift_1_color2 = shift_1_color2
+        self.diff1_shift_2_color2 = shift_2_color2
+
+        # from observe with CL prep, for color1
+        self.observer_dif0CL_color1 = self.SingleObs()  # this is the child class.
+        self.observer_dif0CL_color1.psf = np.copy(psf_CL_color1)
+        self.observer_dif0CL_color1.imsize = imsize_CL_color1  # this should be the image size of the single plane
+        self.observer_dif0CL_color1.psfz0 = psfz0_CL_color1
+        self.observer_dif0CL_color1.debug = observer_debugger
+        self.observer_dif0CL_color1.edge_padding = observer_edge_padding
+        self.CL_A1_color1 = dist_1_amplitd_color1
+        self.CL_S1_color1 = dist_1_shift_color1
+        self.CL_A2_color1 = dist_2_amplitd_color1
+        self.CL_S2_color1 = dist_2_shift_color1
+
+        # from observe with CL prep, for color1
+        self.observer_dif0CL_color2 = self.SingleObs()  # this is the child class.
+        self.observer_dif0CL_color2.psf = np.copy(psf_CL_color2)
+        self.observer_dif0CL_color2.imsize = imsize_CL_color2  # this should be the image size of the single plane
+        self.observer_dif0CL_color2.psfz0 = psfz0_CL_color2
+        self.observer_dif0CL_color2.debug = observer_debugger
+        self.observer_dif0CL_color2.edge_padding = observer_edge_padding
+        self.CL_A1_color2 = dist_1_amplitd_color2
+        self.CL_S1_color2 = dist_1_shift_color2
+        self.CL_A2_color2 = dist_2_amplitd_color2
+        self.CL_S2_color2 = dist_2_shift_color2
+
+        return nan
+
+    def observe_2color_CL_and_grating(self, loc, ctag):
+        if ctag == 1:
+            # get observation for diff1 for color1
+            loc_shifted = copy.deepcopy(loc)
+            loc_shifted[1] = loc[1] + self.diff1_shift_1_color1  # update location based on field translation parameters.
+            loc_shifted[2] = loc[2] + self.diff1_shift_2_color1  # update location based on field translation parameters.
+            self.observer_dif1_color1.location = loc_shifted  # focus at the position
+            self.observer_dif1_color1.single_obs()  # take the observation
+            obs_dif1_color1 = self.observer_dif1_color1.obs.ravel()  # record this first observation
+
+            # get observation for diff0 + CL, for color1
+            loc_shifted = copy.deepcopy(loc)
+            loc_shifted[1] = loc[1]*self.CL_A1_color1 + self.CL_S1_color1  # update location based on field distortion.
+            loc_shifted[2] = loc[2]*self.CL_A2_color1 + self.CL_S2_color1  # update location based on field distortion.
+            self.observer_dif0CL_color1.location = loc_shifted  # focus at the position
+            self.observer_dif0CL_color1.single_obs()  # take the observation
+            self.observer_dif0CL_color1.observation = self.observer_dif0CL_color1.obs.ravel()  # record first observation
+            obs_dif0CL_color1 = self.observer_dif0CL_color1.observation
+
+            obs = np.concatenate([obs_dif0CL_color1, obs_dif1_color1])
+
+        if ctag == 2:
+            # get observation for diff1 for color2
+            loc_shifted = copy.deepcopy(loc)
+            loc_shifted[1] = loc[1] + self.diff1_shift_1_color2  # update location based on field translation parameters.
+            loc_shifted[2] = loc[2] + self.diff1_shift_2_color2  # update location based on field translation parameters.
+            self.observer_dif1_color2.location = loc_shifted  # focus at the position
+            self.observer_dif1_color2.single_obs()  # take the observation
+            obs_dif1_color2 = self.observer_dif1_color2.obs.ravel()  # record this first observation
+
+            # get observation for diff0 + CL, for color2
+            loc_shifted = copy.deepcopy(loc)
+            loc_shifted[1] = loc[1]*self.CL_A1_color2 + self.CL_S1_color2  # update location based on field distortion.
+            loc_shifted[2] = loc[2]*self.CL_A2_color2 + self.CL_S2_color2  # update location based on field distortion.
+            self.observer_dif0CL_color2.location = loc_shifted  # focus at the position
+            self.observer_dif0CL_color2.single_obs()  # take the observation
+            self.observer_dif0CL_color2.observation = self.observer_dif0CL_color2.obs.ravel()  # record first observation
+            obs_dif0CL_color2 = self.observer_dif0CL_color2.observation
+
+            obs = np.concatenate([obs_dif0CL_color2, obs_dif1_color2])
+
+        return obs
+

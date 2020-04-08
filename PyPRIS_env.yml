@@ -14,3 +14,4 @@ dependencies:
     - pillow==5.2.0
     - libtiff==0.4.2
     - nd2reader == 3.1.0    
+
