@@ -232,6 +232,7 @@ class SingleCLTicket:
         self.PRIS_iter_end = 5
 
 class TwoColor_CL_and_grating_Ticket:
+
     def __init__(self):
         "the name of this pris ticket"
         self.name = 'Demo'
@@ -278,12 +279,15 @@ class TwoColor_CL_and_grating_Ticket:
         self.init_ax1_range = list([5, 140])
         self.init_ax2_range = list([5, 212])
 
+
         "debug configurations"
         self.observer_debugger = False
         self.tobserver_edge_padding = True
 
         "output settings"
+
         self.output_file_header = 'Demo_single_plane'
+
         self.output_path = './PyPRIS_Scratch'
 
         "linbreg configurations"
@@ -306,3 +310,4 @@ class TwoColor_CL_and_grating_Ticket:
 
         "others"
         self.PRIS_iter_end = 5
+

@@ -45,6 +45,12 @@ To log-out from the PyPRIS environment, type:
 
 `conda deactivate`
 
+To update PyPRIS environment, type:
+
+`source activate PyPRIS_env`
+
+`conda env update --file PypRIS_env.yml`
+
 ### Computation on Hoffman2
 * upload the observation files (for example: blur_plane1.tif, blur_plane7.tif and psf.tif in test_data) to hoffman2. keep both files under the same file folder 
 * prepare tickets by updating and executing prep_for_hoffman2.py locally (recommended.)

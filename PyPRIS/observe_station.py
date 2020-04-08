@@ -293,9 +293,10 @@ class ObserveStation:
         loc_shifted = copy.deepcopy(loc)
         loc_shifted[1] = loc[1] + self.shift_1 # update location based on field translation parameters.
         loc_shifted[2] = loc[2] + self.shift_2 # update location based on field translation parameters.
+
         self.observer_with_shift.location = loc_shifted  # focus at the position
-        self.observer_with_shift.single_obs()  # take the observation
-        self.observer_with_shift.observation = self.observer_with_shift.obs.ravel()  # record this first observation
+        self.observer_with_shift.single_obs()  # take the observation, this will generate the obs attribute used below.
+        self.observer_with_shift.observation = self.observer_with_shift.obs.ravel()  # record this observation
         return self.observer_with_shift.observation
 
     def observe_with_CL_and_grating_prep(self,  psf_CL, imsize_CL, psfz0_CL,
@@ -425,3 +426,4 @@ class ObserveStation:
             obs = np.concatenate([obs_dif0CL_color2, obs_dif1_color2])
 
         return obs
+
