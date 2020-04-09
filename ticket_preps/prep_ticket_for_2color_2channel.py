@@ -1,7 +1,7 @@
 import sys
 sys.path.append("/u/home/x/xiyuyi/bin")
 sys.path.append("../PyPRIS")
-pypris_path = '/Users/xiyuyi/Desktop/PyPRIS'
+pypris_path = '../PyPRIS'
 sys.path.append(pypris_path)
 from PyPRIS import *
 import copy
@@ -12,7 +12,7 @@ ticket = TwoColor_CL_and_grating_Ticket()
 # fitted parameters from pre-processing steps using pinhole array
 
 "where to find the data files, for both blur and observation"
-ticket.datapath = '/Users/xiyuyi/Desktop/PyPRIS/test_dataset_6'
+ticket.datapath = '/Users/yi10/Desktop/Research/Projects/PRIS/PyPRIS/test_dataset_6'
 ticket.blur_path_CL = "{}/view4_frame328_dif0CL.tif".format(ticket.datapath)
 ticket.blur_path_diff1 = "{}/view4_frame328_dif1.tif".format(ticket.datapath)
 
