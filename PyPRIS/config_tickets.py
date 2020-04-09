@@ -232,7 +232,6 @@ class SingleCLTicket:
         self.PRIS_iter_end = 5
 
 class TwoColor_CL_and_grating_Ticket:
-
     def __init__(self):
         "the name of this pris ticket"
         self.name = 'Demo'
@@ -311,3 +310,6 @@ class TwoColor_CL_and_grating_Ticket:
         "others"
         self.PRIS_iter_end = 5
 
+
+class CLnShiftTicket:
+    pass
