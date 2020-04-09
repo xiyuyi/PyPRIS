@@ -19,6 +19,8 @@ sys.path.append("G:\\DH_localization\\PyPRIS")
 sys.path.append("C:\\Users\\china\\Desktop\\Research\\PyPRIS")
 sys.path.append("/Users/xiyuyi/Desktop/PyPRIS")
 sys.path.append("/Users/yi10/Desktop/Research/Projects/PRIS/PyPRIS")
+sys.path.append("/g/g92/yi10/PyPRIS")
+
 from PyPRIS import *
 import os
 print("")
