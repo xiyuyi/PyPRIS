@@ -4,6 +4,7 @@ import copy
 import pickle
 import joblib
 import matplotlib
+matplotlib.use('agg')
 from PyPRIS.candidate_screening import *
 
 try:
