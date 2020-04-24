@@ -65,7 +65,7 @@ ticket.top_candidates = True
 ticket.top_candidates_N = 100
 "where to find the data files, for both blur and observation"
 
-ticket_folders = []
+ticket_folders = "/p/lscratchh/yi10/PRIS"
 ticket_folders.append('PyPRIS_dif0CL_dif1_CS_DR_top100_tiles')
 ticket.ticket_folder = ticket_folders[0]
 
@@ -79,14 +79,14 @@ ticket.linbreg_alpha.deep_debug = False
 
 
 ticket.species_n = 2
-ticket.linbreg_alpha.maxit = 10000
+ticket.linbreg_alpha.maxit = 100000
 ticket.linbreg_alpha.it_check_rem = 1
-ticket.linbreg_alpha.debug_it_int = 1000
-ticket.linbreg_alpha.kick.ints = 1000
+ticket.linbreg_alpha.debug_it_int = 5000
+ticket.linbreg_alpha.kick.ints = 5000
 ticket.linbreg_alpha.kick.eval_ints = 10
 ticket.linbreg_alpha.kick.flag = True
 ticket.linbreg_alpha.kick.thres = 0.01
-ticket.linbreg_alpha.save_obj_int = 1000
+ticket.linbreg_alpha.save_obj_int = 5000
 ticket.linbreg_alpha.save = True
 ticket.expansion = False
 ticket.linbreg_alpha.PyPRIS_iter = 0
