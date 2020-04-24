@@ -12,7 +12,7 @@ ticket = TwoColor_CL_and_grating_Ticket()
 # fitted parameters from pre-processing steps using pinhole array
 
 "where to find the data files, for both blur and observation"
-ticket.datapath = '/Users/yi10/Desktop/Research/Projects/PRIS/PyPRIS/test_dataset_6'
+ticket.datapath = '/g/g92/yi10/PyPRIS/test_dataset_6'
 ticket.blur_path_CL = "{}/view4_frame328_dif0CL.tif".format(ticket.datapath)
 ticket.blur_path_diff1 = "{}/view4_frame328_dif1.tif".format(ticket.datapath)
 
@@ -79,7 +79,7 @@ ticket.linbreg_alpha.deep_debug = False
 
 
 ticket.species_n = 2
-ticket.linbreg_alpha.maxit = 80000
+ticket.linbreg_alpha.maxit = 10000
 ticket.linbreg_alpha.it_check_rem = 1
 ticket.linbreg_alpha.debug_it_int = 1000
 ticket.linbreg_alpha.kick.ints = 1000
