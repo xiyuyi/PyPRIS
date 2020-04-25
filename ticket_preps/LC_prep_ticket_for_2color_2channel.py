@@ -66,6 +66,7 @@ ticket.top_candidates_N = 100
 "where to find the data files, for both blur and observation"
 
 scratchpath = "/p/lscratchh/yi10/PRIS"
+ticket_folders = []
 ticket_folders.append('PyPRIS_dif0CL_dif1_CS_DR_top100_tiles')
 ticket.ticket_folder = ticket_folders[0]
 
