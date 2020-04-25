@@ -67,7 +67,7 @@ ticket.top_candidates_N = 100
 
 ticket.scratchpath = "/p/lscratchh/yi10/PRIS"
 ticket_folders = []
-ticket_folders.append('PyPRIS_dif0CL_dif1_CS_DR_top100_tiles')
+ticket_folders.append('PyPRIS_dif0CL_dif1_CS_DR_top100_tiles_50kIt')
 ticket.ticket_folder = ticket_folders[0]
 
 
