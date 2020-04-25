@@ -65,7 +65,7 @@ ticket.top_candidates = True
 ticket.top_candidates_N = 100
 "where to find the data files, for both blur and observation"
 
-ticket_folders = "/p/lscratchh/yi10/PRIS"
+scratchpath = "/p/lscratchh/yi10/PRIS"
 ticket_folders.append('PyPRIS_dif0CL_dif1_CS_DR_top100_tiles')
 ticket.ticket_folder = ticket_folders[0]
 
@@ -127,9 +127,9 @@ for ticket.init_ax1_range in ax1_ranges:
                     ticket_new.linbreg_alpha.mu = mu
                     ticket_new.linbreg_alpha.alpha = alpha
                     try:
-                        if not os.path.exists("../{}/{}".format(ticket_new.ticket_folder, ticket_new.name)):
-                            os.mkdir("../{}/{}".format(ticket_new.ticket_folder, ticket_new.name))
+                        if not os.path.exists("{}/{}/{}".format(ticket_new.scratchpath, ticket_new.ticket_folder, ticket_new.name)):
+                            os.mkdir("{}/{}/{}".format(ticket_new.scratchpath, ticket_new.ticket_folder, ticket_new.name))
                     except OSError:
                         pass
-                    with open("../{}/{}/Go.pris_ticket".format(ticket_new.ticket_folder, ticket_new.name), "wb") as f:
+                    with open("{}/{}/{}/Go.pris_ticket".format(ticket_new.scratchpath, ticket_new.ticket_folder, ticket_new.name), "wb") as f:
                         pickle.dump(ticket_new, f, pickle.HIGHEST_PROTOCOL)
