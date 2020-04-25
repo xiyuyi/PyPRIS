@@ -80,7 +80,7 @@ ticket.linbreg_alpha.deep_debug = False
 
 
 ticket.species_n = 2
-ticket.linbreg_alpha.maxit = 100000
+ticket.linbreg_alpha.maxit = 500000
 ticket.linbreg_alpha.it_check_rem = 1
 ticket.linbreg_alpha.debug_it_int = 5000
 ticket.linbreg_alpha.kick.ints = 5000
@@ -106,7 +106,7 @@ except OSError:
     pass
 
 ax1_ranges = [[1,45], [35,80], [70,115], [105,140]]
-ax2_ranges = [[1,45], [35,80], [70,110], [105,140], [130,175], [165,212]]
+ax2_ranges = [[1,45], [35,80], [70,110], [105,140], [130, 175], [165,212]]
 
 #ticket.init_ax1_range = list([1, 40])  # full range is 140  move to loop
 #ticket.init_ax2_range = list([1, 40])  # full range is 212  move to loop
