@@ -100,8 +100,8 @@ ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -15
 ticket.PRIS_iter_end = 7
 
 try:
-    if not os.path.exists("../{}".format(ticket.ticket_folder)):
-        os.mkdir("../{}".format(ticket.ticket_folder))
+    if not os.path.exists("{}/{}".format(ticket.scratchpath, ticket.ticket_folder)):
+        os.mkdir("{}/{}".format(ticket.scratchpath, ticket.ticket_folder))
 except OSError:
     pass
 
