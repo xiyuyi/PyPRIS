@@ -2,8 +2,14 @@
 ##### These lines are for Slurm
 #SBATCH -N 1
 #SBATCH -p pbatch
-#SBATCH -t 20:00:00
+#SBATCH -t 1:00:00
 #SBATCH -A mmbp
+#SBATCH -J sub1
+
+echo $SLURM_JOBID
+id=$SLURM_JOBID
+
+
 
 ##### These are shell commands
 echo 'startig time'
@@ -11,11 +17,25 @@ date
 
 echo '================ system output of the executable starts here ================'
 
-sbatch -n1 pris
+cd /p/lscratchh/yi10/PRIS/PyPRIS_dif0CL_dif1_CS_DR_top100_tiles_50kIt/bgSCF8_mu1.0e+02_alpha1.0e-09_thres-15_c01_zrange-100to100_yrange1to45_xrange1to45
+chmod u+x pris
+srun -N1 -n1 pris
+wait
 
 echo '================ system output of the executable ends here ================'
+echo ''
+echo job id is $id
+touch estimate
+echo "#!/bin/bash" >> estimate
+echo "seff "$id >> estimate
+echo job id is $id
+seff $id
+chmod u+x estimate
+srun -N1 -n1 estimate
 echo 'finish time'
 date
 
 ##### Notes #####
 # in a future upgrade, should make the requested resources to match the size of the dataset.
+
+

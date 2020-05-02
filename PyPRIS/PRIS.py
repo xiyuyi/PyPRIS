@@ -4,11 +4,11 @@ import copy
 import pickle
 import joblib
 import matplotlib
-matplotlib.use('agg')
 from PyPRIS.candidate_screening import *
 
 try:
     from matplotlib import pyplot as plt
+    plt.switch_backend('agg')
 except RuntimeError:
     pass
 
@@ -400,7 +400,6 @@ class LinBreg:
         while self.flag_stop is False:
             # incrementation of the iteration number.
             self.it_count += 1
-            print("current iteration " + str(self.it_count))
             it_count = self.it_count
 
             # calculate distance (residuals)
@@ -468,6 +467,7 @@ class LinBreg:
         import sys
         if self.save is True:
             if currit % step == 1:
+                print("current iteration " + str(self.it_count))
                 print("now start saving objs")
                 self.A = 0 # remove sensing matrix because it is too big.
                 setattr(sys.modules[__name__], 'Kick', self.Kick)

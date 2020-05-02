@@ -1,0 +1,13 @@
+#!/bin/bash
+##### These lines are for Slurm
+#SBATCH -N [NODE NUMBER]
+#SBATCH -p [QUEUE TYPE]
+#SBATCH -t [RUN TIME]
+#SBATCH -A [BANK]
+#SBATCH -J [JOB NAME]
+#SBATCH -o [JOB OUTPUT NAME]
+
+##### These are shell commands
+echo 'startig time'
+date
+echo '================ system output of the executable starts here ================'
