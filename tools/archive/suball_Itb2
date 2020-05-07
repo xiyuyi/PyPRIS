@@ -1,0 +1,71 @@
+#!/bin/bash
+##### These lines are for Slurm
+#SBATCH -N 1
+#SBATCH -p pbatch
+#SBATCH -t 6:00:00
+#SBATCH -A mmbp
+#SBATCH -J N1n8_32G
+
+##### These are shell commands
+echo 'startig time'
+date
+mem_per_job=$((1024*32)) # memory perjob, in MB
+
+echo '================ system output of the executable starts here ================'
+
+cd /p/lscratchh/yi10/PRIS/PyPRIS_dif0CL_dif1_CS_DR_top100_tiles_50kIt/bgSCF8_mu1.0e+02_alpha1.0e-09_thres-15_c11_zrange-100to100_yrange35to80_xrange130to175
+chmod u+x pris
+srun -N1 -n1 --mem $mem_per_job pris &
+
+
+cd /p/lscratchh/yi10/PRIS/PyPRIS_dif0CL_dif1_CS_DR_top100_tiles_50kIt/bgSCF8_mu1.0e+02_alpha1.0e-09_thres-15_c12_zrange-100to100_yrange35to80_xrange165to212
+chmod u+x pris
+srun -N1 -n1 --mem $mem_per_job pris &
+
+
+cd /p/lscratchh/yi10/PRIS/PyPRIS_dif0CL_dif1_CS_DR_top100_tiles_50kIt/bgSCF8_mu1.0e+02_alpha1.0e-09_thres-15_c13_zrange-100to100_yrange70to115_xrange1to45
+chmod u+x pris
+srun -N1 -n1 --mem $mem_per_job pris &
+
+
+cd /p/lscratchh/yi10/PRIS/PyPRIS_dif0CL_dif1_CS_DR_top100_tiles_50kIt/bgSCF8_mu1.0e+02_alpha1.0e-09_thres-15_c14_zrange-100to100_yrange70to115_xrange35to80
+chmod u+x pris
+srun -N1 -n1 --mem $mem_per_job pris &
+
+
+cd /p/lscratchh/yi10/PRIS/PyPRIS_dif0CL_dif1_CS_DR_top100_tiles_50kIt/bgSCF8_mu1.0e+02_alpha1.0e-09_thres-15_c15_zrange-100to100_yrange70to115_xrange70to110
+chmod u+x pris
+srun -N1 -n1 --mem $mem_per_job pris &
+
+
+cd /p/lscratchh/yi10/PRIS/PyPRIS_dif0CL_dif1_CS_DR_top100_tiles_50kIt/bgSCF8_mu1.0e+02_alpha1.0e-09_thres-15_c16_zrange-100to100_yrange70to115_xrange105to140
+chmod u+x pris
+srun -N1 -n1 --mem $mem_per_job pris &
+
+
+cd /p/lscratchh/yi10/PRIS/PyPRIS_dif0CL_dif1_CS_DR_top100_tiles_50kIt/bgSCF8_mu1.0e+02_alpha1.0e-09_thres-15_c17_zrange-100to100_yrange70to115_xrange130to175
+chmod u+x pris
+srun -N1 -n1 --mem $mem_per_job pris &
+
+
+cd /p/lscratchh/yi10/PRIS/PyPRIS_dif0CL_dif1_CS_DR_top100_tiles_50kIt/bgSCF8_mu1.0e+02_alpha1.0e-09_thres-15_c18_zrange-100to100_yrange70to115_xrange165to212
+chmod u+x pris
+srun -N1 -n1 --mem $mem_per_job pris &
+
+wait
+
+echo '================ system output of the executable ends here ================'
+echo '================ system output of the executable ends here ================'
+echo ''
+echo job id is $id
+cd /g/g92/yi10/subtest
+touch estimate
+echo "#!/bin/bash" >> estimate
+echo "seff "$id >> estimate
+echo job id is $id
+seff $id
+chmod u+x estimate
+srun -N1 -n1 estimate
+echo 'finish time'
+date
+

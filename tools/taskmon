@@ -1,0 +1,78 @@
+#!bin/bash
+
+function tmpris.count
+{
+
+if [ $# -ge 1 ]
+then
+  slurmname=$2
+  mem_per_task=$((1024*$3))
+  jobN=$4
+
+  unfinished=0
+  total_tasks=0
+  finished_tasks=0
+  for i in $(ls)
+  do
+    if [ -d $i ]
+    then
+      cd $i
+      for j in $(ls)
+      do
+        if [ -d $j ]
+        then
+          if [ -e ./$j/Go.pris_ticket ]
+          then
+          total_tasks=`expr $total_tasks + 1`
+            if [ -e ./$j/saved_objects/done ]
+            then
+              finished_tasks=`expr $finished_tasks + 1`
+            else
+              unfinished=`expr $unfinished + 1`
+            fi
+          fi
+        fi
+      done
+      cd ..
+    fi
+  done
+
+
+
+
+  # find out total number of nodes
+  if [[ $(hostname) == quartz* ]]
+  then
+    mem_per_node=(36*128)
+  elif [[ $(hostname) == pascal* ]]
+  then
+    mem_per_node=(36*256)
+  fi
+
+  # calculate total number of nodes needed per job
+  nodes_per_job=$((mem_per_task*$unfinished/mem_per_node/$4+1))
+
+  # display status of task bundle
+  echo $total_tasks total tasks
+  echo $finished_tasks finished tasks
+  echo $unfinished tasks to continue
+
+  if [[ $1 == prepslurm ]]
+  then
+  # prepare for the slurm scripts
+  echo "prepare slurm scripts: " $slurmname
+  fi
+
+else
+  echo "options for input argument:"
+  echo "    count: count the pack of tasks"
+  echo "    prepslurm: to prepare a slurm script to submit all jobs"
+  echo "usage:"
+  echo " To count jobs:"
+  echo "    tmpris.count count <slurm-script-name> <mem-per-task(GB)> <jobN> <run time hh:mm:ss>"
+  echo " To prep slurm to submit jobs:"
+  echo "    tmpris.count prepslurm <slurm-script-name> <mem-per-task(GB)> <jobN> <run time hh:mm:ss>"
+  echo ""
+  echo ""
+fi
+}

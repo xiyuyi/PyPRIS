@@ -1,30 +1,41 @@
 #!/bin/bash
 ##### These lines are for Slurm
-#SBATCH -N 1
+#SBATCH -N 2
 #SBATCH -p pbatch
-#SBATCH -t 1:00:00
+#SBATCH -t 6:00:00
 #SBATCH -A mmbp
-#SBATCH -J sub1
-
-echo $SLURM_JOBID
-id=$SLURM_JOBID
-
+#SBATCH -J It_wipeout
 
 
 ##### These are shell commands
 echo 'startig time'
 date
+mem_per_job=$((1024*256)) # memory perjob, in MB
 
 echo '================ system output of the executable starts here ================'
-
-cd /p/lscratchh/yi10/PRIS/PyPRIS_dif0CL_dif1_CS_DR_top100_tiles_50kIt/bgSCF8_mu1.0e+02_alpha1.0e-09_thres-15_c01_zrange-100to100_yrange1to45_xrange1to45
-chmod u+x pris
-srun -N1 -n1 pris
+cd /p/lscratchh/yi10/PRIS/PyPRIS_dif0CL_dif1_CS_DR_top100_tiles_50kIt
+for i in $(ls)
+do
+  cd $i
+  echo now checking $i
+  if [ -e ./saved_objects/done ]
+  then
+    echo $i is done
+  else
+    echo ----------submitting for $i
+    chmod u+x pris
+    srun -N1 -n1 --mem $mem_per_job pris &
+  fi
+  cd ..
+done
 wait
+
+
 
 echo '================ system output of the executable ends here ================'
 echo ''
 echo job id is $id
+cd /g/g92/yi10/subtest
 touch estimate
 echo "#!/bin/bash" >> estimate
 echo "seff "$id >> estimate
@@ -34,8 +45,4 @@ chmod u+x estimate
 srun -N1 -n1 estimate
 echo 'finish time'
 date
-
-##### Notes #####
-# in a future upgrade, should make the requested resources to match the size of the dataset.
-
 

@@ -5,9 +5,11 @@
 #SBATCH -t [RUN TIME]
 #SBATCH -A [BANK]
 #SBATCH -J [JOB NAME]
-#SBATCH -o [JOB OUTPUT NAME]
 
 ##### These are shell commands
 echo 'startig time'
+date
+id=$SLURM_JOBID
+echo job id is $id
 date
 echo '================ system output of the executable starts here ================'
