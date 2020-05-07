@@ -3,64 +3,97 @@
 function tmpris.count
 {
 
-if [ $# -ge 1 ]
+if [ $# -eq 6 ]
 then
   slurmname=$2
   mem_per_task=$((1024*$3))
   jobN=$4
-
+  runtime=$5
+  queue=$6
+  if [[ $(hostname) == pascal* ]]
+  then
+    queue='pvis'
+  fi
   unfinished=0
   total_tasks=0
   finished_tasks=0
-  for i in $(ls)
+  for i in $(find . -maxdepth 5 -type d)
   do
-    if [ -d $i ]
-    then
-      cd $i
-      for j in $(ls)
-      do
-        if [ -d $j ]
-        then
-          if [ -e ./$j/Go.pris_ticket ]
+          if [ -e $i/Go.pris_ticket ]
           then
           total_tasks=`expr $total_tasks + 1`
-            if [ -e ./$j/saved_objects/done ]
+            if [ -e $i/saved_objects/done ]
             then
               finished_tasks=`expr $finished_tasks + 1`
             else
               unfinished=`expr $unfinished + 1`
+              k="task"$unfinished"_dir=\$(pwd)/\$i"
+              eval $k
             fi
           fi
-        fi
-      done
-      cd ..
-    fi
   done
-
-
 
 
   # find out total number of nodes
   if [[ $(hostname) == quartz* ]]
   then
-    mem_per_node=(36*128)
+    mem_per_node=128
   elif [[ $(hostname) == pascal* ]]
   then
-    mem_per_node=(36*256)
+    mem_per_node=256
   fi
 
+  # calculate tasks per job (round up formula)
+  tasks_per_job=$((($unfinished+$jobN-1)/$jobN))
+  # calculate tasks per node based on memory requirement and memory availability (round-up formula)
+  tasks_per_node=$(( ($mem_per_node) / $3 ))
   # calculate total number of nodes needed per job
-  nodes_per_job=$((mem_per_task*$unfinished/mem_per_node/$4+1))
+  nodes_per_job=$((($tasks_per_job+$tasks_per_node-1)/$tasks_per_node))
+
 
   # display status of task bundle
   echo $total_tasks total tasks
   echo $finished_tasks finished tasks
   echo $unfinished tasks to continue
+  echo
+  echo host: $(hostname)
+  echo For each node: $tasks_per_node tasks, each task reqiure $3 G memory.
+  echo For each job: $nodes_per_job nodes
+  echo requested time: $runtime
 
   if [[ $1 == prepslurm ]]
   then
+  tag=0
   # prepare for the slurm scripts
-  echo "prepare slurm scripts: " $slurmname
+  echo "preparing slurm scripts... "
+  for i in $(seq $jobN)
+    do
+      sed -e "s/\[NODE NUMBER\]/$nodes_per_job/g" \
+              -e "s/\[QUEUE TYPE\]/$queue/g" \
+              -e "s/\[RUN TIME\]/$runtime/g" \
+              -e "s/\[BANK\]/mmbp/g"\
+              -e "s/\[JOB NAME\]/$slurmname"-"$i/g" /g/g92/yi10/PyPRIS/tools/slurmhead > $slurmname"-"$i.sl
+
+      for j in $(seq $tasks_per_job)
+        do
+          tag=`expr $tag + 1`
+          if [ $unfinished -ge $tag ]
+            then
+            k="task_dir=\$task"$tag"_dir"
+            eval $k
+            echo "echo submitting $task_dir/pris" >> $slurmname"-"$i.sl
+            echo "  cd "$task_dir >> $slurmname"-"$i.sl
+            echo "  chmod u+x pris" >> $slurmname"-"$i.sl
+            echo "  srun -N1 -n1 --mem "$mem_per_task" pris &"   >> $slurmname"-"$i.sl
+            echo "  " >> $slurmname"-"$i.sl
+          fi
+        done
+        echo " wait " >>  $slurmname"-"$i.sl
+        echo "echo '================ system output of the executable starts here ================'" >>  $slurmname"-"$i.sl
+        echo "echo Done" >>  $slurmname"-"$i.sl
+        echo "echo finish time " >>  $slurmname"-"$i.sl
+        echo "date" >>  $slurmname"-"$i.sl
+    done
   fi
 
 else
@@ -69,10 +102,51 @@ else
   echo "    prepslurm: to prepare a slurm script to submit all jobs"
   echo "usage:"
   echo " To count jobs:"
-  echo "    tmpris.count count <slurm-script-name> <mem-per-task(GB)> <jobN> <run time hh:mm:ss>"
+  echo "    tmpris.count count <slurm-script-name> <mem-per-task(GB)> <jobN> <run time hh:mm:ss> <queue>"
   echo " To prep slurm to submit jobs:"
-  echo "    tmpris.count prepslurm <slurm-script-name> <mem-per-task(GB)> <jobN> <run time hh:mm:ss>"
+  echo "    tmpris.count prepslurm <slurm-script-name> <mem-per-task(GB)> <jobN> <run time hh:mm:ss> <queue>"
   echo ""
   echo ""
 fi
+
+
+}
+
+function tmpris.clean_for_continue
+{
+  dirN=0
+  for i in $(find . -maxdepth 5 -type d)
+  do
+          if [ -e $i/Go.pris_ticket ]
+          then
+          total_tasks=`expr $total_tasks + 1`
+            if [ -e $i/saved_objects ]
+            then
+              if [ -e $i/debug_output ]
+              then
+                :
+              else
+                dirN=`expr $dirN + 1`
+                k="del_dir"$dirN"=$i/saved_objects"
+                eval $k
+              fi
+            fi
+          fi
+  done
+  for i in $(seq $dirN)
+  do
+    k="del_dir=\$del_dir$i"; eval $k
+    k="rm -rf $del_dir"
+    eval $k
+  done
+}
+
+function tmpris.suball
+{
+  echo "submitting all slurm scripts in this directory"
+  for i in $(ls *.sl)
+  do
+    chmod u+x $i
+    sbatch $i
+  done
 }
