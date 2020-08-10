@@ -12,7 +12,7 @@ ticket = TwoColor_CL_and_grating_Ticket()
 # fitted parameters from pre-processing steps using pinhole array
 
 "where to find the data files, for both blur and observation"
-ticket.datapath = '/Users/yi10/Desktop/Research/Projects/PRIS/PyPRIS/test_dataset_6'
+ticket.datapath = '/g/g92/yi10/PyPRIS/test_dataset_6'
 ticket.blur_path_CL = "{}/view4_frame328_dif0CL.tif".format(ticket.datapath)
 ticket.blur_path_diff1 = "{}/view4_frame328_dif1.tif".format(ticket.datapath)
 
@@ -65,8 +65,9 @@ ticket.top_candidates = True
 ticket.top_candidates_N = 100
 "where to find the data files, for both blur and observation"
 
+ticket.scratchpath = "/p/lscratchh/yi10/PRIS"
 ticket_folders = []
-ticket_folders.append('PyPRIS_dif0CL_dif1_CS_DR_top100_tiles')
+ticket_folders.append('PyPRIS_dif0CL_dif1_CS_DR_top100_tiles_50kIt')
 ticket.ticket_folder = ticket_folders[0]
 
 
@@ -79,14 +80,14 @@ ticket.linbreg_alpha.deep_debug = False
 
 
 ticket.species_n = 2
-ticket.linbreg_alpha.maxit = 80000
+ticket.linbreg_alpha.maxit = 500000
 ticket.linbreg_alpha.it_check_rem = 1
-ticket.linbreg_alpha.debug_it_int = 1000
-ticket.linbreg_alpha.kick.ints = 1000
+ticket.linbreg_alpha.debug_it_int = 5000
+ticket.linbreg_alpha.kick.ints = 5000
 ticket.linbreg_alpha.kick.eval_ints = 10
 ticket.linbreg_alpha.kick.flag = True
 ticket.linbreg_alpha.kick.thres = 0.01
-ticket.linbreg_alpha.save_obj_int = 1000
+ticket.linbreg_alpha.save_obj_int = 5000
 ticket.linbreg_alpha.save = True
 ticket.expansion = False
 ticket.linbreg_alpha.PyPRIS_iter = 0
@@ -99,13 +100,13 @@ ticket.linbreg_alpha.stopping_loghistpercdelres_thres = -15
 ticket.PRIS_iter_end = 7
 
 try:
-    if not os.path.exists("../{}".format(ticket.ticket_folder)):
-        os.mkdir("../{}".format(ticket.ticket_folder))
+    if not os.path.exists("{}/{}".format(ticket.scratchpath, ticket.ticket_folder)):
+        os.mkdir("{}/{}".format(ticket.scratchpath, ticket.ticket_folder))
 except OSError:
     pass
 
 ax1_ranges = [[1,45], [35,80], [70,115], [105,140]]
-ax2_ranges = [[1,45], [35,80], [70,110], [105,140], [130,175], [165,212]]
+ax2_ranges = [[1,45], [35,80], [70,110], [105,140], [130, 175], [165,212]]
 
 #ticket.init_ax1_range = list([1, 40])  # full range is 140  move to loop
 #ticket.init_ax2_range = list([1, 40])  # full range is 212  move to loop
@@ -127,9 +128,9 @@ for ticket.init_ax1_range in ax1_ranges:
                     ticket_new.linbreg_alpha.mu = mu
                     ticket_new.linbreg_alpha.alpha = alpha
                     try:
-                        if not os.path.exists("../{}/{}".format(ticket_new.ticket_folder, ticket_new.name)):
-                            os.mkdir("../{}/{}".format(ticket_new.ticket_folder, ticket_new.name))
+                        if not os.path.exists("{}/{}/{}".format(ticket_new.scratchpath, ticket_new.ticket_folder, ticket_new.name)):
+                            os.mkdir("{}/{}/{}".format(ticket_new.scratchpath, ticket_new.ticket_folder, ticket_new.name))
                     except OSError:
                         pass
-                    with open("../{}/{}/Go.pris_ticket".format(ticket_new.ticket_folder, ticket_new.name), "wb") as f:
+                    with open("{}/{}/{}/Go.pris_ticket".format(ticket_new.scratchpath, ticket_new.ticket_folder, ticket_new.name), "wb") as f:
                         pickle.dump(ticket_new, f, pickle.HIGHEST_PROTOCOL)

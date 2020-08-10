@@ -1,0 +1,45 @@
+#!/bin/bash
+##### These lines are for Slurm
+#SBATCH -N 12
+#SBATCH -p pbatch
+#SBATCH -t 10:00:00
+#SBATCH -A mmbp
+#SBATCH -J V1F558
+##### These are shell commands
+jobs_dir=/p/lscratchh/yi10/PRIS/PyPRIS_V1F558_top100_tiles_50kIt
+mem_per_job=$((1024*64)) # memory perjob, in MB
+
+id=$SLURM_JOBID
+echo job id is $id
+echo jobs_dir is $jobs_direcho 'startig time'
+date
+echo '================ system output of the executable starts here ================'
+cd $jobs_dir
+for i in $(ls)
+do
+  if [ -d $i ]
+  then
+    if [[ $i == *'_thres-17_'* ]]
+    then
+      cd $i
+      echo now checking $i
+      if [ -e ./saved_objects/done ]
+        then
+          echo $i is done
+        else
+          echo ----------submitting for $i
+        chmod u+x pris
+        srun -N1 -n1 --mem $mem_per_job pris &
+      fi
+      cd ..
+    fi
+  fi
+done
+wait
+echo '================ system output of the executable ends here ================'
+echo ''
+echo job id is $id
+echo jobs_dir is $jobs_dir
+echo 'finish time'
+date
+

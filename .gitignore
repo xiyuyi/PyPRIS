@@ -1,5 +1,7 @@
 # exclude test folder and the data folder
 .idea
 .DS_Store
+.*~
+.*#
 *~
 *#
