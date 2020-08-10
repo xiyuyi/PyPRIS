@@ -322,7 +322,6 @@ class LinBreg:
 
         return mask
 
-
     def get_ready(self):
         import os
         print("linbreg getready:")

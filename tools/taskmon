@@ -1,5 +1,11 @@
 #!bin/bash
-
+function tmpris.show
+{
+  echo functions:
+  echo tmpris.count: count for wipeout.
+  echo tmpris.clean_for_continue: wipeout
+  echo tmpris.suball: submit all existing .sl scripts using sbatch.
+}
 function tmpris.count
 {
 
@@ -12,7 +18,10 @@ then
   queue=$6
   if [[ $(hostname) == pascal* ]]
   then
+    if [[ $queue == pdebug ]]
+    then
     queue='pvis'
+    fi
   fi
   unfinished=0
   total_tasks=0
@@ -119,7 +128,6 @@ function tmpris.clean_for_continue
   do
           if [ -e $i/Go.pris_ticket ]
           then
-          total_tasks=`expr $total_tasks + 1`
             if [ -e $i/saved_objects ]
             then
               if [ -e $i/debug_output ]
@@ -143,10 +151,64 @@ function tmpris.clean_for_continue
 
 function tmpris.suball
 {
-  echo "submitting all slurm scripts in this directory"
-  for i in $(ls *.sl)
+  if [ $# -eq 0 ]
+  then
+    echo "options for input argument:"
+    echo "    <string>: count the pack of tasks"
+    echo "usage:"
+    echo "    tmpris.suball demo"
+    echo "    this will submit all the slurm scripts of format demo*.sl in the current directory"
+    echo ""
+    echo ""
+  else
+    head=$1
+    echo "submitting all slurm scripts in this directory"
+    for i in $(ls $head*.sl)
+    do
+      chmod u+x $i
+      sbatch $i
+    done
+  fi
+}
+
+function tmpris.move-all-png
+{
+  if [ $# -eq 0 ]
+  then
+    echo Syntax:
+    echo tmpris.move-all-png [destimation folder]
+    echo This will copy the tree of folders into [destimation folder] and copy only the png files.
+    echo
+  fi
+
+  if [ $# -ge 1 ]
+  then
+    echo Sorry, too many input arguments. Type tmpris.move-all-png for syntax
+  fi
+
+  if [ $# -eq 1 ]
+  then
+  mkdir $1
+  for i in $(ls)
   do
-    chmod u+x $i
-    sbatch $i
+    if [[ $i == PyPRIS_* ]]
+    then
+      mkdir $1/$i
+      cd $i
+      for j in $(ls)
+      do
+        if [[ $j == bgSCF8*zrange*yrange*xrange ]]
+        then
+          mkdir $1/$i/$j
+          mkdir $1/$i/$j/debug_output
+          scp ./$j/debug_output/*.png $1/$i/$j/debug_output/*.png
+        fi
+      done
+      cd ..
+    fi
   done
+
+  fi
+
+
 }

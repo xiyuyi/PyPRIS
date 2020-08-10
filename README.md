@@ -70,3 +70,9 @@ Examples include prep_for_hoffman2_Feature2.py and prep_for_hoffman2_feature3.py
   * submit batch jobs
   * remember that there are complications associated with files from Github that was pushed from a windows system!
       * Temporary solution: creat the same file on the linux system by copy-pasting the content in to a new file with the same file name (instead of copy-pasting the file).
+
+
+## Note
+Codes developed before July.8.2019 were developed while Xiyu was affiliated with UCLA.
+
+Codes developed after July.8.2019 were developed while Xiyu is affiliated with LLNL. 
