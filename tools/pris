@@ -182,11 +182,23 @@ for r, d, f in os.walk(path):
         if file.endswith('SensingMx.file'):
             mxnames.append(file[0:-5])
 
+print(mxnames)
+print("here is hte mxnames")
+print("")
+print("")
+print("")
 
 if len(mxnames) is not 0:
     print("PyPRIS Continue!")
-    print("")
-    mxName = mxnames[-1]
+    plt.switch_backend('agg')
+    # find out the maximum iteration number for PRIS iterations
+    its=[]
+    for x in mxnames:
+        it = x.split('_pris')[1].split('_')[0]
+        its.append(np.int(it))
+    maxItN=np.where(its==np.max(its))[0][0]
+
+    mxName = mxnames[maxItN]
     for r, d, f in os.walk(path):
         for file in f:
             if file.startswith(mxName[0:-9]):
@@ -398,3 +410,5 @@ for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
     # recover
     linbreg.get_ready()
     linbreg.go()
+
+os.system('touch ./saved_objects/done')
