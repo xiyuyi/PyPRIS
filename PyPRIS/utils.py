@@ -53,3 +53,32 @@ def fetch_saved_objects(path, key):
         d[key]['pris' + str(pris_N)] = e
 
     return d
+
+
+def linbreg_report(linbreg, tstr):
+    v = linbreg.candidate_vis()
+    vis = v[:, :, :]
+    prj_ax0 = copy.deepcopy(np.mean(vis, axis=0))
+    prj_ax1 = copy.deepcopy(np.mean(vis, axis=1))
+    prj_ax2 = copy.deepcopy(np.mean(vis, axis=2).T)
+    patch = np.zeros((vis.shape[0], vis.shape[0]))
+    cat1 = np.concatenate([prj_ax0, prj_ax2], axis=1)
+    cat2 = np.concatenate([prj_ax1, patch], axis=1)
+    cat = np.concatenate([cat1, cat2], axis=0)
+
+    b = linbreg.b.reshape(a.obs_dim0, a.obs_dim1)
+    recb = linbreg.recb.reshape(a.obs_dim0, a.obs_dim1)
+    print(tstr)
+    plt.figure(figsize=(15, 5))
+    plt.subplot(1, 3, 1)
+    plt.imshow(cat)
+    t = plt.title('projections')
+
+    plt.subplot(1, 3, 2)
+    plt.imshow(b)
+    t = plt.title('input blur')
+
+    plt.subplot(1, 3, 3)
+    plt.imshow(recb)
+    t = plt.title('recovered blur')
+    return [b, recb, cat]
