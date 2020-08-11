@@ -128,6 +128,8 @@ function tmpris.clean_for_continue
   do
           if [ -e $i/Go.pris_ticket ]
           then
+
+          total_tasks=`expr $total_tasks + 1`
             if [ -e $i/saved_objects ]
             then
               if [ -e $i/debug_output ]
@@ -209,6 +211,5 @@ function tmpris.move-all-png
   done
 
   fi
-
 
 }
