@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 
 def fetch_saved_objects(path, key):
     objs = next(os.walk(path))[2]
