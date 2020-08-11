@@ -35,15 +35,15 @@ def fetch_saved_objects(path, key):
         for f in objs:
             # find the linbreg for current thres and current pris_N
             if 'pris' + str(pris_N) + '_' + str(linbreg_n) + '.file' in f:
-                linbreg = count_fp + '/saved_objects/' + f
+                linbreg = path + '/' + f
 
             # find the sensing_mx for current thres and current pris_N
             if 'pris' + str(pris_N) + '_SensingMx.file' in f:
-                sensingmx = count_fp + '/saved_objects/' + f
+                sensingmx = path + '/' + f
 
             # find the pris obj for current thres and current pris_N
             if '_pris' + str(pris_N) + '.file' in f:
-                prisobj = count_fp + '/saved_objects/' + f
+                prisobj = path + '/' + f
 
         # construct the dict:
         e = {'linbreg': linbreg,
