@@ -1,6 +1,12 @@
 import os
 import pandas as pd
 import numpy as np
+import copy
+try:
+    from matplotlib import pyplot as plt
+    plt.switch_backend('agg')
+except RuntimeError:
+    pass
 
 def fetch_saved_objects(path, key):
     objs = next(os.walk(path))[2]
@@ -55,7 +61,7 @@ def fetch_saved_objects(path, key):
     return d
 
 
-def linbreg_report(linbreg, tstr):
+def linbreg_report(linbreg, msg):
     v = linbreg.candidate_vis()
     vis = v[:, :, :]
     prj_ax0 = copy.deepcopy(np.mean(vis, axis=0))
@@ -66,9 +72,9 @@ def linbreg_report(linbreg, tstr):
     cat2 = np.concatenate([prj_ax1, patch], axis=1)
     cat = np.concatenate([cat1, cat2], axis=0)
 
-    b = linbreg.b.reshape(a.obs_dim0, a.obs_dim1)
-    recb = linbreg.recb.reshape(a.obs_dim0, a.obs_dim1)
-    print(tstr)
+    b = linbreg.b.reshape(linbreg.obs_dim0, linbreg.obs_dim1)
+    recb = linbreg.recb.reshape(linbreg.obs_dim0, linbreg.obs_dim1)
+    print(msg)
     plt.figure(figsize=(15, 5))
     plt.subplot(1, 3, 1)
     plt.imshow(cat)
@@ -80,5 +86,5 @@ def linbreg_report(linbreg, tstr):
 
     plt.subplot(1, 3, 3)
     plt.imshow(recb)
-    t = plt.title('recovered blur')
-    return [b, recb, cat]
+    t = plt.title('recovered blur '+str(linbreg.PyPRIS_iter)+', it'+str(linbreg.it_count))
+    return [b, recb, cat, prj_ax0, prj_ax1, prj_ax2]
