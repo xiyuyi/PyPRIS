@@ -4,7 +4,10 @@ import copy
 import pickle
 import joblib
 import matplotlib
+
+from PyPRIS.utils import *
 from PyPRIS.candidate_screening import *
+
 
 try:
     from matplotlib import pyplot as plt
@@ -14,6 +17,9 @@ except RuntimeError:
 
 #  Authors: Xiyu Yi, Xingjia Wang @ UCLA, 2019.
 #  PI: Shimon Weiss, Department of Chemistry and Biochemistry, UCLA.
+#  Xiyu continued to work on the codes after July 8th of 2020,
+#  when she started to become an employee at Lawrence Livermore National Laboratory.
+
 
 class PyPRIS:
     
@@ -192,6 +198,14 @@ class PyPRIS:
                 print(key + ":  [hidden];")
             else:
                 print(key + ":  " + str(value))
+
+    def prep_candit_rolling_pop(self):
+        """
+        this function takes a pypris object in, and returns a modified version.
+        :return:
+        """
+        self = utils.candidates_init_rolling_pop(self)
+        return
 
 
 class LinBreg:

@@ -88,3 +88,23 @@ def linbreg_report(linbreg, msg):
     plt.imshow(recb)
     t = plt.title('recovered blur '+str(linbreg.PyPRIS_iter)+', it'+str(linbreg.it_count))
     return [b, recb, cat, prj_ax0, prj_ax1, prj_ax2]
+
+
+def candidates_init_pop_and_roll(p):
+    """
+    this function should go over candidates from patch to patch, calculate the sensing matrix for the patch,
+    inverse it, and pop out empty candidates.
+    Refine, and pop. until it reaches a desired candidate pool size (user defined.).
+    Then update the pypris object with the current ReF, A, candidates, candidates intervals, etc.
+    And return the updated pypris object.
+
+    :param p: a PyPRIS object.
+    :return: a modified PyPRIS object with the following updated fields:
+        current_relReF (should be an appropriate number), because we want to smart initiate the pool with original pixel size.
+        current_A: should reduce to the lean candidate pool.
+        current_candidates
+        current_candidates_intervals
+
+    """
+    print('OK')
+    pass
