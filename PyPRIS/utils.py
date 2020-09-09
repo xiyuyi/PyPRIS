@@ -92,8 +92,9 @@ def linbreg_report(linbreg, msg):
 
 def candidates_init_pop_and_roll(p):
     """
-    this function should go over candidates from patch to patch, calculate the sensing matrix for the patch,
-    inverse it, and pop out empty candidates.
+    this function should go over candidates pools in a tiling fashion.
+    For each tile, the corresponding sensing matrix is going to be calculated, then multiply the observation with the
+    inverse of the sensing matrix, and then pop out empty candidates.
     Refine, and pop. until it reaches a desired candidate pool size (user defined.).
     Then update the pypris object with the current ReF, A, candidates, candidates intervals, etc.
     And return the updated pypris object.
