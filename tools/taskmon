@@ -5,6 +5,10 @@ function tmpris.what
   echo tmpris.count: count for wipeout.
   echo tmpris.clean_for_continue: wipeout
   echo tmpris.suball: submit all existing .sl scripts using sbatch.
+  echo tmpris.move-final-pris: move pris results into a destination folder
+  echo tmpris.move-all-png: move all png files to the destination folder
+  echo
+  echo "type tmpris.<the name> for usage information"
 }
 function tmpris.count
 {
@@ -255,6 +259,7 @@ function tmpris.move-final-pris
     echo Syntax:
     echo "tmpris.move-final-pris <destimation folder> <pris-tag> <linbreg-tag> <sensing-matrix-tag> <ticket_folder_head>"
     echo "This will copy the tree of folders into [destimation folder] and copy only the last iteration"
+    echo "make sure you are under the parent directory of all pris ticket folders"
     echo "of pypris object, and/or linbreg object, and/or the sensing matrix to the destination based "
     echo "on the choices."
     echo "<destination folder>: string"
