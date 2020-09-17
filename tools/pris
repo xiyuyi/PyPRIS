@@ -271,8 +271,8 @@ else:
     # get a PyPRIS object:
     pypris = PyPRIS()
     pypris.observation = blur.ravel()
-    pypris.top_candidates = ticket.top_candidates
-    pypris.top_candidate_N = ticket.top_candidates_N
+    #pypris.top_candidates = ticket.top_candidates
+    #pypris.top_candidate_N = ticket.top_candidates_N
 
     # put the configured observer to the pypris to perform the tasks of 'observe_biplane'
     # when a pypris object observes, it is through the observer and it is
@@ -313,7 +313,7 @@ else:
             for i0 in range_ind0:
                 for i1 in range_ind1:
                     for i2 in range_ind2:
-                        pypris.current_candidates.append([i0, i1, i2, ctag])
+                        pypris.current_candidates.append([i0, i1, i2, 1])
         else:
             for i0 in range_ind0:
                 for i1 in range_ind1:

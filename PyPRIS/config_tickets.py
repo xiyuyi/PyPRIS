@@ -310,6 +310,5 @@ class TwoColor_CL_and_grating_Ticket:
         "others"
         self.PRIS_iter_end = 5
 
-
 class CLnShiftTicket:
     pass

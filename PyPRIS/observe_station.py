@@ -62,10 +62,10 @@ class ObserveStation:
             loc2sta = int(max(loc2 - psf2hw, 0))
             loc2end = int(min(loc2 + psf2hw + 1, obs2w))
 
-            psf1sta = int(psf1hw - (loc1 - loc1sta));  # need to think about whether I should add 1 or not.
-            psf1end = int(psf1hw + (loc1end - loc1));
-            psf2sta = int(psf2hw - (loc2 - loc2sta));  # need to think about whether I should add 1 or not.
-            psf2end = int(psf2hw + (loc2end - loc2));
+            psf1sta = int(psf1hw - (loc1 - loc1sta))  # need to think about whether I should add 1 or not.
+            psf1end = int(psf1hw + (loc1end - loc1))
+            psf2sta = int(psf2hw - (loc2 - loc2sta))  # need to think about whether I should add 1 or not.
+            psf2end = int(psf2hw + (loc2end - loc2))
 
             if self.debug is True:
                 print('original loc1 is ' + str(self.location[1]))
@@ -85,7 +85,8 @@ class ObserveStation:
 
             if self.subpixel_shift is True:
                 # get the stamp with only the integer part
-                stamp = np.copy(self.psf[self.layerN, :, :])
+                eps = np.finfo(float).eps
+                stamp = np.copy(self.psf[self.layerN, :, :])+eps
                 # up perform sub-pixel interpolation to include the sub-pixel shifts in the stamp.
 
                 locs1 = np.arange(0, stamp.shape[0])
