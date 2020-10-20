@@ -69,8 +69,10 @@ then
 
   # calculate tasks per job per batch (round up formula)
   tasks_per_job_per_batch=$((($tasks_per_job+$sequential_batch_N-1)/$sequential_batch_N))
+
   # calculate tasks per node based on memory requirement and memory availability (round-up formula)
   tasks_per_node=$(( ($mem_per_node) / $mem_per_task_G ))
+
   # calculate total number of nodes needed per job
   nodes_per_job=$((($tasks_per_job_per_batch+$tasks_per_node-1)/$tasks_per_node))
 
