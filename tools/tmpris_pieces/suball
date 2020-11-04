@@ -1,0 +1,21 @@
+function tmpris.suball
+{
+  if [ $# -eq 0 ]
+  then
+    echo "options for input argument:"
+    echo "    <string>: count the pack of tasks"
+    echo "usage:"
+    echo "    tmpris.suball demo"
+    echo "    this will submit all the slurm scripts of format demo*.sl in the current directory"
+    echo ""
+    echo ""
+  else
+    head=$1
+    echo "submitting all slurm scripts in this directory"
+    for i in $(ls $head*.sl)
+    do
+      chmod u+x $i
+      sbatch $i
+    done
+  fi
+}

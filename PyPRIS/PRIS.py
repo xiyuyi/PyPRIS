@@ -656,9 +656,13 @@ class LinBreg:
                 t.set_position([.5, 1])
 
                 plt.subplot(nrow, ncol, 19)
-                plt.hist(self.res.ravel(), 100)
-                t = plt.title('histogram of residual')
-                t.set_position([.5, 1])
+                try:
+                    plt.hist(self.res.ravel(), 100)
+                    t = plt.title('histogram of residual')
+                except:
+                    t = plt.title('histogram of residual not available')
+                    pass
+                t.set_position([.5, 0.5])
 
                 plt.subplot(nrow, ncol, 20)
                 if len(self.kick.hist_eval_counts) > 2:
