@@ -85,8 +85,7 @@ class ObserveStation:
 
             if self.subpixel_shift is True:
                 # get the stamp with only the integer part
-                eps = np.finfo(float).eps
-                stamp = np.copy(self.psf[self.layerN, :, :])+eps
+                stamp = np.float64(np.copy(self.psf[self.layerN, :, :])) + np.finfo(float).eps
                 # up perform sub-pixel interpolation to include the sub-pixel shifts in the stamp.
 
                 locs1 = np.arange(0, stamp.shape[0])

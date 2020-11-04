@@ -664,6 +664,7 @@ class LinBreg:
                     pass
                 t.set_position([.5, 0.5])
 
+
                 plt.subplot(nrow, ncol, 20)
                 if len(self.kick.hist_eval_counts) > 2:
                     t = list(zip(*self.kick.hist_eval_counts))

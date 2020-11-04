@@ -1,0 +1,335 @@
+#!bin/bash
+function tmpris.what
+{
+  echo functions:
+  echo tmpris.count: count for wipeout.
+  echo tmpris.clean_for_continue: wipeout
+  echo tmpris.suball: submit all existing .sl scripts using sbatch.
+  echo tmpris.move-final-pris: move pris results into a destination folder
+  echo tmpris.move-all-png: move all png files to the destination folder
+  echo
+  echo "type tmpris.<the name> for usage information"
+}
+
+function tmpris.count
+{
+
+if [ $# -eq 9 ]
+then
+  slurmname=$2
+  mem_per_task_G=$3
+  mem_per_task=$((1024*$3))
+  jobN=$4
+  runtime=$5
+  queue=$6
+  bank=$7
+  sequential_batch_N=$8
+  folder_depth=$9
+  if [[ $(hostname) == pascal* ]]
+  then
+    if [[ $queue == pdebug ]]
+    then
+    queue='pvis'
+    fi
+  fi
+  unfinished=0
+  total_tasks=0
+  finished_tasks=0
+  checkN=0
+  for i in $(find . -maxdepth $folder_depth -type d)
+  do
+      echo $checkN
+      checkN=`expr $checkN + 1`
+          if [ -e $i/Go.pris_ticket ]
+          then
+          total_tasks=`expr $total_tasks + 1`
+            if [ -e $i/saved_objects/done ]
+            then
+              finished_tasks=`expr $finished_tasks + 1`
+            else
+              unfinished=`expr $unfinished + 1`
+              k="task"$unfinished"_dir=\$(pwd)/\$i"
+              eval $k
+            fi
+          fi
+  done
+
+
+  # find out total number of nodes
+  if [[ $(hostname) == quartz* ]]
+  then
+    mem_per_node=128
+  elif [[ $(hostname) == pascal* ]]
+  then
+    mem_per_node=256
+  fi
+
+  # calculate tasks per job (round up formula)
+  tasks_per_job=$((($unfinished+$jobN-1)/$jobN))
+
+  # calculate tasks per job per batch (round up formula)
+  tasks_per_job_per_batch=$((($tasks_per_job+$sequential_batch_N-1)/$sequential_batch_N))
+
+  # calculate tasks per node based on memory requirement and memory availability (round-up formula)
+  tasks_per_node=$(( ($mem_per_node) / $mem_per_task_G ))
+
+  # calculate total number of nodes needed per job
+  nodes_per_job=$((($tasks_per_job_per_batch+$tasks_per_node-1)/$tasks_per_node))
+
+
+  # display status of task bundle
+  echo $total_tasks total tasks
+  echo $finished_tasks finished tasks
+  echo $unfinished tasks to continue
+  echo
+  echo host: $(hostname)
+  echo total jobs: $jobN
+  echo For each node: $tasks_per_node tasks, each task reqiure $3 G memory.
+  echo For each job: $nodes_per_job nodes will be requested, and will be used to run $tasks_per_job tasks
+  echo requested time: $runtime
+  echo tasks per job per batch is $tasks_per_job_per_batch
+  echo tasks per job is $tasks_per_job
+  echo total number of batches is $sequential_batch_N
+
+
+  if [[ $1 == prepslurm ]]
+  then
+  tag=0
+  batch_count=0
+  # prepare for the slurm scripts
+  echo "preparing slurm scripts... "
+  for i in $(seq $jobN)
+    do
+      echo "prep job" $i
+      sed -e "s/\[NODE NUMBER\]/$nodes_per_job/g" \
+              -e "s/\[QUEUE TYPE\]/$queue/g" \
+              -e "s/\[RUN TIME\]/$runtime/g" \
+              -e "s/\[BANK\]/$bank/g"\
+              -e "s/\[JOB NAME\]/$slurmname"-"$i/g" /g/g92/yi10/PyPRIS/tools/slurmhead > $slurmname"-"$i.sl
+
+      for j in $(seq $tasks_per_job)
+        do
+          tag=`expr $tag + 1`
+          batch_count=`expr $batch_count + 1`
+          if [ $unfinished -ge $tag ]
+            then
+            k="task_dir=\$task"$tag"_dir"
+            eval $k
+            echo "echo submitting $task_dir/pris" >> $slurmname"-"$i.sl
+            echo "  cd "$task_dir >> $slurmname"-"$i.sl
+            echo "  chmod u+x pris" >> $slurmname"-"$i.sl
+            echo "  srun -N1 -n1 --mem "$mem_per_task" pris &"   >> $slurmname"-"$i.sl
+            echo "  " >> $slurmname"-"$i.sl
+            if [ $batch_count -eq $tasks_per_job_per_batch ]
+            then
+              echo " wait" >> $slurmname"-"$i.sl
+              echo "  " >> $slurmname"-"$i.sl
+              batch_count=0
+              fi
+          fi
+        done
+        echo " wait " >>  $slurmname"-"$i.sl
+        echo "echo '================ system output of the executable starts here ================'" >>  $slurmname"-"$i.sl
+        echo "echo Done" >>  $slurmname"-"$i.sl
+        echo "echo finish time " >>  $slurmname"-"$i.sl
+        echo "date" >>  $slurmname"-"$i.sl
+    done
+  fi
+
+else
+  echo "options for input argument:"
+  echo "    count: count the pack of tasks"
+  echo "    prepslurm: to prepare a slurm script to submit all jobs"
+  echo "usage:"
+  echo " To count jobs:"
+  echo "    tmpris.count count <slurm-script-name> <mem-per-task(GB)> <jobN> <run time hh:mm:ss> <queue> <bank> <sequenctial_batch_N> <folder_depth>"
+  echo " To prep slurm to submit jobs:"
+  echo "    tmpris.count prepslurm <slurm-script-name> <mem-per-task(GB)> <jobN> <run time hh:mm:ss> <queue> <bank> <sequenctial_batch_N> <folder_depth>"
+  echo ""
+  echo "Options"
+  echo "<bank>:"
+  echo "---- mmbp for LDRD-LW"
+  echo "---- cancer for ras"
+  echo ""
+  echo "<queue>:"
+  echo "---- pbatch for calculation"
+  echo "---- pdebug for debug"
+  echo ""
+  echo "<sequenctial_batch_N>:"
+  echo "----  sequential batch number. It is sequential from batch to batch. tasks within the same batch are parallel"
+fi
+
+
+}
+
+function tmpris.clean_for_continue
+{
+  dirN=0
+  for i in $(find . -maxdepth 5 -type d)
+  do
+          if [ -e $i/Go.pris_ticket ]
+          then
+
+          total_tasks=`expr $total_tasks + 1`
+            if [ -e $i/saved_objects ]
+            then
+              if [ -e $i/debug_output ]
+              then
+                :
+              else
+                dirN=`expr $dirN + 1`
+                k="del_dir"$dirN"=$i/saved_objects"
+                eval $k
+              fi
+            fi
+          fi
+  done
+  for i in $(seq $dirN)
+  do
+    k="del_dir=\$del_dir$i"; eval $k
+    k="rm -rf $del_dir"
+    eval $k
+  done
+}
+
+function tmpris.suball
+{
+  if [ $# -eq 0 ]
+  then
+    echo "options for input argument:"
+    echo "    <string>: count the pack of tasks"
+    echo "usage:"
+    echo "    tmpris.suball demo"
+    echo "    this will submit all the slurm scripts of format demo*.sl in the current directory"
+    echo ""
+    echo ""
+  else
+    head=$1
+    echo "submitting all slurm scripts in this directory"
+    for i in $(ls $head*.sl)
+    do
+      chmod u+x $i
+      sbatch $i
+    done
+  fi
+}
+
+function tmpris.move-all-png
+{
+  if [ $# -eq 0 ]
+  then
+    echo Syntax:
+    echo tmpris.move-all-png [destimation folder]
+    echo This will copy the tree of folders into [destimation folder] and copy only the png files.
+    echo
+  fi
+
+  if [ $# -ge 1 ]
+  then
+    echo Sorry, too many input arguments. Type tmpris.move-all-png for syntax
+  fi
+
+  if [ $# -eq 1 ]
+  then
+  mkdir $1
+  for i in $(ls)
+  do
+    if [[ $i == PyPRIS_* ]]
+    then
+      mkdir $1/$i
+      cd $i
+      for j in $(ls)
+      do
+        if [[ $j == bgSCF8*zrange*yrange*xrange ]]
+        then
+          mkdir $1/$i/$j
+          mkdir $1/$i/$j/debug_output
+          scp ./$j/debug_output/*.png $1/$i/$j/debug_output/*.png
+        fi
+      done
+      cd ..
+    fi
+  done
+
+  fi
+
+}
+
+function tmpris.move-final-pris
+{
+  if [ $# -eq 0 ]
+  then
+    echo Syntax:
+    echo "tmpris.move-final-pris <destimation folder> <pris-tag> <linbreg-tag> <sensing-matrix-tag> <ticket_folder_head>"
+    echo "This will copy the tree of folders into [destimation folder] and copy only the last iteration"
+    echo "make sure you are under the parent directory of all pris ticket folders"
+    echo "of pypris object, and/or linbreg object, and/or the sensing matrix to the destination based "
+    echo "on the choices."
+    echo "<destination folder>: string"
+    echo "<pris-tag>: 0 or 1. Choose 0 for no, 1 for yes."
+    echo "<linbreg-tag>: 0 or 1. Choose 0 for no, 1 for yes."
+    echo "<sensing-matrix-tag>: 0 or 1. Choose 0 for no, 1 for yes."
+    echo "<ticket_folder_head>: string, the starting string of the folders for all the tickets."
+
+    echo
+  fi
+
+  if [ $# -ge 6 ]
+  then
+    echo Sorry, too many input arguments. Type tmpris.move-final-pris for syntax
+  fi
+
+  if [ $# -eq 5 ]
+  then
+  pristag=$2
+  linbregtag=$3
+  sensmxtag=$4
+  ticket_folder_head=$5
+  if [ -e $1 ]
+  then
+    :
+    else
+    mkdir $1
+    fi
+  for i in $(ls)
+  do
+    echo $i
+    if [[ $i == $ticket_folder_head* ]]
+    then
+      mkdir $1/$i
+      mkdir $1/$i/saved_objects
+          # find lastlinbregN
+          lastlinbregN=1000 # should change to automatic detection
+          # find lastprisN
+          lastprisN=4 # should change to automatic deteciton.
+
+          # Now copy over linbreg
+            if [[ $linbregtag -eq 1 ]]
+            then
+              # should change to actual detection
+              fname="PyPRIS_"$i"_pris4_1000.file"
+              scp ./$i/saved_objects/$fname $1/$i/saved_objects/$fname
+            fi
+
+          # now copy over pris
+            if [[ $pristag -eq 1 ]]
+            then
+              fname=PyPRIS_pris4.file
+              scp ./$i/saved_objects/$fname $1/$i/saved_objects/$fname
+            fi
+
+          # now copy over sensing matrix
+            if [[ $sensmxtag -eq 1 ]]
+            then
+              fname="PyPRIS_"$i"_pris4_SensingMx.file"
+              scp ./$i/saved_objects/$fname $1/$i/saved_objects/$fname
+            fi
+
+    fi
+  done
+
+  fi
+
+
+
+}
