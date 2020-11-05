@@ -211,6 +211,8 @@ class PyPRIS:
 class LinBreg:
     def __init__(self, PyPRIS_n):
         import time
+        self.auto_mu = False
+        self.auto_bg = False
         self.PyPRIS_iter = []  # Associated PyPRIS iter number
         self.PyPRIS_name = PyPRIS_n # Associated PyPRIS name
         self.path_0 = "../PyPRIS_Scratch"
@@ -242,7 +244,6 @@ class LinBreg:
         self.kick = self.Kick(self)
         self.A_dir = ''  # directory to store sensing matrix when saving
         self.mu_reference = 0
-        self.auto_mu = False
 
     class Kick:
         def __init__(self, LinBreg):
@@ -398,10 +399,21 @@ class LinBreg:
             else:
                 print ("Successfully created Debug directory %s " % self.path_d)
 
+        if self.auto_bg is True:
+            print('setting auto background component transfer function')
+            pp = np.max(np.dot(self.b, self.A[:, :-1]))
+            bb = np.max(np.dot(self.b, self.A[:, -1]))
+            r = pp/bb
+            self.A[:, -1] = self.A[:, -1] * r * 2
+
+            # unfinished...
         if self.auto_mu is True:
             print('Setting AutoMu')
             pp = np.dot(self.b, self.A)
             self.mu = np.max(pp.ravel())
+
+
+
 
     def shrink(self, sk):
         sk[np.where((sk >= -self.mu) * (sk <= self.mu))] = 0
