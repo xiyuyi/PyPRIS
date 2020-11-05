@@ -242,6 +242,8 @@ class LinBreg:
         self.kick = self.Kick(self)
         self.A_dir = ''  # directory to store sensing matrix when saving
         self.mu_reference = 0
+        self.auto_mu = False
+
     class Kick:
         def __init__(self, LinBreg):
             self.parent = LinBreg
@@ -395,6 +397,11 @@ class LinBreg:
                 print ("Creation of the directory %s failed" % self.path_d)
             else:
                 print ("Successfully created Debug directory %s " % self.path_d)
+
+        if self.auto_mu is True:
+            print('Setting AutoMu')
+            pp = np.dot(self.b, self.A)
+            self.mu = np.max(pp.ravel())
 
     def shrink(self, sk):
         sk[np.where((sk >= -self.mu) * (sk <= self.mu))] = 0

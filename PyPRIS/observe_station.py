@@ -266,8 +266,8 @@ class ObserveStation:
         # get an observer to observe with updated location coordiantes
         # self.channel_observer_2 = self.SingleObs()
         loc_shifted = copy.deepcopy(loc)
-        loc_shifted[1] = loc[1]*self.CL_A1 + self.CL_S1# update location based on field distortion parameters.
-        loc_shifted[2] = loc[2]*self.CL_A2 + self.CL_S2# update location based on field distortion parameters.
+        loc_shifted[1] = loc[1]*self.CL_A1 + self.CL_S1 # update location based on field distortion parameters.
+        loc_shifted[2] = loc[2]*self.CL_A2 + self.CL_S2 # update location based on field distortion parameters.
         self.observer_with_CL.location = loc_shifted  # focus at the position
         self.observer_with_CL.single_obs()  # take the observation
         self.observer_with_CL.observation = self.observer_with_CL.obs.ravel()  # record this first observation
