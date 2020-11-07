@@ -164,3 +164,39 @@ def get_clusters_fromlinbreg(lbpath, ticketIndex, csvpath, D, save=False):
     else:
         print('Sorry, only 2D clustering is available as of yet')
     return clusters
+
+
+def find_psf_matrix_offset(pypris):
+    """
+    find the offset of the PSF matrix from the exact center of the matrix.
+    :param pypris:
+    :return:
+    """
+    center = np.round((np.max(pypris.current_candidates, axis=0) - np.min(pypris.current_candidates, axis=0)) / 2).astype('float32')
+    range_ind0 = np.arange(center[0], center[0] + 1 - pypris.current_candidates_intervals[0]/2, pypris.current_candidates_intervals[0])
+    range_ind1 = np.arange(center[1], center[1] + 1 - pypris.current_candidates_intervals[1]/2, pypris.current_candidates_intervals[1])
+    range_ind2 = np.arange(center[2], center[2] + 1 - pypris.current_candidates_intervals[2]/2, pypris.current_candidates_intervals[2])
+    pypris.current_candidates = list()  # erase the current pool of candidates, and make the new set
+    if pypris.species_n == 1:
+        for i0 in range_ind0:
+            for i1 in range_ind1:
+                for i2 in range_ind2:
+                    pypris.current_candidates.append([i0, i1, i2, 1])
+
+    # Now generate the observation of all those candidates locations by generating the sensing matrix
+    pypris.generate_sensing_mx()
+
+    # find the candidate that is located at a center pixel in observation space.
+    # sort observation pixels
+    l = (np.sort(pypris.current_A[:, :-1], axis=0))
+    # calculate the ratio of the brightese pixel and the second brightest pixel
+    p1 = l[-1, :]
+    p2 = l[-2, :]
+    ratio = list(p1 / p2)
+
+    # find the index with the highest ratio
+    ind = ratio.index(np.max(ratio))
+
+    # print out the offset
+    offset = pypris.current_candidates[ind][0:3] - center + 0.5
+    return offset

@@ -47,3 +47,15 @@ def pris_show(locs, lb, outputhtml, saveoption):
     grid = gridplot([[p1, p2], [p4, p3]], plot_width=pw, plot_height=ph)
     show(grid)
     return
+
+def bokeh_imshow(im):
+    p1 = figure(tooltips=[("x", "$x"), ("y", "$y"), ("value", "@image")],
+                    title='blur')
+    p1.x_range.range_padding = p1.y_range.range_padding = 0
+    p1.image(image=[im], x=0, y=0, dw=500, dh=500)
+    pw=450
+    ph=450
+    grid = gridplot([[p1]], plot_width=500, plot_height=500)
+    show(grid)
+
+
