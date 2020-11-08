@@ -724,8 +724,15 @@ class LinBreg:
 def loadCSSolver(path, PyPRIS_name, PyPRIS_SensMx_name):
     with open('{}/{}.file'.format(path, PyPRIS_name), "rb") as f:
         linbreg = pickle.load(f) #the loaded object is a LinBreg object
-    with open('{}/{}.file'.format(path, PyPRIS_SensMx_name), "rb") as s:
-        linbreg.A = joblib.load(s)
+
+    try:
+        with open('{}/{}.file'.format(path, PyPRIS_SensMx_name), "rb") as s:
+            linbreg.A = joblib.load(s)
+    except Warning:
+        print("the following file not found:")
+        print('{}/{}.file'.format(path, PyPRIS_SensMx_name))
+        print("There is no sensing matrix detected.")
+        pass
     return linbreg
 
 
