@@ -172,7 +172,7 @@ def find_psf_matrix_offset(pypris):
     :param pypris:
     :return:
     """
-    center = np.round((np.max(pypris.current_candidates, axis=0) - np.min(pypris.current_candidates, axis=0)) / 2).astype('float32')
+    center = np.round((np.max(pypris.current_candidates, axis=0) - np.min(pypris.current_candidates, axis=0)) / 2).astype('float32')+0.5
     range_ind0 = np.arange(center[0], center[0] + 1 - pypris.current_candidates_intervals[0]/2, pypris.current_candidates_intervals[0])
     range_ind1 = np.arange(center[1], center[1] + 1 - pypris.current_candidates_intervals[1]/2, pypris.current_candidates_intervals[1])
     range_ind2 = np.arange(center[2], center[2] + 1 - pypris.current_candidates_intervals[2]/2, pypris.current_candidates_intervals[2])
@@ -198,5 +198,5 @@ def find_psf_matrix_offset(pypris):
     ind = ratio.index(np.max(ratio))
 
     # print out the offset
-    offset = pypris.current_candidates[ind][0:3] - center + 0.5
+    offset = pypris.current_candidates[ind][0:3] - center
     return offset
