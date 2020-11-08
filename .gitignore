@@ -7,3 +7,9 @@
 *#
 /PyPRIS/__pycache__
 /.ipynb_checkpoints/
+/examples
+**workbench
+**/workbooks/.ipynb
+**/workbooks/*.html
+**/workbooks/*.csv
+/workbooks/.ipynb_checkpoints

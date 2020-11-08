@@ -1,0 +1,40 @@
+function tmpris.move-all-png
+{
+  if [ $# -eq 0 ]
+  then
+    echo Syntax:
+    echo tmpris.move-all-png [destimation folder]
+    echo This will copy the tree of folders into [destimation folder] and copy only the png files.
+    echo
+  fi
+
+  if [ $# -ge 1 ]
+  then
+    echo Sorry, too many input arguments. Type tmpris.move-all-png for syntax
+  fi
+
+  if [ $# -eq 1 ]
+  then
+  mkdir $1
+  for i in $(ls)
+  do
+    if [[ $i == PyPRIS_* ]]
+    then
+      mkdir $1/$i
+      cd $i
+      for j in $(ls)
+      do
+        if [[ $j == bgSCF8*zrange*yrange*xrange ]]
+        then
+          mkdir $1/$i/$j
+          mkdir $1/$i/$j/debug_output
+          scp ./$j/debug_output/*.png $1/$i/$j/debug_output/*.png
+        fi
+      done
+      cd ..
+    fi
+  done
+
+  fi
+
+}

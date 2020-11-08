@@ -1,0 +1,29 @@
+function tmpris.clean_for_continue
+{
+  dirN=0
+  for i in $(find . -maxdepth 5 -type d)
+  do
+          if [ -e $i/Go.pris_ticket ]
+          then
+
+          total_tasks=`expr $total_tasks + 1`
+            if [ -e $i/saved_objects ]
+            then
+              if [ -e $i/debug_output ]
+              then
+                :
+              else
+                dirN=`expr $dirN + 1`
+                k="del_dir"$dirN"=$i/saved_objects"
+                eval $k
+              fi
+            fi
+          fi
+  done
+  for i in $(seq $dirN)
+  do
+    k="del_dir=\$del_dir$i"; eval $k
+    k="rm -rf $del_dir"
+    eval $k
+  done
+}

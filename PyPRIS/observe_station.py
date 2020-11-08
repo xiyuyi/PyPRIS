@@ -62,10 +62,10 @@ class ObserveStation:
             loc2sta = int(max(loc2 - psf2hw, 0))
             loc2end = int(min(loc2 + psf2hw + 1, obs2w))
 
-            psf1sta = int(psf1hw - (loc1 - loc1sta));  # need to think about whether I should add 1 or not.
-            psf1end = int(psf1hw + (loc1end - loc1));
-            psf2sta = int(psf2hw - (loc2 - loc2sta));  # need to think about whether I should add 1 or not.
-            psf2end = int(psf2hw + (loc2end - loc2));
+            psf1sta = int(psf1hw - (loc1 - loc1sta))  # need to think about whether I should add 1 or not.
+            psf1end = int(psf1hw + (loc1end - loc1))
+            psf2sta = int(psf2hw - (loc2 - loc2sta))  # need to think about whether I should add 1 or not.
+            psf2end = int(psf2hw + (loc2end - loc2))
 
             if self.debug is True:
                 print('original loc1 is ' + str(self.location[1]))
@@ -85,7 +85,7 @@ class ObserveStation:
 
             if self.subpixel_shift is True:
                 # get the stamp with only the integer part
-                stamp = np.copy(self.psf[self.layerN, :, :])
+                stamp = np.float64(np.copy(self.psf[self.layerN, :, :])) + np.finfo(float).eps
                 # up perform sub-pixel interpolation to include the sub-pixel shifts in the stamp.
 
                 locs1 = np.arange(0, stamp.shape[0])
@@ -266,8 +266,8 @@ class ObserveStation:
         # get an observer to observe with updated location coordiantes
         # self.channel_observer_2 = self.SingleObs()
         loc_shifted = copy.deepcopy(loc)
-        loc_shifted[1] = loc[1]*self.CL_A1 + self.CL_S1# update location based on field distortion parameters.
-        loc_shifted[2] = loc[2]*self.CL_A2 + self.CL_S2# update location based on field distortion parameters.
+        loc_shifted[1] = loc[1]*self.CL_A1 + self.CL_S1 # update location based on field distortion parameters.
+        loc_shifted[2] = loc[2]*self.CL_A2 + self.CL_S2 # update location based on field distortion parameters.
         self.observer_with_CL.location = loc_shifted  # focus at the position
         self.observer_with_CL.single_obs()  # take the observation
         self.observer_with_CL.observation = self.observer_with_CL.obs.ravel()  # record this first observation

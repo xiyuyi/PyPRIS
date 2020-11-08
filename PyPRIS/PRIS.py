@@ -4,7 +4,10 @@ import copy
 import pickle
 import joblib
 import matplotlib
+
+from PyPRIS.utils import *
 from PyPRIS.candidate_screening import *
+
 
 try:
     from matplotlib import pyplot as plt
@@ -14,6 +17,9 @@ except RuntimeError:
 
 #  Authors: Xiyu Yi, Xingjia Wang @ UCLA, 2019.
 #  PI: Shimon Weiss, Department of Chemistry and Biochemistry, UCLA.
+#  Xiyu continued to work on the codes after July 8th of 2020,
+#  when she started to become an employee at Lawrence Livermore National Laboratory.
+
 
 class PyPRIS:
     
@@ -193,10 +199,22 @@ class PyPRIS:
             else:
                 print(key + ":  " + str(value))
 
+    def prep_candit_rolling_pop(self):
+        """
+        this function takes a pypris object in, and returns a modified version.
+        :return:
+        """
+        self = utils.candidates_init_rolling_pop(self)
+        return
+
 
 class LinBreg:
     def __init__(self, PyPRIS_n):
         import time
+        self.auto_mu = False
+        self.auto_bg = False
+        self.auto_mu_fold = 1
+        self.auto_bg_fold = 2
         self.PyPRIS_iter = []  # Associated PyPRIS iter number
         self.PyPRIS_name = PyPRIS_n # Associated PyPRIS name
         self.path_0 = "../PyPRIS_Scratch"
@@ -208,6 +226,7 @@ class LinBreg:
         self.maxit = 2000  # maximum iteration steps.
         self.debug_it_int = 1
         self.flag_positivity = True
+        self.flag_bg_allow_negative = True
         self.it_check_rem = 1
         self.iterations = list()
         self.hist_res = list()
@@ -228,6 +247,8 @@ class LinBreg:
         self.kick = self.Kick(self)
         self.A_dir = ''  # directory to store sensing matrix when saving
         self.mu_reference = 0
+
+
     class Kick:
         def __init__(self, LinBreg):
             self.parent = LinBreg
@@ -382,6 +403,20 @@ class LinBreg:
             else:
                 print ("Successfully created Debug directory %s " % self.path_d)
 
+        if self.auto_bg is True:
+            print('setting auto background component transfer function')
+            pp = np.max(np.dot(self.b, self.A[:, :-1]))
+            bb = np.max(np.dot(self.b, self.A[:, -1]))
+            r = pp/bb
+            self.A[:, -1] = self.A[:, -1] * r * self.auto_bg_fold
+
+            # unfinished...
+
+        if self.auto_mu is True:
+            print('Setting AutoMu')
+            pp = np.dot(self.b, self.A)
+            self.mu = np.max(pp.ravel())*self.auto_mu_fold
+
     def shrink(self, sk):
         sk[np.where((sk >= -self.mu) * (sk <= self.mu))] = 0
         sk[np.where(sk > self.mu)] -= self.mu
@@ -444,7 +479,9 @@ class LinBreg:
             bg = self.x[-1]
             if self.flag_positivity is True:
                 self.x[np.where(self.x < 0)] = 0
-                self.x[-1]=bg # release the background component from the positivity constraint
+                if self.flag_bg_allow_negative is True:
+                    self.x[-1]=bg # release the background component from the positivity constraint
+
             if self.deep_debug is True: self.debug_output(it_count, appstr='_e_positivity_updated')
 
             # update the quantities for status tracking purposes.
@@ -642,9 +679,14 @@ class LinBreg:
                 t.set_position([.5, 1])
 
                 plt.subplot(nrow, ncol, 19)
-                plt.hist(self.res.ravel(), 100)
-                t = plt.title('histogram of residual')
-                t.set_position([.5, 1])
+                try:
+                    plt.hist(self.res.ravel(), 100)
+                    t = plt.title('histogram of residual')
+                except:
+                    t = plt.title('histogram of residual not available')
+                    pass
+                t.set_position([.5, 0.5])
+
 
                 plt.subplot(nrow, ncol, 20)
                 if len(self.kick.hist_eval_counts) > 2:
@@ -678,13 +720,22 @@ class LinBreg:
         stopping_tag = copy.deepcopy(self.hist_percent_delta_res[-1])
         self.stopping_loghistpercdelres = abs(np.log(abs(stopping_tag)))*np.sign(stopping_tag)
 
+
 def loadCSSolver(path, PyPRIS_name, PyPRIS_SensMx_name):
     with open('{}/{}.file'.format(path, PyPRIS_name), "rb") as f:
         linbreg = pickle.load(f) #the loaded object is a LinBreg object
-    with open('{}/{}.file'.format(path, PyPRIS_SensMx_name), "rb") as s:
-        linbreg.A = joblib.load(s)
+
+    try:
+        with open('{}/{}.file'.format(path, PyPRIS_SensMx_name), "rb") as s:
+            linbreg.A = joblib.load(s)
+    except Warning:
+        print("the following file not found:")
+        print('{}/{}.file'.format(path, PyPRIS_SensMx_name))
+        print("There is no sensing matrix detected.")
+        pass
     return linbreg
-                       
+
+
 def loadPyPRIS(path, PyPRIS_name):
     with open('{}/{}.file'.format(path, PyPRIS_name), "rb") as f:
         pris = pickle.load(f) #the loaded object is a PyPRIS object
