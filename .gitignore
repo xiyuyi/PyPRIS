@@ -12,3 +12,4 @@
 **/workbooks/.ipynb
 **/workbooks/*.html
 **/workbooks/*.csv
+/workbooks/.ipynb_checkpoints
