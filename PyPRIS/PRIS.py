@@ -728,10 +728,10 @@ def loadCSSolver(path, PyPRIS_name, PyPRIS_SensMx_name):
     try:
         with open('{}/{}.file'.format(path, PyPRIS_SensMx_name), "rb") as s:
             linbreg.A = joblib.load(s)
-    except Warning:
+    except:
         print("the following file not found:")
         print('{}/{}.file'.format(path, PyPRIS_SensMx_name))
-        print("There is no sensing matrix detected.")
+        print("No sensing matrix available, the relevant visualization will be omitted.")
         pass
     return linbreg
 
