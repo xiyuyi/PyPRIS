@@ -22,13 +22,16 @@ def pris_show(locs, lb, outputhtml, saveoption):
                 title='blur')
     p1.x_range.range_padding = p1.y_range.range_padding = 0
     p1.image(image=[blur], x=0, y=0, dw=w, dh=h)
-    # p1.scatter(locs[:,1],locs[:,0],marker='cross', color="red", size=1)
+
+
 
     p2 = figure(x_range=p1.x_range, y_range=p1.y_range,
                 tooltips=[("x", "$x"), ("y", "$y"), ("value", "@image")],
                 title='reconstructed blur')
     p2.x_range.range_padding = p2.y_range.range_padding = 0
     p2.image(image=[recb], x=0, y=0, dw=w, dh=h)
+
+
 
     p3 = figure(x_range=p1.x_range, y_range=p1.y_range,
                 tooltips=[("x", "$x"), ("y", "$y"), ("value", "@image")],
@@ -37,14 +40,31 @@ def pris_show(locs, lb, outputhtml, saveoption):
     p3.image(image=[blur], x=0, y=0, dw=w, dh=h)
     p3.scatter(locs[:, 1], locs[:, 0], marker='dot', size=25, color='red')
 
+
+
     p4 = figure(x_range=p1.x_range, y_range=p1.y_range,
                 tooltips=[("x", "$x"), ("y", "$y"), ("value", "@image")],
                 title='residual')
     p4.x_range.range_padding = p4.y_range.range_padding = 0
     p4.image(image=[blur - recb], x=0, y=0, dw=w, dh=h)
+
+
+    # p5 = figure(x_range=p1.x_range, y_range=p1.y_range,
+    #             tooltips=[("x", "$x"), ("y", "$y"), ("value", "@image")],
+    #             title='residual')
+    # p5.x_range.range_padding = p4.y_range.range_padding = 0
+    # p5.image(image=[blur - recb], x=0, y=0, dw=w, dh=h)
+    #
+    #
+    # p6 = figure(x_range=p1.x_range, y_range=p1.y_range,
+    #             tooltips=[("x", "$x"), ("y", "$y"), ("value", "@image")],
+    #             title='residual')
+    # p6.x_range.range_padding = p4.y_range.range_padding = 0
+    # p6.image(image=[blur - recb], x=0, y=0, dw=w, dh=h)
+
     if saveoption:
         output_file(outputhtml, title="pris result")
-    grid = gridplot([[p1, p2], [p4, p3]], plot_width=pw, plot_height=ph)
+    grid = gridplot([[p1, p2], [p3, p4]], plot_width=pw, plot_height=ph)
     show(grid)
     return
 
