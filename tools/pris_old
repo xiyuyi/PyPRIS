@@ -260,8 +260,6 @@ if len(mxnames) is not 0:
 else:
     print("PyPRIS Begin!")
     print("")
-    os.system('mkdir ./saved_objects')
-    os.system('touch ./saved_objects/start')
     # condition a main linbreg object that carries the basic configurations.
     # for each PRIS iteration, a new linbreg object will be cloned from this one for its own task.
     # the purpose here is just to simplify the parameter configuration process.

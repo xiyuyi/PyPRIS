@@ -29,6 +29,7 @@ then
       checkN=`expr $checkN + 1`
           if [ -e $i/Go.pris_ticket ]
           then
+            scp $i/.
           total_tasks=`expr $total_tasks + 1`
             if [ -e $i/saved_objects/done ]
             then
@@ -45,36 +46,55 @@ then
   # find out total number of nodes
   if [[ $(hostname) == quartz* ]]
   then
+    echo Youou are using quartz
     mem_per_node=128
   elif [[ $(hostname) == pascal* ]]
   then
+    echo You are using pascal
     mem_per_node=256
   fi
 
-  # calculate tasks per job (round up formula)
+  # calculate tasks per job (round up formula), jobN is user input. one job is one slurm script.
   tasks_per_job=$((($unfinished+$jobN-1)/$jobN))
 
-  # calculate tasks per job per batch (round up formula)
+  # calculate tasks per job per batch (round up formula), sequential_batch_N is user input.
   tasks_per_job_per_batch=$((($tasks_per_job+$sequential_batch_N-1)/$sequential_batch_N))
+
   # calculate tasks per node based on memory requirement and memory availability (round-up formula)
-  tasks_per_node=$(( ($mem_per_node) / $mem_per_task_G ))
+  tasks_per_node=$(( ($mem_per_node) / $mem_per_task_G )) # this is fixed based on 2 user input value.
+  # this is the parallel tasks per node.
+
   # calculate total number of nodes needed per job
   nodes_per_job=$((($tasks_per_job_per_batch+$tasks_per_node-1)/$tasks_per_node))
 
+  # calculate the total number of tasks (from both sequential and parallel) needed to be calculated on one node.
+  # use round up formula to get the maximum one.
+  max_tasks_per_node=$((($tasks_per_job+$nodes_per_job-1)/$nodes_per_job))
+
+  # calculate the actual batchN
+  actual_batchN=$((($max_tasks_per_node+$tasks_per_node-1)/$tasks_per_node))
 
   # display status of task bundle
-  echo $total_tasks total tasks
-  echo $finished_tasks finished tasks
+  echo You have a total of $total_tasks tasks under this directory and the subdirectories up to depth of $folder_depth
+  echo $finished_tasks of them are finished
   echo $unfinished tasks to continue
   echo
   echo host: $(hostname)
-  echo total jobs: $jobN
-  echo For each node: $tasks_per_node tasks, each task reqiure $3 G memory.
-  echo For each job: $nodes_per_job nodes will be requested, and will be used to run $tasks_per_job tasks
-  echo requested time: $runtime
-  echo tasks per job per batch is $tasks_per_job_per_batch
-  echo tasks per job is $tasks_per_job
-  echo total number of batches is $sequential_batch_N
+  echo ---- memory per node: $mem_per_node
+  echo ---- total jobs: $jobN  \(1 job corresponds to 1 slurm script\)
+  echo ---- For each job: $nodes_per_job nodes will be requested, and will be used to run $tasks_per_job tasks in total.
+  echo ---- For each node: up to $tasks_per_node tasks will be computed in the same instance.
+  echo ---- $sequential_batch_N sequential batches are planned, actual batch number is up to $actual_batchN
+  echo ---- each task reqiure $3 G memory.
+  echo ---- Time to be requested for each job: $runtime
+  echo ------- The total time is shared among all sequential tasks.
+  echo ------- Please make sure the average time per batch is enough to finish one task.
+  echo ----
+  echo ---- tasks per job per sequential batch on each node is $tasks_per_job_per_batch
+  echo ---- tasks per job on each node is $tasks_per_job
+  echo ---- total number of batches is $sequential_batch_N
+  echo
+  echo
 
 
   if [[ $1 == prepslurm ]]
@@ -122,6 +142,12 @@ then
   fi
 
 else
+  clear
+  echo "tmpris.count can do the following:"
+  echo "    count how many pris tickets are ther in the tree starting from the pwd"
+  echo "    prepare slurmscripts"
+  echo " you can choose the depth of folder-tree for the search."
+  echo ""
   echo "options for input argument:"
   echo "    count: count the pack of tasks"
   echo "    prepslurm: to prepare a slurm script to submit all jobs"
@@ -134,7 +160,7 @@ else
   echo "Options"
   echo "<bank>:"
   echo "---- mmbp for LDRD-LW (project ended in 2020)"
-  echo "---- cancer for ras"
+  echo "---- cancer for spt-pris for ras"
   echo "---- dynimag for LDRD-ER"
   echo ""
   echo "<queue>:"
