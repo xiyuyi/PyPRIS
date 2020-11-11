@@ -70,7 +70,7 @@ def pris_show(locs, candidate_locs, lb, outputhtml, saveoption):
     p6.image(image=[blur - recb], x=0, y=0, dw=w, dh=h)
 
     if saveoption:
-        output_file(outputhtml, title="pris result")
+        output_file(outputhtml, title="PRIS0to4 candidate pools")
     grid = gridplot([[p1, p2, p3], [p4, p5, p6]], plot_width=pw, plot_height=ph)
     show(grid)
     return
@@ -186,7 +186,7 @@ def pris_show_pris0to4(locs, cands0, cands1, cands2, cands3, cands4, lb, outputh
 
 
     if saveoption:
-        output_file(outputhtml, title="pris result")
+        output_file(outputhtml, title="result (PRIS4)")
     grid = gridplot([[p1, p2, p3], [p4, p5, p6]], plot_width=pw, plot_height=ph)
     show(grid)
     return

@@ -423,6 +423,7 @@ for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
     linbreg.b = pypris.observation.ravel()
     linbreg.PyPRIS_iter = "pris"+ str(PRIS_iter)
     linbreg.stopping_loghistpercdelres_thres -= PRIS_iter
+    linbreg.maxit += linbreg.maxit_delta*PRIS_iter
     linbreg.alpha = linbreg_ori.alpha/PRIS_iter
     print(" ")
     print(" ---------------- PRIS refinement # " + str(PRIS_iter) + " ------------------ ")
