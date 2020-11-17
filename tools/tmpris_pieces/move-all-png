@@ -3,39 +3,125 @@ function tmpris.move-all-png
   if [ $# -eq 0 ]
   then
     echo Syntax:
-    echo tmpris.move-all-png [destimation folder]
+    echo tmpris.move-all-png [destimation folder] [option]
     echo This will copy the tree of folders into [destimation folder] and copy only the png files.
+    echo [option]:  use either \"all\", or  \"finished\"
+    echo when you choose \"finished\", it will only move the pngs of the finished tickets.
     echo
   fi
 
-  if [ $# -gt 1 ]
+  if [ $# -gt 2 ]
   then
     echo Sorry, too many input arguments. Type tmpris.move-all-png for syntax
   fi
 
   if [ $# -eq 1 ]
   then
+    mvtype=finished
+    echo moving pngs of only the finished tickets.
+    echo if you would like to move all the pngs, use \"all\" for [option]
+    echo type tmpris.move-all-png for more.
+  fi
+
+  if [ $# -eq 2 ]
+  then
+    mvtype=$2
+  fi
+
+
+  if [ $# -eq 2 ] || [ $# -eq 1 ]
+  then
+  echo move pngs, mvtype is $mvtype
   mkdir $1
   for i in $(ls)
   do
     if [ -d ./$i/debug_output ]
     then
-      mkdir $1/$i
-      scp ./$i/debug_output/*.png $1/$i/.
-#      cd $i
-#      for j in $(ls)
-#      do
-#        if [[ $j == bgSCF8*zrange*yrange*xrange ]]
-#        then
-#          mkdir $1/$i/$j
-#          mkdir $1/$i/$j/debug_output
-#          scp ./$j/debug_output/*.png $1/$i/$j/debug_output/*.png
-#        fi
-#      done
-#      cd ..
+      if [[ $mvtype == all ]]
+      then
+        mkdir $1/$i
+        scp ./$i/debug_output/*.png $1/$i/.
+      elif [[ $mvtype == finished ]]
+      then
+        if [ -f ./$i/saved_objects/done ]
+        then
+          mkdir $1/$i
+          scp ./$i/debug_output/*.png $1/$i/.
+        fi
+      fi
     fi
   done
 
   fi
 
+}
+
+function split_by () {
+    string=$1
+    separator=$2
+
+    tmp=${string//"$separator"/$'\2'}
+    IFS=$'\2' read -a arr <<< "$tmp"
+    for substr in "${arr[@]}" ; do
+        echo "$substr"
+    done
+    echo
+}
+
+
+
+function tmpris.count_muFold_bgFold
+{
+
+  rm count_muFOld_bgFold
+  touch count_muFOld_bgFold
+  f=$(pwd)/count_muFOld_bgFold
+  echo this is going to count 2 layers of folders.
+  for i in $(ls)
+  do
+    if [ -d ./$i ]
+    then
+      cd $i
+      for j in $(ls)
+      do
+        if [ -d $j ]
+        then
+            str=$j
+            # parsing
+            tag=0
+            for seg in $(split_by $str 'muFold')
+            do
+              tag=`expr $tag + 1`
+              k="seg"$tag"="$seg
+              eval $k
+            done
+
+            for seg in $(split_by $seg2 '_')
+            do
+              tag=`expr $tag + 1`
+              k="seg"$tag"="$seg
+              eval $k
+            done
+
+            for seg in $(split_by $seg4 'bgFold')
+            do
+              tag=`expr $tag + 1`
+              k="seg"$tag"="$seg
+              eval $k
+            done
+
+            # get muFold and bgFold strings
+            muFold=$seg3
+            bgFold=$seg5
+
+            # update the counts
+            varname=muFold"$muFold"_bgFold"$bgFold"
+            echo $varname >> $f
+
+        fi
+      done
+      cd ..
+    fi
+  done
+  cut -f 100 count_muFOld_bgFold | sort| uniq -c |sort -nr
 }

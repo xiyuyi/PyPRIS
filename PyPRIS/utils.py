@@ -144,7 +144,7 @@ def get_clusters(locs, brightnesses, epsv, ticketIndex, csvpath, saveoption):
     return clusters
 
 
-def get_clusters_fromlinbreg(lbpath, ticketIndex, csvpath, D, save=False):
+def get_clusters_fromlinbreg(lbpath, ticketIndex, csvpath, D, save=False, epsv=None):
     """
     get clusters from the full path of a single linbreg object.
     :param lbpath: full path to the targeted linbreg object
@@ -159,7 +159,9 @@ def get_clusters_fromlinbreg(lbpath, ticketIndex, csvpath, D, save=False):
             lb = pickle.load(f)
         locs=np.asarray(lb.candidate_coords)[:,1:3]
         brightnesses=lb.x[0:-1]
-        epsv=np.linalg.norm(lb.candidate_intervals[1:])
+        if epsv is None:
+            epsv=np.linalg.norm(lb.candidate_intervals[1:])
+
         clusters = get_clusters(locs,brightnesses, epsv=epsv, ticketIndex=ticketIndex, csvpath=csvpath, saveoption=save)
     else:
         print('Sorry, only 2D clustering is available as of yet')
