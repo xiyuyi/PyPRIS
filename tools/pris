@@ -272,6 +272,8 @@ else:
     #
     # get a PyPRIS object:
     pypris = PyPRIS()
+    if hasattr(ticket, 'inputbg'):
+        pypris.inputbg = ticket.inputbg
     pypris.observation = blur.ravel()
     #pypris.top_candidates = ticket.top_candidates
     #pypris.top_candidate_N = ticket.top_candidates_N
