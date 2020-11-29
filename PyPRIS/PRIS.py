@@ -47,6 +47,7 @@ class PyPRIS:
         self.species_n = 1
         self.top_candidates = False
         self.top_candidates_N = 500
+        self.inputbg = None
 
     def save(self):
         import os
@@ -175,7 +176,13 @@ class PyPRIS:
                 self.current_A[:, count] = self.observe(loc[0:3],loc[3])
             else:
                 self.current_A[:, count] = self.observe(loc)
-        self.current_A[:, len(self.current_candidates)] = 1
+        if hasattr(self, 'inputbg'):
+            if self.inputbg is None:
+                self.current_A[:, len(self.current_candidates)] = 1
+            else:
+                self.current_A[:, len(self.current_candidates)] = self.inputbg
+        else:
+            self.current_A[:, len(self.current_candidates)] = 1
 
     def set_check_mark(self):
         self.hist_candidates.append(self.current_candidates)
