@@ -5,6 +5,8 @@ source $DIR/tmpris_pieces/clean_for_continue
 source $DIR/tmpris_pieces/suball
 source $DIR/tmpris_pieces/move-final-pris
 source $DIR/tmpris_pieces/move-all-png
+source $DIR/tmpris_pieces/gencount
+
 
 
 function tmpris.what

@@ -243,7 +243,7 @@ if len(mxnames) is not 0:
     if isinstance(ticket, SingleCLTicket):
         #"use the observe with single cylindrical lens observation skill of the observer for pypris object"
         pypris.observe = observer.observe_with_CL
-        
+
     if isinstance(ticket, CLnShiftTicket):
         "use the observe with the combination of cylindrical lens channel observation skill and the shift channel for pypris object"
         pypris.observe = observer.observe_with_CL_and_grating
@@ -347,7 +347,7 @@ else:
     loop over small blocks.
     inverse the process to get the initial candidate patches.
     Considerations around the edges of the candidate pool:
-        There should be no issue. Becuase each candidate would have propagated the full signal into the observation space.
+        There should be no issue. Because each candidate would have propagated the full signal into the observation space.
             Now paused to look at including functions as methods in a class.  
         define it inside the pypris object.          
     """

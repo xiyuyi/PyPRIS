@@ -10,12 +10,14 @@ import bokeh.io
 from bokeh.layouts import gridplot
 
 
-def pris_show(locs, candidate_locs, lb, outputhtml, saveoption, locs_g=None):
-    locs=np.asarray(locs)
-    blur = lb.b.reshape(128, 128)
-    recb = lb.recb.reshape(128, 128)
-    w=128
-    h=128
+def pris_show(locs, candidate_locs, lb=None, outputhtml=None, saveoption=False, locs_g=None, inspect_aggregated=False, blur=None, recb=None,blurx=128,blury=128):
+    locs = np.asarray(locs)
+    if inspect_aggregated is False:
+        blur = lb.b.reshape(blurx, blury)
+        recb = lb.recb.reshape(blurx, blury)
+
+    w=blurx
+    h=blury
     pw=400
     ph=400
     p1 = figure(tooltips=[("x", "$x"), ("y", "$y"), ("value", "@image")],
@@ -83,12 +85,12 @@ def bokeh_imshow(im):
     grid = gridplot([[p1]], plot_width=500, plot_height=500)
     show(grid)
 
-def pris_show_pris0to4(locs, cands0, cands1, cands2, cands3, cands4, lb, outputhtml, saveoption):
+def pris_show_pris0to4(locs, cands0, cands1, cands2, cands3, cands4, lb, outputhtml, saveoption,bdimx=128,bdimy=128):
     locs=np.asarray(locs)
-    blur = lb.b.reshape(128, 128)
-    recb = lb.recb.reshape(128, 128)
-    w=128
-    h=128
+    blur = lb.b.reshape(bdimx, bdimy)
+    recb = lb.recb.reshape(bdimx, bdimy)
+    w=bdimx
+    h=bdimy
     pw=500
     ph=500
     x0 = cands0

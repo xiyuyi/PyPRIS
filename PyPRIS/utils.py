@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import copy
 from csv import writer
+from os import listdir
 from sklearn.cluster import DBSCAN
 import pickle
 
@@ -202,3 +203,27 @@ def find_psf_matrix_offset(pypris):
     # print out the offset
     offset = pypris.current_candidates[ind][0:3] - center
     return offset
+
+def get_lb_fname_w_max_it(saved_objects_path, pris_n,ssMx=True):
+    # find all the files of the given pris iteration number.
+    fs = [f for f in listdir(saved_objects_path) if '_pris'+str(pris_n) in f]
+    # take only the linbreg objects
+    linbregs = [x for x in fs if 'SensingMx' not in x and 'pris' + str(pris_n) + '.file' not in x]
+    if ssMx is True:
+        ssMxname = [x for x in fs if 'SensingMx' in x][0]
+    else:
+       ssMxname = 'sensing_matrix_not_found'
+    # take out a list of iteration numbers of the linbreg objects
+    linbregs_its = [np.int(x.split('.')[-2].split('_')[-1]) for x in linbregs]
+    # find the maximum iteration number as stored
+    maxit = np.max(linbregs_its)
+    # get the file name of the linbreg object with the largest iteration number
+    lb_w_maxit = [x for x in linbregs if 'pris'+str(pris_n)+'_'+str(maxit)+'.file' in x]
+    output=None
+    if len(lb_w_maxit) is 1:
+        output=lb_w_maxit[0]
+    elif len(lb_w_maxit) > 1:
+        print('ambiguous file name')
+    elif len(lb_w_maxit) is 0:
+        print('resluts not available for this linbreg.')
+    return [output, ssMxname]

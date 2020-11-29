@@ -69,7 +69,7 @@ then
     nodes_per_job=$((($tasks_per_job_per_batch+$tasks_per_node-1)/$tasks_per_node))
 
     # calculate the total number of tasks (from both sequential and parallel) needed to be calculated on one node.
-    # use round up formula to get the maximum one.
+    #    # use round up formula to get the maximum one.
     max_tasks_per_node=$((($tasks_per_job+$nodes_per_job-1)/$nodes_per_job))
 
     # calculate the actual batchN

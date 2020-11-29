@@ -721,19 +721,21 @@ class LinBreg:
         self.stopping_loghistpercdelres = abs(np.log(abs(stopping_tag)))*np.sign(stopping_tag)
 
 
-def loadCSSolver(path, PyPRIS_name, PyPRIS_SensMx_name):
+def loadCSSolver(path, PyPRIS_name, PyPRIS_SensMx_name, ssMx=True):
     with open('{}/{}.file'.format(path, PyPRIS_name), "rb") as f:
         linbreg = pickle.load(f) #the loaded object is a LinBreg object
 
-    try:
-        with open('{}/{}.file'.format(path, PyPRIS_SensMx_name), "rb") as s:
-            linbreg.A = joblib.load(s)
-    except:
-        print("the following file not found:")
-        print('{}/{}.file'.format(path, PyPRIS_SensMx_name))
-        print("No sensing matrix available, the relevant visualization will be omitted.")
-        pass
+    if ssMx is True:
+        try:
+            with open('{}/{}.file'.format(path, PyPRIS_SensMx_name), "rb") as s:
+                linbreg.A = joblib.load(s)
+        except:
+            print("the following file not found:")
+            print('{}/{}.file'.format(path, PyPRIS_SensMx_name))
+            print("No sensing matrix available, the relevant visualization will be omitted.")
+            pass
     return linbreg
+
 
 
 def loadPyPRIS(path, PyPRIS_name):
