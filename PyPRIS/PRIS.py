@@ -377,30 +377,30 @@ class LinBreg:
         else:
             print ("Successfully created Scratch directory %s " % self.path_0)
 
-        if self.save is True:   
-            try:
-                if not os.path.exists(self.path_s):
-                    os.mkdir(self.path_s)
-
-                try:
-                    with open("{}/PyPRIS_{}_{}_SensingMx.file".format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter), "wb") as f:
-                        joblib.dump(self.A, f, pickle.HIGHEST_PROTOCOL)
-                except OSError:
-                    print ("Failed to write sensing matrix to directory %s " % self.path_s)
-                else: 
-                    print ("Successfully wrote sensing matrix to directory %s " % self.path_s)
-
-                self.A = 0 # remove sensing matrix because it is too big for pickle
-                with open("{}/PyPRIS_{}_{}_{}.file".format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter, 0), "wb") as f:
-                    pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
-                    print ("Successfully saved Linbreg ID {} at iteration {} to directory.".format(self.PyPRIS_iter, 0))
-                with open('{}/PyPRIS_{}_{}_SensingMx.file'.format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter), "rb") as s:
-                    self.A = joblib.load(s)  # load sensing matrix back
-
-            except OSError:
-                print ("Creation of the directory %s failed" % self.path_s)
-            else:
-                print ("Successfully created Object-saving directory %s " % self.path_s)
+        # if self.save is True:
+        #     try:
+        #         if not os.path.exists(self.path_s):
+        #             os.mkdir(self.path_s)
+        #
+        #         try:
+        #             with open("{}/PyPRIS_{}_{}_SensingMx.file".format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter), "wb") as f:
+        #                 joblib.dump(self.A, f, pickle.HIGHEST_PROTOCOL)
+        #         except OSError:
+        #             print ("Failed to write sensing matrix to directory %s " % self.path_s)
+        #         else:
+        #             print ("Successfully wrote sensing matrix to directory %s " % self.path_s)
+        #
+        #         self.A = 0 # remove sensing matrix because it is too big for pickle
+        #         with open("{}/PyPRIS_{}_{}_{}.file".format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter, 0), "wb") as f:
+        #             pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
+        #             print ("Successfully saved Linbreg ID {} at iteration {} to directory.".format(self.PyPRIS_iter, 0))
+        #         with open('{}/PyPRIS_{}_{}_SensingMx.file'.format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter), "rb") as s:
+        #             self.A = joblib.load(s)  # load sensing matrix back
+        #
+        #     except OSError:
+        #         print ("Creation of the directory %s failed" % self.path_s)
+        #     else:
+        #         print ("Successfully created Object-saving directory %s " % self.path_s)
 
         if self.debug is True:
             try:
@@ -505,12 +505,12 @@ class LinBreg:
             # check intermediate outputs. (Valid under debug mode).
             self.debug_output(it_count, appstr='_h_track_status_updated')
             # save object into separate file every assigned step
-            self.save_obj(it_count, self.save_obj_int)
+            #self.save_obj(it_count, self.save_obj_int)
                 
     def save_obj(self, currit, step):
         import sys
         if self.save is True:
-            if currit % step == 1:
+            if currit % step == 0 and currit>=step:
                 print("current iteration " + str(self.it_count))
                 print("now start saving objs")
                 self.A = 0 # remove sensing matrix because it is too big.
