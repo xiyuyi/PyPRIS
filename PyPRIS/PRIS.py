@@ -55,9 +55,10 @@ class PyPRIS:
             if not os.path.exists(self.path_s):
                 os.mkdir(self.path_s)
         except OSError:
-            print ("Creation of the directory %s failed" % self.path_s)
+            print("Creation of the directory %s failed" % self.path_s)
         else:
-            print ("Successfully created Scratch directory %s " % self.path_s)
+            print("Successfully created Scratch directory %s " % self.path_s)
+
         if self.ifsave is True:
             self.current_A = np.ndarray(0)
             with open("{}/PyPRIS_pris{}.file".format(self.path_s, self.current_PRIS_ItN), "wb") as f:
@@ -180,7 +181,7 @@ class PyPRIS:
             if self.inputbg is None:
                 self.current_A[:, len(self.current_candidates)] = 1
             else:
-                self.current_A[:, len(self.current_candidates)] = self.inputbg
+                self.current_A[:, len(self.current_candidates)] = self.inputbg.ravel()
         else:
             self.current_A[:, len(self.current_candidates)] = 1
 
@@ -518,7 +519,7 @@ class LinBreg:
                     pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
                     print ("Successfully saved Linbreg ID {} at iteration {} to directory.".format(self.PyPRIS_iter, currit))
                 with open('{}/PyPRIS_{}_{}_SensingMx.file'.format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter), "rb") as s:
-                    self.A = joblib.load(s) # load sensing matrix back
+                    self.A = joblib.load(s)  # load sensing matrix back
             elif self.flag_stop is True:
                 self.A = 0 # remove sensing matrix because it is too big
                 with open("{}/PyPRIS_{}_{}_{}.file".format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter, currit), "wb") as f:

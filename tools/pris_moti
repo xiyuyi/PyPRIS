@@ -18,9 +18,7 @@ sys.path.append("/u/home/x/xiyuyi/bin")
 sys.path.append("G:\\DH_localization\\PyPRIS")
 sys.path.append("C:\\Users\\china\\Desktop\\Research\\PyPRIS")
 sys.path.append("/Users/yi10/Desktop/Research/Projects/P-PRIS/PyPRIS")
-sys.path.append("/g/g92/yi10/PyPRIS/PyPRIS")
 sys.path.append("/g/g92/yi10/PyPRIS")
-
 
 from PyPRIS import *
 import os
@@ -201,7 +199,6 @@ if len(mxnames) is not 0:
         it = x.split('_pris')[1].split('_')[0]
         its.append(np.int(it))
     maxItN=np.where(its==np.max(its))[0][0]
-
     mxName = mxnames[maxItN]
     for r, d, f in os.walk(path):
         for file in f:
@@ -245,7 +242,7 @@ if len(mxnames) is not 0:
     if isinstance(ticket, SingleCLTicket):
         #"use the observe with single cylindrical lens observation skill of the observer for pypris object"
         pypris.observe = observer.observe_with_CL
-        
+
     if isinstance(ticket, CLnShiftTicket):
         "use the observe with the combination of cylindrical lens channel observation skill and the shift channel for pypris object"
         pypris.observe = observer.observe_with_CL_and_grating
@@ -262,6 +259,8 @@ if len(mxnames) is not 0:
 else:
     print("PyPRIS Begin!")
     print("")
+    os.system('mkdir ./saved_objects')
+    os.system('touch ./saved_objects/start')
     # condition a main linbreg object that carries the basic configurations.
     # for each PRIS iteration, a new linbreg object will be cloned from this one for its own task.
     # the purpose here is just to simplify the parameter configuration process.
@@ -272,6 +271,9 @@ else:
     #
     # get a PyPRIS object:
     pypris = PyPRIS()
+    if hasattr(ticket, 'inputbg_path'):
+        bg=io.imread(ticket.inputbg_path)
+        pypris.inputbg = bg.ravel().astype('float32')
     pypris.observation = blur.ravel()
     #pypris.top_candidates = ticket.top_candidates
     #pypris.top_candidate_N = ticket.top_candidates_N
@@ -327,11 +329,6 @@ else:
                     for i2 in range_ind2:
                         pypris.current_candidates.append([i0, i1, i2, 2])
 
-        # set a check mark for pypris:
-        #
-        print("now set check)mark of pypris")
-        pypris.set_check_mark()
-        pypris.save()
 
         # construct sensing matrix,
         print("now generate sensing matrix")
@@ -347,19 +344,30 @@ else:
     loop over small blocks.
     inverse the process to get the initial candidate patches.
     Considerations around the edges of the candidate pool:
-        There should be no issue. Becuase each candidate would have propagated the full signal into the observation space.
+        There should be no issue. Because each candidate would have propagated the full signal into the observation space.
             Now paused to look at including functions as methods in a class.  
         define it inside the pypris object.          
     """
-    # if flag_pris_rolling_pop is True:
-    #     pypris.prep_candit_rolling_pop() # uncomment once done.
+    flatbg=False
+    if hasattr(pypris, 'inputbg'):
+        if pypris.inputbg is None:
+            flatbg=True
+    else:
+        flatbg=True
 
-    c = np.dot(pypris.observation.ravel(), pypris.current_A)
-    c1 = np.min(c[0:-2])
-    c2 = np.max(c[0:-2])
-    bgv = c1 + (c2 - c1) * ticket.bg_scaling_coef
-    pypris.current_A[:, -1] = bgv / np.sum(
-        pypris.observation.ravel())  # the last column in A corresponds to the background component.
+    if flatbg is True:
+        print('use input background')
+        c = np.dot(pypris.observation.ravel(), pypris.current_A)
+        c1 = np.min(c[0:-2])
+        c2 = np.max(c[0:-2])
+        bgv = c1 + (c2 - c1) * ticket.bg_scaling_coef
+        pypris.current_A[:, -1] = bgv / np.sum(
+            pypris.observation.ravel())  # the last column in A corresponds to the background component.
+    else:
+        bgv = pypris.current_A[:, -1] * ticket.bg_scaling_coef
+        pypris.current_A[:, -1] = bgv / np.sum(
+            pypris.observation.ravel())  # the last column in A corresponds to the background component.
+
 
     linbreg = copy.deepcopy(linbreg_ori)
     linbreg.candidate_coords = pypris.current_candidates
@@ -372,6 +380,13 @@ else:
     print("")
     # recover
     linbreg.get_ready()
+    #
+    # set a check mark for pypris:
+    #
+    print("now set check)mark of pypris")
+    # pypris.set_check_mark()
+    pypris.save()
+
     linbreg.go()
     Iter=0
 
@@ -382,7 +397,6 @@ for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
     pypris.expansion = ticket.expansion
     pypris.refine_candidates(linbreg)
     pypris.current_PRIS_ItN += 1
-    pypris.save()
     # put the configured observer to the pypris to perform the tasks of 'observe_biplane'
     # when a pypris object observes, it is through the observer and it is
     # done with the observer's observe_biplane skill (skill = method). or obsreve monoplane skill
@@ -411,11 +425,26 @@ for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
     pypris.generate_sensing_mx()
     # prepare the inner sparse recovery
     pypris.current_A = pypris.current_A / ticket.psf_norm_factor
-    c = np.dot(pypris.observation.ravel(), pypris.current_A)
-    c1 = np.min(c[0:-2])
-    c2 = np.max(c[0:-2])
-    bgv = c1 + (c2 - c1) * ticket.bg_scaling_coef
-    pypris.current_A[:, -1] = bgv / np.sum(pypris.observation.ravel())  # the last column in A corresponds to the background component.   
+    flagbg=False
+    if hasattr(pypris, 'inputbg'):
+        if pypris.inputbg is None:
+            flatbg=True
+    else:
+        flatbg=True
+
+    if flatbg is True:
+        c = np.dot(pypris.observation.ravel(), pypris.current_A)
+        c1 = np.min(c[0:-2])
+        c2 = np.max(c[0:-2])
+        bgv = c1 + (c2 - c1) * ticket.bg_scaling_coef
+        pypris.current_A[:, -1] = bgv / np.sum(
+            pypris.observation.ravel())  # the last column in A corresponds to the background component.
+    else:
+        bgv = pypris.current_A[:, -1] * ticket.bg_scaling_coef
+        pypris.current_A[:, -1] = bgv / np.sum(
+            pypris.observation.ravel())  # the last column in A corresponds to the background component.
+
+    pypris.save()
     linbreg = copy.deepcopy(linbreg_ori)
     linbreg.candidate_coords = pypris.current_candidates
     linbreg.candidate_intervals = pypris.current_candidates_intervals
@@ -423,6 +452,7 @@ for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
     linbreg.b = pypris.observation.ravel()
     linbreg.PyPRIS_iter = "pris"+ str(PRIS_iter)
     linbreg.stopping_loghistpercdelres_thres -= PRIS_iter
+    linbreg.maxit += linbreg.maxit_delta*PRIS_iter
     linbreg.alpha = linbreg_ori.alpha/PRIS_iter
     print(" ")
     print(" ---------------- PRIS refinement # " + str(PRIS_iter) + " ------------------ ")
