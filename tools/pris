@@ -272,8 +272,8 @@ else:
     # get a PyPRIS object:
     pypris = PyPRIS()
     if hasattr(ticket, 'inputbg_path'):
-        pypris.inputbg = np.float(io.imread(ticket.inputbg_path))
-
+        bg=io.imread(ticket.inputbg_path)
+        pypris.inputbg = bg.ravel().astype('float32')
     pypris.observation = blur.ravel()
     #pypris.top_candidates = ticket.top_candidates
     #pypris.top_candidate_N = ticket.top_candidates_N
@@ -323,14 +323,18 @@ else:
                 for i1 in range_ind1:
                     for i2 in range_ind2:
                         pypris.current_candidates.append([i0, i1, i2, 1])
-    #
+
             for i0 in range_ind0:
                 for i1 in range_ind1:
                     for i2 in range_ind2:
                         pypris.current_candidates.append([i0, i1, i2, 2])
+
         # set a check mark for pypris:
         #
-        #
+        print("now set check)mark of pypris")
+        pypris.set_check_mark()
+        pypris.save()  # save before calculating the sensing matrix.
+
         # construct sensing matrix,
         print("now generate sensing matrix")
         pypris.generate_sensing_mx()
@@ -349,6 +353,7 @@ else:
             Now paused to look at including functions as methods in a class.  
         define it inside the pypris object.          
     """
+    flatbg=False
     if hasattr(pypris, 'inputbg'):
         if pypris.inputbg is None:
             flatbg=True
@@ -356,6 +361,7 @@ else:
         flatbg=True
 
     if flatbg is True:
+        print('use input background')
         c = np.dot(pypris.observation.ravel(), pypris.current_A)
         c1 = np.min(c[0:-2])
         c2 = np.max(c[0:-2])
@@ -367,9 +373,6 @@ else:
         pypris.current_A[:, -1] = bgv / np.sum(
             pypris.observation.ravel())  # the last column in A corresponds to the background component.
 
-    print("now set check)mark of pypris")
-    pypris.set_check_mark()
-    pypris.save()
 
     linbreg = copy.deepcopy(linbreg_ori)
     linbreg.candidate_coords = pypris.current_candidates
@@ -392,7 +395,7 @@ for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
     pypris.expansion = ticket.expansion
     pypris.refine_candidates(linbreg)
     pypris.current_PRIS_ItN += 1
-
+    pypris.save()  # save before calculating the sensing matrix
     # put the configured observer to the pypris to perform the tasks of 'observe_biplane'
     # when a pypris object observes, it is through the observer and it is
     # done with the observer's observe_biplane skill (skill = method). or obsreve monoplane skill
@@ -440,7 +443,6 @@ for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
         pypris.current_A[:, -1] = bgv / np.sum(
             pypris.observation.ravel())  # the last column in A corresponds to the background component.
 
-    pypris.save()
     linbreg = copy.deepcopy(linbreg_ori)
     linbreg.candidate_coords = pypris.current_candidates
     linbreg.candidate_intervals = pypris.current_candidates_intervals
