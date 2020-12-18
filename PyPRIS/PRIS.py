@@ -745,7 +745,6 @@ def loadCSSolver(path, PyPRIS_name, PyPRIS_SensMx_name, ssMx=True):
     return linbreg
 
 
-
 def loadPyPRIS(path, PyPRIS_name):
     with open('{}/{}.file'.format(path, PyPRIS_name), "rb") as f:
         pris = pickle.load(f) #the loaded object is a PyPRIS object
