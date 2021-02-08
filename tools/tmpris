@@ -6,18 +6,22 @@ source $DIR/tmpris_pieces/suball
 source $DIR/tmpris_pieces/move-final-pris
 source $DIR/tmpris_pieces/move-all-png
 source $DIR/tmpris_pieces/gencount
-
+source $DIR/tmpris_pieces/countcalcpy.sh
+source $DIR/tmpris_pieces/trim_highest_prisn_objects.sh
 
 
 function tmpris.what
 {
   echo functions:
   echo tmpris.count: count for wipeout.
+  echo tmpris.countcalcpy: count for wipeout. Search through script calcpy
   echo tmpris.clean_for_continue: wipeout
   echo tmpris.suball: submit all existing .sl scripts using sbatch.
   echo tmpris.move-final-pris: move pris results into a destination folder
   echo tmpris.move-all-png: move all png files to the destination folder
   echo tmpris.reset-test: wipe out files generated in a ticket folder in testing phase.
+  echo tmpris.cktime: check the computation time of each ticket within the current ticket packt
+  echo tmpris.trim_highest_prisn_objects: trim the highest prisn objects in the saved_objects folder as pirs results.
   echo
   echo "type tmpris.<the name> for usage information"
 }
@@ -28,4 +32,15 @@ function tmpris.reset-test
   rm -rf ./saved*obj*
   scp ~/PyPRIS/tools/pris .
   scp ~/PyPRIS/tools/pris_moti .
+}
+
+function tmpris.cktime
+{
+  for i in $(ls); do if [ -e ./$i/saved_objects/done ];
+  then
+  ll -tl ./$i/saved_objects/start;
+  ll -tl ./$i/saved_objects/done;
+  echo
+  fi;
+  done
 }

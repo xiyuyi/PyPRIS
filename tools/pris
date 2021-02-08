@@ -1,4 +1,4 @@
-#!/g/g92/yi10/anaconda3/envs/PyPRIS_env/bin/python
+#!/g/g92/yi10/anaconda3/envs/pris/bin/python
 
 print("")
 print("")

@@ -1,4 +1,4 @@
-function tmpris.count
+function tmpris.countcalcpy
 {
 
 if [ $# -eq 9 ]
@@ -27,17 +27,12 @@ then
   do
       echo $checkN
       checkN=`expr $checkN + 1`
-          if [ -e $i/Go.pris_ticket ]
+          if [ -e $i/calcpy ]
           then
-          total_tasks=`expr $total_tasks + 1`
-            if [ -e $i/saved_objects/done ]
-            then
-              finished_tasks=`expr $finished_tasks + 1`
-            else
-              unfinished=`expr $unfinished + 1`
-              k="task"$unfinished"_dir=\$(pwd)/\$i"
-              eval $k
-            fi
+            total_tasks=`expr $total_tasks + 1`
+            unfinished=`expr $unfinished + 1`
+            k="task"$unfinished"_dir=\$(pwd)/\$i"
+            eval $k
           fi
   done
 
@@ -123,10 +118,10 @@ fi
             then
             k="task_dir=\$task"$tag"_dir"
             eval $k
-            echo "echo submitting $task_dir/pris" >> $slurmname"-"$i.sl
+            echo "echo submitting $task_dir/calcpy" >> $slurmname"-"$i.sl
             echo "  cd "$task_dir >> $slurmname"-"$i.sl
-            echo "  chmod u+x pris" >> $slurmname"-"$i.sl
-            echo "  srun -N1 -n1 --mem "$mem_per_task" pris &"   >> $slurmname"-"$i.sl
+            echo "  chmod u+x calcpy" >> $slurmname"-"$i.sl
+            echo "  srun -N1 -n1 --mem "$mem_per_task" calcpy &"   >> $slurmname"-"$i.sl
             echo "  " >> $slurmname"-"$i.sl
             if [ $batch_count -eq $tasks_per_job_per_batch ]
             then
@@ -146,8 +141,8 @@ fi
 
 else
   clear
-  echo "tmpris.count can do the following:"
-  echo "    count how many pris tickets are ther in the tree starting from the pwd"
+  echo "tmpris.countcalcpy is very similar to tmpris.count, but it submit the calcpy script. It can do the following:"
+  echo "    count how many calcpy scripts are there in the tree starting from the pwd"
   echo "    prepare slurmscripts"
   echo " you can choose the depth of folder-tree for the search."
   echo ""
@@ -156,9 +151,9 @@ else
   echo "    prepslurm: to prepare a slurm script to submit all jobs"
   echo "usage:"
   echo " To count jobs:"
-  echo "    tmpris.count count <slurm-script-name> <mem-per-task(GB)> <jobN> <run time hh:mm:ss> <queue> <bank> <sequenctial_batch_N> <folder_depth>"
+  echo "    tmpris.countcalcpy count <slurm-script-name> <mem-per-task(GB)> <jobN> <run time hh:mm:ss> <queue> <bank> <sequenctial_batch_N> <folder_depth>"
   echo " To prep slurm to submit jobs:"
-  echo "    tmpris.count prepslurm <slurm-script-name> <mem-per-task(GB)> <jobN> <run time hh:mm:ss> <queue> <bank> <sequenctial_batch_N> <folder_depth>"
+  echo "    tmpris.countcalcpy prepslurm <slurm-script-name> <mem-per-task(GB)> <jobN> <run time hh:mm:ss> <queue> <bank> <sequenctial_batch_N> <folder_depth>"
   echo ""
   echo "Options"
   echo "<bank>:"
