@@ -1,8 +1,9 @@
-function tmpris.countcalcpy
+function tmpris.gencount
 {
 
 if [ $# -eq 9 ]
 then
+  scriptname=$1
   slurmname=$2
   mem_per_task_G=$3
   mem_per_task=$((1024*$3))
@@ -19,6 +20,7 @@ then
     queue='pvis'
     fi
   fi
+  # find unifinished tasks
   unfinished=0
   total_tasks=0
   finished_tasks=0
@@ -27,26 +29,31 @@ then
   do
       echo $checkN
       checkN=`expr $checkN + 1`
-          if [ -e $i/calcpy ]
+          if [ -e $i/$scriptname ]
           then
+            scp $i/.
             total_tasks=`expr $total_tasks + 1`
-            unfinished=`expr $unfinished + 1`
+            unfinished=$total_tasks
             k="task"$unfinished"_dir=\$(pwd)/\$i"
             eval $k
           fi
   done
-
-
   # find out total number of nodes
   if [[ $(hostname) == quartz* ]]
   then
-    echo Youou are using quartz
+    echo You are using quartz
     mem_per_node=128
   elif [[ $(hostname) == pascal* ]]
   then
     echo You are using pascal
     mem_per_node=256
+  elif [[ $(hostname) == flash* ]]
+  then
+    echo You are using flash
+    mem_per_node=512
   fi
+
+  # distribute tasks across all nodes and jobs to be requested
   if [ $unfinished -ge 0 ]
   then
     # calculate tasks per job (round up formula), jobN is user input. one job is one slurm script.
@@ -90,47 +97,50 @@ then
     echo ---- total number of batches is $sequential_batch_N
     echo
     echo
-else
-  echo all the tasks are finished.
-  prepslurm=0
-fi
+    prepslurm=yes
+  else
+    echo no tasks found
+    prepslurm=no
+  fi
 
-  if [[ $1 == prepslurm ]]
+  if [[ $prepslurm == yes ]]
   then
-  tag=0
-  batch_count=0
-  # prepare for the slurm scripts
-  echo "preparing slurm scripts... "
-  for i in $(seq $jobN)
-    do
-      echo "prep job" $i ----- $slurmname"-"$i.sl
-      sed -e "s/\[NODE NUMBER\]/$nodes_per_job/g" \
+    tag=0
+    batch_count=0
+    # prepare for the slurm scripts
+    echo "preparing slurm scripts... "
+    for i in $(seq $jobN)
+      do
+        # first, copy over a slurmhead file with the correct configurations.
+        echo "prep job" $i
+        sed -e "s/\[NODE NUMBER\]/$nodes_per_job/g" \
               -e "s/\[QUEUE TYPE\]/$queue/g" \
               -e "s/\[RUN TIME\]/$runtime/g" \
               -e "s/\[BANK\]/$bank/g"\
               -e "s/\[JOB NAME\]/$slurmname"-"$i/g" /g/g92/yi10/PyPRIS/tools/slurmhead > $slurmname"-"$i.sl
 
-      for j in $(seq $tasks_per_job)
-        do
-          tag=`expr $tag + 1`
-          batch_count=`expr $batch_count + 1`
-          if [ $unfinished -ge $tag ]
-            then
-            k="task_dir=\$task"$tag"_dir"
-            eval $k
-            echo "echo submitting $task_dir/calcpy" >> $slurmname"-"$i.sl
-            echo "  cd "$task_dir >> $slurmname"-"$i.sl
-            echo "  chmod u+x calcpy" >> $slurmname"-"$i.sl
-            echo "  srun -N1 -n1 --mem "$mem_per_task" calcpy &"   >> $slurmname"-"$i.sl
-            echo "  " >> $slurmname"-"$i.sl
-            if [ $batch_count -eq $tasks_per_job_per_batch ]
-            then
-              echo " wait" >> $slurmname"-"$i.sl
+        # populate tasks inside this slurm script.
+        for j in $(seq $tasks_per_job)
+          do
+            tag=`expr $tag + 1`
+            batch_count=`expr $batch_count + 1`
+            if [ $unfinished -ge $tag ]
+              then
+              k="task_dir=\$task"$tag"_dir"
+              eval $k
+              echo "echo submitting $task_dir/$scriptname" >> $slurmname"-"$i.sl
+              echo "  cd "$task_dir >> $slurmname"-"$i.sl
+              echo "  chmod u+x $scriptname" >> $slurmname"-"$i.sl
+              echo "  srun -N1 -n1 --mem "$mem_per_task" $scriptname &"   >> $slurmname"-"$i.sl
               echo "  " >> $slurmname"-"$i.sl
-              batch_count=0
-              fi
-          fi
-        done
+              if [ $batch_count -eq $tasks_per_job_per_batch ]
+              then
+                echo " wait" >> $slurmname"-"$i.sl
+                echo "  " >> $slurmname"-"$i.sl
+                batch_count=0
+                fi
+            fi
+          done
         echo " wait " >>  $slurmname"-"$i.sl
         echo "echo '================ system output of the executable starts here ================'" >>  $slurmname"-"$i.sl
         echo "echo Done" >>  $slurmname"-"$i.sl
@@ -141,19 +151,16 @@ fi
 
 else
   clear
-  echo "tmpris.countcalcpy is very similar to tmpris.count, but it submit the calcpy script. It can do the following:"
-  echo "    count how many calcpy scripts are there in the tree starting from the pwd"
-  echo "    prepare slurmscripts"
+  echo "tmpris.gencount can do the following:"
+  echo "    count how many scripts with a given filehead exists in the sub directories"
+  echo "    prepare slurmscripts to submit them all as individual tasks."
   echo " you can choose the depth of folder-tree for the search."
   echo ""
   echo "options for input argument:"
   echo "    count: count the pack of tasks"
   echo "    prepslurm: to prepare a slurm script to submit all jobs"
   echo "usage:"
-  echo " To count jobs:"
-  echo "    tmpris.countcalcpy count <slurm-script-name> <mem-per-task(GB)> <jobN> <run time hh:mm:ss> <queue> <bank> <sequenctial_batch_N> <folder_depth>"
-  echo " To prep slurm to submit jobs:"
-  echo "    tmpris.countcalcpy prepslurm <slurm-script-name> <mem-per-task(GB)> <jobN> <run time hh:mm:ss> <queue> <bank> <sequenctial_batch_N> <folder_depth>"
+  echo "    tmpris.gencount <script-file-head> <slurm-script-name> <mem-per-task(GB)> <jobN> <run time hh:mm:ss> <queue> <bank> <sequenctial_batch_N> <folder_depth>"
   echo ""
   echo "Options"
   echo "<bank>:"
@@ -168,6 +175,7 @@ else
   echo "<sequenctial_batch_N>:"
   echo "----  sequential batch number. It is sequential from batch to batch. tasks within the same batch are parallel"
 fi
-
-
 }
+
+
+

@@ -29,7 +29,7 @@ print("")
 import warnings
 warnings.filterwarnings("ignore")
 
-flag_pris_rolling_pop = False
+flag_pris_rolling_pop=False
 
 # load the original ticket
 ticket = get_ticket('./Go.pris_ticket')
