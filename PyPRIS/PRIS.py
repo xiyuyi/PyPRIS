@@ -47,6 +47,7 @@ class PyPRIS:
         self.species_n = 1
         self.top_candidates = False
         self.top_candidates_N = 500
+        self.inputbg = None
 
     def save(self):
         import os
@@ -54,9 +55,10 @@ class PyPRIS:
             if not os.path.exists(self.path_s):
                 os.mkdir(self.path_s)
         except OSError:
-            print ("Creation of the directory %s failed" % self.path_s)
+            print("Creation of the directory %s failed" % self.path_s)
         else:
-            print ("Successfully created Scratch directory %s " % self.path_s)
+            print("Successfully created Scratch directory %s " % self.path_s)
+
         if self.ifsave is True:
             self.current_A = np.ndarray(0)
             with open("{}/PyPRIS_pris{}.file".format(self.path_s, self.current_PRIS_ItN), "wb") as f:
@@ -165,17 +167,24 @@ class PyPRIS:
             self.current_candidates = copy.deepcopy(survival_coordinates)
             self.survival_inds = survival_inds
 
-    def generate_sensing_mx(self):
-        print("----------- Generate sensing matrix:")
-        print("            Matrix size:",str(len(self.observation)),' observation pixels ')
-        print("                        ",str(len(self.current_candidates)),' candidates ')
+    def generate_sensing_mx(self, print_option=True):
+        if print_option:
+            print("----------- Generate sensing matrix:")
+            print("            Matrix size:",str(len(self.observation)),' observation pixels ')
+            print("                        ",str(len(self.current_candidates)),' candidates ')
         self.current_A = np.ndarray([len(self.observation), len(self.current_candidates) + 1])
         for count, loc in enumerate(self.current_candidates):
             if self.species_n == 2:
                 self.current_A[:, count] = self.observe(loc[0:3],loc[3])
             else:
                 self.current_A[:, count] = self.observe(loc)
-        self.current_A[:, len(self.current_candidates)] = 1
+        if hasattr(self, 'inputbg'):
+            if self.inputbg is None:
+                self.current_A[:, len(self.current_candidates)] = 1
+            else:
+                self.current_A[:, len(self.current_candidates)] = self.inputbg.ravel()
+        else:
+            self.current_A[:, len(self.current_candidates)] = 1
 
     def set_check_mark(self):
         self.hist_candidates.append(self.current_candidates)
@@ -369,7 +378,7 @@ class LinBreg:
         else:
             print ("Successfully created Scratch directory %s " % self.path_0)
 
-        if self.save is True:   
+        if self.save is True:
             try:
                 if not os.path.exists(self.path_s):
                     os.mkdir(self.path_s)
@@ -379,7 +388,7 @@ class LinBreg:
                         joblib.dump(self.A, f, pickle.HIGHEST_PROTOCOL)
                 except OSError:
                     print ("Failed to write sensing matrix to directory %s " % self.path_s)
-                else: 
+                else:
                     print ("Successfully wrote sensing matrix to directory %s " % self.path_s)
 
                 self.A = 0 # remove sensing matrix because it is too big for pickle
@@ -502,7 +511,7 @@ class LinBreg:
     def save_obj(self, currit, step):
         import sys
         if self.save is True:
-            if currit % step == 1:
+            if currit % step == 0 and currit>=step:
                 print("current iteration " + str(self.it_count))
                 print("now start saving objs")
                 self.A = 0 # remove sensing matrix because it is too big.
@@ -511,7 +520,7 @@ class LinBreg:
                     pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
                     print ("Successfully saved Linbreg ID {} at iteration {} to directory.".format(self.PyPRIS_iter, currit))
                 with open('{}/PyPRIS_{}_{}_SensingMx.file'.format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter), "rb") as s:
-                    self.A = joblib.load(s) # load sensing matrix back
+                    self.A = joblib.load(s)  # load sensing matrix back
             elif self.flag_stop is True:
                 self.A = 0 # remove sensing matrix because it is too big
                 with open("{}/PyPRIS_{}_{}_{}.file".format(self.path_s, self.PyPRIS_name, self.PyPRIS_iter, currit), "wb") as f:
@@ -721,18 +730,19 @@ class LinBreg:
         self.stopping_loghistpercdelres = abs(np.log(abs(stopping_tag)))*np.sign(stopping_tag)
 
 
-def loadCSSolver(path, PyPRIS_name, PyPRIS_SensMx_name):
+def loadCSSolver(path, PyPRIS_name, PyPRIS_SensMx_name, ssMx=True):
     with open('{}/{}.file'.format(path, PyPRIS_name), "rb") as f:
         linbreg = pickle.load(f) #the loaded object is a LinBreg object
 
-    try:
-        with open('{}/{}.file'.format(path, PyPRIS_SensMx_name), "rb") as s:
-            linbreg.A = joblib.load(s)
-    except Warning:
-        print("the following file not found:")
-        print('{}/{}.file'.format(path, PyPRIS_SensMx_name))
-        print("There is no sensing matrix detected.")
-        pass
+    if ssMx is True:
+        try:
+            with open('{}/{}.file'.format(path, PyPRIS_SensMx_name), "rb") as s:
+                linbreg.A = joblib.load(s)
+        except:
+            print("the following file not found:")
+            print('{}/{}.file'.format(path, PyPRIS_SensMx_name))
+            print("No sensing matrix available, the relevant visualization will be omitted.")
+            pass
     return linbreg
 
 

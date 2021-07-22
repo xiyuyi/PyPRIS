@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import copy
 from csv import writer
+from os import listdir
 from sklearn.cluster import DBSCAN
 import pickle
 
@@ -144,7 +145,7 @@ def get_clusters(locs, brightnesses, epsv, ticketIndex, csvpath, saveoption):
     return clusters
 
 
-def get_clusters_fromlinbreg(lbpath, ticketIndex, csvpath, D, save=False):
+def get_clusters_fromlinbreg(lbpath, ticketIndex, csvpath, D, save=False, epsv=None):
     """
     get clusters from the full path of a single linbreg object.
     :param lbpath: full path to the targeted linbreg object
@@ -159,7 +160,9 @@ def get_clusters_fromlinbreg(lbpath, ticketIndex, csvpath, D, save=False):
             lb = pickle.load(f)
         locs=np.asarray(lb.candidate_coords)[:,1:3]
         brightnesses=lb.x[0:-1]
-        epsv=np.linalg.norm(lb.candidate_intervals[1:])
+        if epsv is None:
+            epsv=np.linalg.norm(lb.candidate_intervals[1:])
+
         clusters = get_clusters(locs,brightnesses, epsv=epsv, ticketIndex=ticketIndex, csvpath=csvpath, saveoption=save)
     else:
         print('Sorry, only 2D clustering is available as of yet')
@@ -200,3 +203,27 @@ def find_psf_matrix_offset(pypris):
     # print out the offset
     offset = pypris.current_candidates[ind][0:3] - center
     return offset
+
+def get_lb_fname_w_max_it(saved_objects_path, pris_n,ssMx=True):
+    # find all the files of the given pris iteration number.
+    fs = [f for f in listdir(saved_objects_path) if '_pris'+str(pris_n) in f]
+    # take only the linbreg objects
+    linbregs = [x for x in fs if 'SensingMx' not in x and 'pris' + str(pris_n) + '.file' not in x]
+    if ssMx is True:
+        ssMxname = [x for x in fs if 'SensingMx' in x][0]
+    else:
+       ssMxname = 'sensing_matrix_not_found'
+    # take out a list of iteration numbers of the linbreg objects
+    linbregs_its = [np.int(x.split('.')[-2].split('_')[-1]) for x in linbregs]
+    # find the maximum iteration number as stored
+    maxit = np.max(linbregs_its)
+    # get the file name of the linbreg object with the largest iteration number
+    lb_w_maxit = [x for x in linbregs if 'pris'+str(pris_n)+'_'+str(maxit)+'.file' in x]
+    output=None
+    if len(lb_w_maxit) is 1:
+        output=lb_w_maxit[0]
+    elif len(lb_w_maxit) > 1:
+        print('ambiguous file name')
+    elif len(lb_w_maxit) is 0:
+        print('resluts not available for this linbreg.')
+    return [output, ssMxname]

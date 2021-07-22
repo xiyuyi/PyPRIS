@@ -1,0 +1,78 @@
+function tmpris.move-final-pris
+{
+  if [ $# -eq 0 ]
+  then
+    echo Syntax:
+    echo "tmpris.move-final-pris <destimation folder> <pris-tag> <linbreg-tag> <sensing-matrix-tag> <ticket_folder_head>"
+    echo "This will copy the tree of folders into [destimation folder] and copy only the last iteration"
+    echo "make sure you are under the parent directory of all pris ticket folders"
+    echo "of pypris object, and/or linbreg object, and/or the sensing matrix to the destination based "
+    echo "on the choices."
+    echo "<destination folder>: string"
+    echo "<pris-tag>: 0 or 1. Choose 0 for no, 1 for yes."
+    echo "<linbreg-tag>: 0 or 1. Choose 0 for no, 1 for yes."
+    echo "<sensing-matrix-tag>: 0 or 1. Choose 0 for no, 1 for yes."
+    echo "<ticket_folder_head>: string, the starting string of the folders for all the tickets."
+
+    echo
+  fi
+
+  if [ $# -ge 6 ]
+  then
+    echo Sorry, too many input arguments. Type tmpris.move-final-pris for syntax
+  fi
+
+  if [ $# -eq 5 ]
+  then
+  pristag=$2
+  linbregtag=$3
+  sensmxtag=$4
+  ticket_folder_head=$5
+  if [ -e $1 ]
+  then
+    :
+    else
+    mkdir $1
+    fi
+  for i in $(ls)
+  do
+    echo $i
+    if [[ $i == $ticket_folder_head* ]]
+    then
+      mkdir $1/$i
+      mkdir $1/$i/saved_objects
+          # find lastlinbregN
+          lastlinbregN=1000 # should change to automatic detection
+          # find lastprisN
+          lastprisN=4 # should change to automatic deteciton.
+
+          # Now copy over linbreg
+            if [[ $linbregtag -eq 1 ]]
+            then
+              # should change to actual detection
+              fname="PyPRIS_"$i"_pris4_1000.file"
+              scp ./$i/saved_objects/$fname $1/$i/saved_objects/$fname
+            fi
+
+          # now copy over pris
+            if [[ $pristag -eq 1 ]]
+            then
+              fname=PyPRIS_pris4.file
+              scp ./$i/saved_objects/$fname $1/$i/saved_objects/$fname
+            fi
+
+          # now copy over sensing matrix
+            if [[ $sensmxtag -eq 1 ]]
+            then
+              fname="PyPRIS_"$i"_pris4_SensingMx.file"
+              scp ./$i/saved_objects/$fname $1/$i/saved_objects/$fname
+            fi
+
+    fi
+  done
+
+  fi
+  }
+
+
+
