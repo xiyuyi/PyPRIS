@@ -13,6 +13,7 @@ print("[some more description]")
 
 
 import sys
+import copy
 sys.path.append("/u/home/a/alejandr/bin")
 sys.path.append("/u/home/x/xiyuyi/bin")
 sys.path.append("G:\\DH_localization\\PyPRIS")
@@ -29,7 +30,7 @@ print("")
 import warnings
 warnings.filterwarnings("ignore")
 
-flag_pris_rolling_pop = False
+flag_pris_rolling_pop = True
 
 # load the original ticket
 ticket = get_ticket('./Go.pris_ticket')
@@ -277,7 +278,7 @@ else:
     pypris.observation = blur.ravel()
     #pypris.top_candidates = ticket.top_candidates
     #pypris.top_candidate_N = ticket.top_candidates_N
-
+    #
     # put the configured observer to the pypris to perform the tasks of 'observe_biplane'
     # when a pypris object observes, it is through the observer and it is
     # done with the observer's observe_biplane skill (skill = method).
@@ -342,17 +343,70 @@ else:
         # prepare the inner sparse recovery
         pypris.current_A = pypris.current_A / ticket.psf_norm_factor
 
+    if flag_pris_rolling_pop is True:
+        # rolling pop the candidates:
+        """
+        Strategy: rolling pop the candidates with original pixel size grid, no skip. (or refine as well at this stage from bigger to smaller).
+        loop over small blocks.
+        inverse the process to get the initial candidate patches.
+        Considerations around the edges of the candidate pool:
+            There should be no issue. Because each candidate would have propagated the full signal into the observation space.
+                Now paused to look at including functions as methods in a class.  
+            define it inside the pypris object.          
+        """
+        # initialize the first pool of candidates with the current candidate intervals.
+        current_candidates_collection= list()  # current pool of candidates.
+        L2_detB_list = list()  # current pool of candidates.
+        print('screening initial candidates. Pool size limit = ' + str(ticket.candidate_count_max))
+        obs = copy.deepcopy(pypris.observation)
+        if pypris.species_n == 1:
+            for i0 in range_ind0:
+                for i1 in range_ind1:
+                    sys.stdout.write('\r')
+                    sys.stdout.write("{} out of {}".format(str(i1),str(range_ind1[-1])))
+                    sys.stdout.flush()
+                    for i2 in range_ind2:
+                        # prep are a sole candidate pool
+                        pypris.current_candidates=[[i0, i1, i2, 1]]
+                        # generate the sensing matrix for this candidate only
+                        pypris.generate_sensing_mx(print_option=False)
+                        pypris.current_A = pypris.current_A / ticket.psf_norm_factor
 
-    # rolling pop the candidates:
-    """
-    Strategy: rolling pop the candidates with original pixel size grid, no skip. (or refine as well at this stage from bigger to smaller).
-    loop over small blocks.
-    inverse the process to get the initial candidate patches.
-    Considerations around the edges of the candidate pool:
-        There should be no issue. Because each candidate would have propagated the full signal into the observation space.
-            Now paused to look at including functions as methods in a class.  
-        define it inside the pypris object.          
-    """
+                        # now compare the two images
+                        ssA = pypris.current_A[:, 0];
+                        ind = np.argmax(ssA)
+                        ssA = ssA/np.max(ssA)*obs[ind]
+                        # calcualate the drop of the L2_detB.
+                        L2_b0 = np.sum(obs**2)
+                        L2_b1 = np.sum((obs-ssA)**2)
+                        L2_det = L2_b0 - L2_b1
+                        # collect the list for comparison later on.
+                        current_candidates_collection.append([i0, i1, i2, 1])
+                        L2_detB_list.append(np.sum(L2_det))  # current pool of candidates.
+
+            candN = np.min([ticket.candidate_count_max, len(L2_detB_list)])
+            cand_inds = sorted(range(len(L2_detB_list)), key=lambda i: L2_detB_list[i])[-candN:]
+            pypris.current_candidates = [current_candidates_collection[x] for x in cand_inds]
+
+        else:
+            print('this function for multi species is not implemented yet')
+
+        # set a check mark for pypris:
+        #
+        print("now set check)mark of pypris")
+        pypris.set_check_mark()
+        pypris.save()  # save before calculating the sensing matrix.
+
+        # construct sensing matrix,
+        print("now generate sensing matrix")
+        pypris.generate_sensing_mx()
+        print("sensing matrix generation done.")
+        # prepare the inner sparse recovery
+        pypris.current_A = pypris.current_A / ticket.psf_norm_factor
+
+
+
+
     flatbg=False
     if hasattr(pypris, 'inputbg'):
         if pypris.inputbg is None:

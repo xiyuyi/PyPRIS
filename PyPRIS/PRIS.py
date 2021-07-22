@@ -167,10 +167,11 @@ class PyPRIS:
             self.current_candidates = copy.deepcopy(survival_coordinates)
             self.survival_inds = survival_inds
 
-    def generate_sensing_mx(self):
-        print("----------- Generate sensing matrix:")
-        print("            Matrix size:",str(len(self.observation)),' observation pixels ')
-        print("                        ",str(len(self.current_candidates)),' candidates ')
+    def generate_sensing_mx(self, print_option=True):
+        if print_option:
+            print("----------- Generate sensing matrix:")
+            print("            Matrix size:",str(len(self.observation)),' observation pixels ')
+            print("                        ",str(len(self.current_candidates)),' candidates ')
         self.current_A = np.ndarray([len(self.observation), len(self.current_candidates) + 1])
         for count, loc in enumerate(self.current_candidates):
             if self.species_n == 2:
