@@ -362,9 +362,7 @@ else:
         if pypris.species_n == 1:
             for i0 in range_ind0:
                 for i1 in range_ind1:
-                    sys.stdout.write('\r')
-                    sys.stdout.write("{} out of {}".format(str(i1),str(range_ind1[-1])))
-                    sys.stdout.flush()
+                    print("{} out of {}".format(str(i1),str(range_ind1[-1])))
                     for i2 in range_ind2:
                         # prep are a sole candidate pool
                         pypris.current_candidates=[[i0, i1, i2, 1]]
