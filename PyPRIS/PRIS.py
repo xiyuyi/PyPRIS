@@ -601,15 +601,24 @@ class LinBreg:
                 t.set_position([.5, 1.15])
 
                 plt.subplot(nrow, ncol, 2)
+<<<<<<< HEAD
                 self.completeb = np.ndarray(self.obs_dim0*self.obs_dim1).ravel()
+=======
+                self.completeb = np.zeros(self.obs_dim0*self.obs_dim1).ravel()
+>>>>>>> 528025842a9fc25341593261d98bf07875b1d7ae
                 self.completeb[self.b_inds] = copy.deepcopy(self.b)
                 plt.imshow(self.completeb.reshape(self.obs_dim0, self.obs_dim1))
                 t = plt.title('input blur')
                 t.set_position([.5, 1.15])
 
                 plt.subplot(nrow, ncol, 3)
+<<<<<<< HEAD
                 self.completeb_rec = np.ndarray(self.obs_dim0*self.obs_dim1)
                 self.completeb_rec[self.b_inds] = self.recb
+=======
+                self.completeb_rec = np.zeros(self.obs_dim0*self.obs_dim1).ravel()
+                self.completeb_rec[self.b_inds] = copy.deepcopy(self.recb)
+>>>>>>> 528025842a9fc25341593261d98bf07875b1d7ae
                 plt.imshow(self.completeb_rec.reshape(self.obs_dim0, self.obs_dim1))
                 t = plt.title('recovered blur')
                 t.set_position([.5, 1.15])
