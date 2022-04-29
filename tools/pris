@@ -276,6 +276,7 @@ else:
         bg=io.imread(ticket.inputbg_path)
         pypris.inputbg = bg.ravel().astype('float32')
     pypris.observation = blur.ravel()
+    pypris.observation_complete = copy.deepcopy(pypris.observation)
     #pypris.top_candidates = ticket.top_candidates
     #pypris.top_candidate_N = ticket.top_candidates_N
     #
@@ -401,6 +402,14 @@ else:
         print("sensing matrix generation done.")
         # prepare the inner sparse recovery
         pypris.current_A = pypris.current_A / ticket.psf_norm_factor
+        if ticket.drop_out_dim_pixels is True:
+            print("now dripping out dim pixels")
+            inds = np.where(obs > ticket.drop_out_pixels_threshold)
+            pypris.observation_inds = inds
+            pypris.current_A = pypris.current_A[inds][:]
+            print("current sensing matrix size is" + str(pypris.current_A.shape))
+            pypris.observation_complete = copy.deepcopy(pypris.observation)
+            pypris.observation = copy.deepcopy(pypris.observation_complete[inds])
 
 
 
@@ -431,6 +440,7 @@ else:
     linbreg.candidate_intervals = pypris.current_candidates_intervals
     linbreg.A = pypris.current_A
     linbreg.b = pypris.observation.ravel()
+    linbreg.b_inds = pypris.observation_inds
     linbreg.PyPRIS_iter = "pris0"
     print("")
     print("---------------- PRIS refinement #0 ------------------")
@@ -472,10 +482,15 @@ for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
         pypris.species_n = 2
         pypris.observe = observer.observe_2color_CL_and_grating
 
-
+    pypris.current_A=[]
     pypris.generate_sensing_mx()
     # prepare the inner sparse recovery
     pypris.current_A = pypris.current_A / ticket.psf_norm_factor
+    if ticket.drop_out_dim_pixels is True:
+        print("now dripping out dim pixels")
+        pypris.current_A = pypris.current_A[pypris.observation_inds][:]
+        print("current sensing matrix size is" + str(pypris.current_A.shape))
+
     flagbg=False
     if hasattr(pypris, 'inputbg'):
         if pypris.inputbg is None:
@@ -500,6 +515,7 @@ for PRIS_iter in np.arange(Iter + 1, ticket.PRIS_iter_end):
     linbreg.candidate_intervals = pypris.current_candidates_intervals
     linbreg.A = pypris.current_A
     linbreg.b = pypris.observation.ravel()
+    linbreg.b_inds = pypris.observation_inds
     linbreg.PyPRIS_iter = "pris"+ str(PRIS_iter)
     linbreg.stopping_loghistpercdelres_thres -= PRIS_iter
     linbreg.maxit += linbreg.maxit_delta*PRIS_iter

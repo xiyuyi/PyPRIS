@@ -167,17 +167,25 @@ class PyPRIS:
             self.current_candidates = copy.deepcopy(survival_coordinates)
             self.survival_inds = survival_inds
 
-    def generate_sensing_mx(self, print_option=True):
+    def generate_sensing_mx(self, print_option=True, complete_obs_flag=True):
         if print_option:
             print("----------- Generate sensing matrix:")
-            print("            Matrix size:",str(len(self.observation)),' observation pixels ')
+            print("            Matrix size:",str(len(self.observation_complete)),' observation pixels ')
             print("                        ",str(len(self.current_candidates)),' candidates ')
-        self.current_A = np.ndarray([len(self.observation), len(self.current_candidates) + 1])
+        self.current_A = np.ndarray([len(self.observation_complete), len(self.current_candidates) + 1])
         for count, loc in enumerate(self.current_candidates):
             if self.species_n == 2:
-                self.current_A[:, count] = self.observe(loc[0:3],loc[3])
+                complete_observation = self.observe(loc[0:3],loc[3]).ravel()
+                if complete_obs_flag is True:
+                    self.current_A[:, count] = complete_observation
+                else:
+                    self.current_A[:, count] = complete_observation[self.observation_inds]
             else:
-                self.current_A[:, count] = self.observe(loc)
+                complete_observation = self.observe(loc)
+                if complete_obs_flag is True:
+                    self.current_A[:, count] = complete_observation
+                else:
+                    self.current_A[:, count] = complete_observation[self.observation_inds]
         if hasattr(self, 'inputbg'):
             if self.inputbg is None:
                 self.current_A[:, len(self.current_candidates)] = 1
@@ -593,12 +601,16 @@ class LinBreg:
                 t.set_position([.5, 1.15])
 
                 plt.subplot(nrow, ncol, 2)
-                plt.imshow(self.b.reshape(self.obs_dim0, self.obs_dim1))
+                self.completeb = np.ndarray(self.obs_dim0*self.obs_dim1).ravel()
+                self.completeb[self.b_inds] = copy.deepcopy(self.b)
+                plt.imshow(self.completeb.reshape(self.obs_dim0, self.obs_dim1))
                 t = plt.title('input blur')
                 t.set_position([.5, 1.15])
 
                 plt.subplot(nrow, ncol, 3)
-                plt.imshow(self.recb.reshape(self.obs_dim0, self.obs_dim1))
+                self.completeb_rec = np.ndarray(self.obs_dim0*self.obs_dim1)
+                self.completeb_rec[self.b_inds] = self.recb
+                plt.imshow(self.completeb_rec.reshape(self.obs_dim0, self.obs_dim1))
                 t = plt.title('recovered blur')
                 t.set_position([.5, 1.15])
 
