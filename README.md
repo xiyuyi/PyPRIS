@@ -74,5 +74,7 @@ Examples include prep_for_hoffman2_Feature2.py and prep_for_hoffman2_feature3.py
 
 ## Note
 Codes developed before July 8, 2019 were developed while Xiyu was affiliated with UCLA.
+
 Codes developed between July 8, 2019 and May 13, 2022 were developed while Xiyu was affiliated with LLNL.
+
 Codes developed after May 16, 2022 were developed while Xiyu is affiliated with CZ Biohub.
